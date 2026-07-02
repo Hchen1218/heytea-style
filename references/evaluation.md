@@ -9,7 +9,7 @@ An output is successful when:
 - one real object from the input remains recognizable and photographic;
 - the background is white or off-white with strong negative space;
 - the chosen template is clear before generation: `带字版`, `无字版`, or `两套都出（推荐）`;
-- if local private cutouts exist, selected reference assets are listed and match the chosen template;
+- if reference cutouts exist, selected assets are listed and match the chosen template;
 - black primitive micro-worker lines interact with the object instead of floating randomly;
 - the doodles feel naive, functional, and hand-drawn rather than cute or polished;
 - the poster does not use official HEYTEA logos, official marks, or watermarks;
@@ -17,7 +17,7 @@ An output is successful when:
 
 For `带字版`, success depends first on the lettering:
 
-- a primary `lettering/title-blocks/*` cutout is used or listed as the title rhythm reference when private assets are available;
+- a primary `lettering/title-blocks/*` cutout is used or listed as the title rhythm reference when reference assets are available;
 - `lettering/glyphs/*` and `lettering/strokes/*` are used or recommended when the title looks too font-like;
 - the workflow uses or recommends a separate poster-base pass, title construction reference sheet, and title-layer pass when publishable lettering is required;
 - the title is a primary composition element, not a small caption;
@@ -27,7 +27,7 @@ For `带字版`, success depends first on the lettering:
 
 For `无字版`, success depends first on action storytelling:
 
-- a primary `figures/full-poses/*` cutout is used or listed as the action reference when private assets are available;
+- a primary `figures/full-poses/*` cutout is used or listed as the action reference when reference assets are available;
 - `figures/action-parts/*` is used or listed only when an action mark or prop helps the story;
 - no `lettering/*` cutout is selected for this version;
 - there is no invented text anywhere;
@@ -56,7 +56,7 @@ Ask these after each generated poster:
 
 1. Is the real object still the hero?
 2. Which template was used, and is that template visually obvious?
-3. Were the selected private cutout assets appropriate for the template?
+3. Were the selected reference cutout assets appropriate for the template?
 4. For `带字版`, was the title handled through a construction reference sheet and separate title layer?
 5. For `带字版`, does the lettering have malformed childlike glyph skeletons rather than a clean font skeleton?
 6. For `无字版`, does the action story work without any text?
@@ -85,8 +85,8 @@ For a formal skill-creator loop, compare with-skill and without-skill outputs on
 Before committing or packaging this skill:
 
 - no public file contains local absolute workstation paths, source social-media filenames, chat-temp paths, or generated image cache references;
-- `private-assets/` is ignored and is not present in the `.skill` archive;
-- `scripts/extract_reference_assets.py` is not in the public skill package; private extraction belongs under ignored local assets only;
+- `private-assets/reference-cutouts/` may be included when reference images are intended to ship;
+- raw source caches and extraction scripts are not present in the repository or `.skill` archive;
 - `scripts/build_title_reference_sheet.py` and `scripts/composite_title_layer.py` are present in the package if the docs mention them;
 - the title reference sheet used for image generation is model-facing: no English labels and no target title rendered in a standard system font;
 - `git status --short` is reviewed before staging; do not stage `.DS_Store`, stale packages, or unrelated generated outputs.

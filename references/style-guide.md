@@ -186,9 +186,9 @@ Subtitle patterns:
 
 If the user provides product or object details, write more specifically. If Chinese text must be exact, recommend adding it as post-edit text if generation mangles it.
 
-## Private Cutout Asset Workflow
+## Reference Cutout Asset Workflow
 
-When `private-assets/reference-cutouts/asset-index.json` exists, use it before writing prompts. These files are local private references extracted from the user's reference set. Use them to improve fidelity on line weight, wobble, figure proportions, gesture, and handwritten rhythm. Do not package them into a public skill release.
+When `private-assets/reference-cutouts/asset-index.json` exists, use it before writing prompts. These cutouts are reference assets for line weight, wobble, figure proportions, gesture, and handwritten rhythm. Use them as style references, not as official brand assets. Do not publish raw source caches or extraction scripts.
 
 Asset selection rules:
 
@@ -229,7 +229,7 @@ Template B asset use:
 - Optionally select one `figures/action-parts/*` asset.
 - Do not select lettering assets and do not reserve title space.
 
-When local private assets exist, list selected reference assets by path and purpose. If they do not exist, use the style rules and prompt templates without pretending that private cutouts are available.
+When reference assets exist, list selected reference assets by path and purpose. If they do not exist, use the style rules and prompt templates without pretending that cutouts are available.
 
 ## Prompt Templates
 
@@ -302,7 +302,7 @@ Goal:
 Preserve the main photographed object as a real object with its original texture, material, shape, and natural shadow. Do not convert the whole image into a cartoon.
 
 Reference assets:
-Use selected local private cutouts as style references: [title construction sheet path] for rough crooked title glyph skeleton and stroke rhythm, and [optional figure reference path] for primitive micro-worker proportions and gesture. Use them as line-style and pose references, not as official brand assets. This all-in-one route is draft-only; for fidelity, generate the title layer separately.
+Use selected reference cutouts as style references: [title construction sheet path] for rough crooked title glyph skeleton and stroke rhythm, and [optional figure reference path] for primitive micro-worker proportions and gesture. Use them as line-style and pose references, not as official brand assets. This all-in-one route is draft-only; for fidelity, generate the title layer separately.
 
 Layout:
 Clean white or soft off-white background, generous negative space, portrait poster composition. This is the typography-led version. Make the rough Chinese title the first visual priority in the upper-left or left side. Place the real object [placement], smaller than the title block, about [scale] of canvas height, usually middle-lower or lower-right.
@@ -326,7 +326,7 @@ Goal:
 Preserve the main photographed object as a real object with its original texture, material, shape, and natural shadow. Do not convert the whole image into a cartoon.
 
 Reference assets:
-Use selected local private cutouts as style references: [figures/full-poses reference path] for primitive micro-worker proportions and action pose, and [optional figures/action-parts reference path] for action marks. Do not use any lettering reference for this version.
+Use selected reference cutouts as style references: [figures/full-poses reference path] for primitive micro-worker proportions and action pose, and [optional figures/action-parts reference path] for action marks. Do not use any lettering reference for this version.
 
 Layout:
 Clean white or soft off-white background, generous negative space, portrait poster composition. This is the no-text narrative version. Do not reserve a title area. Place the real object [placement] and build the composition around the action story. Keep the object about [scale] of canvas height.

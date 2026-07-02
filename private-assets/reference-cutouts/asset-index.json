@@ -1,0 +1,536 @@
+[
+  {
+    "name": "title_tiramisu_heavy_black",
+    "category": "lettering/title-blocks",
+    "path": "private-assets/reference-cutouts/lettering/title-blocks/title_tiramisu_heavy_black.png",
+    "role": "main-title-reference",
+    "template_use": "typography-led",
+    "stroke_weight": "heavy",
+    "glyph_traits": [
+      "two loose vertical columns",
+      "blunt marker",
+      "uneven scale",
+      "off-grid"
+    ],
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "heavy crooked vertical title lettering, thick black marker feel"
+  },
+  {
+    "name": "title_salty_cheese_crooked",
+    "category": "lettering/title-blocks",
+    "path": "private-assets/reference-cutouts/lettering/title-blocks/title_salty_cheese_crooked.png",
+    "role": "main-title-reference",
+    "template_use": "typography-led",
+    "stroke_weight": "medium",
+    "glyph_traits": [
+      "compressed vertical stack",
+      "crooked radicals",
+      "awkward spacing"
+    ],
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "crooked stacked title lettering with awkward spacing"
+  },
+  {
+    "name": "title_matcha_crisp_thin",
+    "category": "lettering/title-blocks",
+    "path": "private-assets/reference-cutouts/lettering/title-blocks/title_matcha_crisp_thin.png",
+    "role": "main-title-reference",
+    "template_use": "typography-led",
+    "stroke_weight": "thin",
+    "glyph_traits": [
+      "thin childish pen",
+      "top-left title block",
+      "loose word spacing"
+    ],
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "thinner childlike title handwriting"
+  },
+  {
+    "name": "glyph_ti_heavy",
+    "category": "lettering/glyphs",
+    "path": "private-assets/reference-cutouts/lettering/glyphs/glyph_ti_heavy.png",
+    "role": "glyph-skeleton-reference",
+    "template_use": "typography-led",
+    "stroke_weight": "heavy",
+    "glyph_traits": [
+      "left-heavy",
+      "tall box",
+      "broken horizontal joins"
+    ],
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "single heavy character sample for radical proportion and blunt ends"
+  },
+  {
+    "name": "glyph_la_heavy",
+    "category": "lettering/glyphs",
+    "path": "private-assets/reference-cutouts/lettering/glyphs/glyph_la_heavy.png",
+    "role": "glyph-skeleton-reference",
+    "template_use": "typography-led",
+    "stroke_weight": "heavy",
+    "glyph_traits": [
+      "collapsed left radical",
+      "crooked verticals",
+      "uneven lower weight"
+    ],
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "heavy glyph with awkward vertical rhythm"
+  },
+  {
+    "name": "glyph_su_heavy",
+    "category": "lettering/glyphs",
+    "path": "private-assets/reference-cutouts/lettering/glyphs/glyph_su_heavy.png",
+    "role": "glyph-skeleton-reference",
+    "template_use": "typography-led",
+    "stroke_weight": "heavy",
+    "glyph_traits": [
+      "oversized lower component",
+      "off-center dot",
+      "uneven stroke endings"
+    ],
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "heavy bottom character sample for childlike imbalance"
+  },
+  {
+    "name": "glyph_xi_heavy",
+    "category": "lettering/glyphs",
+    "path": "private-assets/reference-cutouts/lettering/glyphs/glyph_xi_heavy.png",
+    "role": "glyph-skeleton-reference",
+    "template_use": "typography-led",
+    "stroke_weight": "heavy",
+    "glyph_traits": [
+      "oversized horizontal bars",
+      "compressed lower block",
+      "right drift"
+    ],
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "heavy glyph with broad top and small lower block"
+  },
+  {
+    "name": "glyph_yin_crooked",
+    "category": "lettering/glyphs",
+    "path": "private-assets/reference-cutouts/lettering/glyphs/glyph_yin_crooked.png",
+    "role": "glyph-skeleton-reference",
+    "template_use": "typography-led",
+    "stroke_weight": "medium",
+    "glyph_traits": [
+      "large open box",
+      "tilted top",
+      "thin crooked vertical"
+    ],
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "crooked boxy glyph sample"
+  },
+  {
+    "name": "glyph_lao_crooked",
+    "category": "lettering/glyphs",
+    "path": "private-assets/reference-cutouts/lettering/glyphs/glyph_lao_crooked.png",
+    "role": "glyph-skeleton-reference",
+    "template_use": "typography-led",
+    "stroke_weight": "medium",
+    "glyph_traits": [
+      "loose stacked parts",
+      "small internal gaps",
+      "awkward left lean"
+    ],
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "medium crooked glyph with childlike stacked construction"
+  },
+  {
+    "name": "glyph_thick_thin_pen",
+    "category": "lettering/glyphs",
+    "path": "private-assets/reference-cutouts/lettering/glyphs/glyph_thick_thin_pen.png",
+    "role": "glyph-skeleton-reference",
+    "template_use": "typography-led",
+    "stroke_weight": "thin",
+    "glyph_traits": [
+      "thin pen",
+      "long loose horizontal",
+      "right component drift"
+    ],
+    "quality": "secondary",
+    "copyright_scope": "private-reference-only",
+    "notes": "thin title glyph sample for lighter title modes"
+  },
+  {
+    "name": "glyph_tea_thin_pen",
+    "category": "lettering/glyphs",
+    "path": "private-assets/reference-cutouts/lettering/glyphs/glyph_tea_thin_pen.png",
+    "role": "glyph-skeleton-reference",
+    "template_use": "typography-led",
+    "stroke_weight": "thin",
+    "glyph_traits": [
+      "thin pen",
+      "open lower component",
+      "slightly collapsed center"
+    ],
+    "quality": "secondary",
+    "copyright_scope": "private-reference-only",
+    "notes": "thin title glyph sample"
+  },
+  {
+    "name": "stroke_heavy_long_horizontal",
+    "category": "lettering/strokes",
+    "path": "private-assets/reference-cutouts/lettering/strokes/stroke_heavy_long_horizontal.png",
+    "role": "stroke-anatomy-reference",
+    "template_use": "typography-led",
+    "stroke_weight": "heavy",
+    "glyph_traits": [
+      "blunt caps",
+      "uneven pressure",
+      "slight wobble"
+    ],
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "heavy horizontal stroke with flat marker end"
+  },
+  {
+    "name": "stroke_heavy_vertical_hook",
+    "category": "lettering/strokes",
+    "path": "private-assets/reference-cutouts/lettering/strokes/stroke_heavy_vertical_hook.png",
+    "role": "stroke-anatomy-reference",
+    "template_use": "typography-led",
+    "stroke_weight": "heavy",
+    "glyph_traits": [
+      "crooked vertical",
+      "hooked end",
+      "bad join"
+    ],
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "heavy vertical and hook fragment"
+  },
+  {
+    "name": "radical_box_open_medium",
+    "category": "lettering/strokes",
+    "path": "private-assets/reference-cutouts/lettering/strokes/radical_box_open_medium.png",
+    "role": "radical-anatomy-reference",
+    "template_use": "typography-led",
+    "stroke_weight": "medium",
+    "glyph_traits": [
+      "open box",
+      "non-parallel sides",
+      "uneven corner joins"
+    ],
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "box radical sample for deliberately clumsy enclosed forms"
+  },
+  {
+    "name": "stroke_thin_long_slash",
+    "category": "lettering/strokes",
+    "path": "private-assets/reference-cutouts/lettering/strokes/stroke_thin_long_slash.png",
+    "role": "stroke-anatomy-reference",
+    "template_use": "typography-led",
+    "stroke_weight": "thin",
+    "glyph_traits": [
+      "thin pen",
+      "uneven slant",
+      "raw start"
+    ],
+    "quality": "secondary",
+    "copyright_scope": "private-reference-only",
+    "notes": "thin slanted stroke sample"
+  },
+  {
+    "name": "product_note_tea_bag",
+    "category": "lettering/notes",
+    "path": "private-assets/reference-cutouts/lettering/notes/product_note_tea_bag.png",
+    "role": "small-note-reference",
+    "template_use": "typography-led-secondary",
+    "stroke_weight": "thin",
+    "glyph_traits": [
+      "small loose note",
+      "not a display title"
+    ],
+    "quality": "secondary",
+    "copyright_scope": "private-reference-only",
+    "notes": "thin product-note lettering on package"
+  },
+  {
+    "name": "product_note_cocoa",
+    "category": "lettering/notes",
+    "path": "private-assets/reference-cutouts/lettering/notes/product_note_cocoa.png",
+    "role": "small-note-reference",
+    "template_use": "typography-led-secondary",
+    "stroke_weight": "thin",
+    "glyph_traits": [
+      "loose note",
+      "mixed Latin and Chinese",
+      "not title style"
+    ],
+    "quality": "secondary",
+    "copyright_scope": "private-reference-only",
+    "notes": "loose explanatory text, product-note style"
+  },
+  {
+    "name": "small_note_cheese",
+    "category": "lettering/notes",
+    "path": "private-assets/reference-cutouts/lettering/notes/small_note_cheese.png",
+    "role": "small-note-reference",
+    "template_use": "typography-led-secondary",
+    "stroke_weight": "thin",
+    "glyph_traits": [
+      "spaced product note",
+      "thin black pen"
+    ],
+    "quality": "secondary",
+    "copyright_scope": "private-reference-only",
+    "notes": "thin product descriptor near cheese object"
+  },
+  {
+    "name": "worker_kettle_pour",
+    "category": "figures/full-poses",
+    "path": "private-assets/reference-cutouts/figures/full-poses/worker_kettle_pour.png",
+    "role": "figure-pose-reference",
+    "template_use": "no-text-narrative",
+    "stroke_weight": "medium-heavy",
+    "glyph_traits": [],
+    "action_verb": "pour",
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "micro worker pouring kettle into cup, strong action arc"
+  },
+  {
+    "name": "worker_throw_cube",
+    "category": "figures/full-poses",
+    "path": "private-assets/reference-cutouts/figures/full-poses/worker_throw_cube.png",
+    "role": "figure-pose-reference",
+    "template_use": "no-text-narrative",
+    "stroke_weight": "medium-heavy",
+    "glyph_traits": [],
+    "action_verb": "throw",
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "tiny worker throwing a cube with a rough motion arc"
+  },
+  {
+    "name": "worker_thinking_bubbles",
+    "category": "figures/full-poses",
+    "path": "private-assets/reference-cutouts/figures/full-poses/worker_thinking_bubbles.png",
+    "role": "figure-pose-reference",
+    "template_use": "no-text-narrative",
+    "stroke_weight": "medium-heavy",
+    "glyph_traits": [],
+    "action_verb": "imagine",
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "back-view worker plus thought bubbles and question marks"
+  },
+  {
+    "name": "worker_large_reading",
+    "category": "figures/full-poses",
+    "path": "private-assets/reference-cutouts/figures/full-poses/worker_large_reading.png",
+    "role": "figure-pose-reference",
+    "template_use": "no-text-narrative",
+    "stroke_weight": "medium-heavy",
+    "glyph_traits": [],
+    "action_verb": "read-open",
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "large primitive figure reading or opening package"
+  },
+  {
+    "name": "worker_carry_basket",
+    "category": "figures/full-poses",
+    "path": "private-assets/reference-cutouts/figures/full-poses/worker_carry_basket.png",
+    "role": "figure-pose-reference",
+    "template_use": "typography-led-or-no-text",
+    "stroke_weight": "medium",
+    "glyph_traits": [],
+    "action_verb": "carry",
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "standing worker carrying basket, practical gesture"
+  },
+  {
+    "name": "worker_pull_cheese",
+    "category": "figures/full-poses",
+    "path": "private-assets/reference-cutouts/figures/full-poses/worker_pull_cheese.png",
+    "role": "figure-pose-reference",
+    "template_use": "no-text-narrative",
+    "stroke_weight": "medium",
+    "glyph_traits": [],
+    "action_verb": "pull-drag",
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "worker pulling or stretching a dairy element, no nearby text"
+  },
+  {
+    "name": "worker_cacao_push",
+    "category": "figures/full-poses",
+    "path": "private-assets/reference-cutouts/figures/full-poses/worker_cacao_push.png",
+    "role": "figure-pose-reference",
+    "template_use": "no-text-narrative",
+    "stroke_weight": "thin-medium",
+    "glyph_traits": [],
+    "action_verb": "push",
+    "quality": "secondary",
+    "copyright_scope": "private-reference-only",
+    "notes": "tiny worker bracing or pushing an oversized ingredient"
+  },
+  {
+    "name": "worker_dessert_chef",
+    "category": "figures/full-poses",
+    "path": "private-assets/reference-cutouts/figures/full-poses/worker_dessert_chef.png",
+    "role": "figure-pose-reference",
+    "template_use": "typography-led-or-no-text",
+    "stroke_weight": "thin-medium",
+    "glyph_traits": [],
+    "action_verb": "sprinkle",
+    "quality": "secondary",
+    "copyright_scope": "private-reference-only",
+    "notes": "chef-like worker sprinkling topping, separated from dessert shadow"
+  },
+  {
+    "name": "worker_cleaning_bucket",
+    "category": "figures/full-poses",
+    "path": "private-assets/reference-cutouts/figures/full-poses/worker_cleaning_bucket.png",
+    "role": "figure-pose-reference",
+    "template_use": "no-text-narrative",
+    "stroke_weight": "medium-heavy",
+    "glyph_traits": [],
+    "action_verb": "wash-clean",
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "small worker cleaning or operating bucket"
+  },
+  {
+    "name": "worker_cocoa_thrower",
+    "category": "figures/full-poses",
+    "path": "private-assets/reference-cutouts/figures/full-poses/worker_cocoa_thrower.png",
+    "role": "figure-pose-reference",
+    "template_use": "no-text-narrative",
+    "stroke_weight": "medium-heavy",
+    "glyph_traits": [],
+    "action_verb": "throw",
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "larger standing worker tossing ingredient pieces"
+  },
+  {
+    "name": "worker_seed_push",
+    "category": "figures/full-poses",
+    "path": "private-assets/reference-cutouts/figures/full-poses/worker_seed_push.png",
+    "role": "figure-pose-reference",
+    "template_use": "no-text-narrative",
+    "stroke_weight": "thin",
+    "glyph_traits": [],
+    "action_verb": "push-roll",
+    "quality": "secondary",
+    "copyright_scope": "private-reference-only",
+    "notes": "tiny worker pushing a large cacao seed"
+  },
+  {
+    "name": "logo_like_drinking_head",
+    "category": "figures/full-poses",
+    "path": "private-assets/reference-cutouts/figures/full-poses/logo_like_drinking_head.png",
+    "role": "avoid-default-logo-like-reference",
+    "template_use": "private-study-only",
+    "stroke_weight": "filled-black",
+    "glyph_traits": [],
+    "action_verb": "drink",
+    "quality": "avoid-default",
+    "copyright_scope": "private-study-only",
+    "notes": "logo-like drinking head mark; do not use by default in generated posters"
+  },
+  {
+    "name": "action_liquid_arc_pour",
+    "category": "figures/action-parts",
+    "path": "private-assets/reference-cutouts/figures/action-parts/action_liquid_arc_pour.png",
+    "role": "action-mark-reference",
+    "template_use": "typography-led-or-no-text",
+    "stroke_weight": "medium-heavy",
+    "glyph_traits": [],
+    "action_verb": "pour",
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "rough pour arc, steam puff, and two vertical liquid lines"
+  },
+  {
+    "name": "action_throw_arc",
+    "category": "figures/action-parts",
+    "path": "private-assets/reference-cutouts/figures/action-parts/action_throw_arc.png",
+    "role": "action-mark-reference",
+    "template_use": "no-text-narrative",
+    "stroke_weight": "medium-heavy",
+    "glyph_traits": [],
+    "action_verb": "throw",
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "throwing arc and cube path"
+  },
+  {
+    "name": "action_thought_bubbles",
+    "category": "figures/action-parts",
+    "path": "private-assets/reference-cutouts/figures/action-parts/action_thought_bubbles.png",
+    "role": "action-mark-reference",
+    "template_use": "no-text-narrative",
+    "stroke_weight": "medium-heavy",
+    "glyph_traits": [],
+    "action_verb": "imagine",
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "thought bubbles with simple object icons and question marks"
+  },
+  {
+    "name": "rough_arrow",
+    "category": "figures/action-parts",
+    "path": "private-assets/reference-cutouts/figures/action-parts/rough_arrow.png",
+    "role": "action-mark-reference",
+    "template_use": "typography-led-or-no-text",
+    "stroke_weight": "medium-heavy",
+    "glyph_traits": [],
+    "action_verb": "direct",
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "rough directional arrow with uneven stroke"
+  },
+  {
+    "name": "ladder_bucket_props",
+    "category": "figures/action-parts",
+    "path": "private-assets/reference-cutouts/figures/action-parts/ladder_bucket_props.png",
+    "role": "action-prop-reference",
+    "template_use": "no-text-narrative",
+    "stroke_weight": "medium-heavy",
+    "glyph_traits": [],
+    "action_verb": "climb-wash",
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "ladder and bucket action props"
+  },
+  {
+    "name": "ground_line_large_eater",
+    "category": "figures/action-parts",
+    "path": "private-assets/reference-cutouts/figures/action-parts/ground_line_large_eater.png",
+    "role": "action-prop-reference",
+    "template_use": "no-text-narrative",
+    "stroke_weight": "medium-heavy",
+    "glyph_traits": [],
+    "action_verb": "stage",
+    "quality": "secondary",
+    "copyright_scope": "private-reference-only",
+    "notes": "long hand-drawn ground line for object theater compositions"
+  },
+  {
+    "name": "cocoa_throw_arc",
+    "category": "figures/action-parts",
+    "path": "private-assets/reference-cutouts/figures/action-parts/cocoa_throw_arc.png",
+    "role": "action-mark-reference",
+    "template_use": "no-text-narrative",
+    "stroke_weight": "thin-medium",
+    "glyph_traits": [],
+    "action_verb": "throw",
+    "quality": "secondary",
+    "copyright_scope": "private-reference-only",
+    "notes": "thin motion arc near cacao pieces"
+  }
+]

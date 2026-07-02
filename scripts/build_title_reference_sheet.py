@@ -40,7 +40,7 @@ def load_records(index_path: Path) -> list[dict]:
     if not index_path.exists():
         raise SystemExit(
             f"Missing private asset index: {index_path}\n"
-            "This helper needs local private cutouts. Public skill packages do not include private-assets; "
+            "This helper needs reference cutouts. If this package does not include them, "
             "pass --index to a local asset index or use the text prompt workflow."
         )
     with index_path.open("r", encoding="utf-8") as handle:

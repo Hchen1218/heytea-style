@@ -27,7 +27,7 @@
       "files": [],
       "expectations": [
         "The output selects or clearly follows the 带字版 template.",
-        "If private cutouts are available, the output uses or lists a primary lettering/title-blocks/* reference for title rhythm.",
+        "If reference cutouts are available, the output uses or lists a primary lettering/title-blocks/* reference for title rhythm.",
         "If the user emphasizes font fidelity, the output creates or recommends a title construction reference sheet before the title layer.",
         "The title is described as large, rough, crooked, childlike, heavy black Chinese marker lettering.",
         "The title treatment rejects perfect 2x2 grid placement and asks for loose staggered vertical columns when the title has four characters.",
@@ -43,7 +43,7 @@
       "files": [],
       "expectations": [
         "The output selects or clearly follows the 无字版 template.",
-        "If private cutouts are available, the output uses or lists a primary figures/full-poses/* reference that matches the action.",
+        "If reference cutouts are available, the output uses or lists a primary figures/full-poses/* reference that matches the action.",
         "The output does not use or list lettering references for the 无字版.",
         "The prompt explicitly forbids all text, letters, numbers, labels, captions, and random glyphs.",
         "The composition does not reserve a title area.",
@@ -58,7 +58,7 @@
       "files": [],
       "expectations": [
         "The output explains the template choice before generation.",
-        "If private cutouts are available, the output explains that 带字版 and 无字版 need different reference asset sets.",
+        "If reference cutouts are available, the output explains that 带字版 and 无字版 need different reference asset sets.",
         "The default recommendation is 两套都出（推荐） when the user has not chosen.",
         "The 带字版 concept uses typography-led composition.",
         "The 无字版 concept uses action-led composition with no title area.",
@@ -87,8 +87,8 @@
       "files": [],
       "expectations": [
         "The output checks for local absolute workstation paths and private cached source references in public files.",
-        "The output confirms private-assets/ is excluded from public packaging.",
-        "The output flags scripts/extract_reference_assets.py as private-only if it appears in the public package.",
+        "The output confirms private-assets/reference-cutouts/ can be included when reference images are intended to ship.",
+        "The output flags raw source caches and scripts/extract_reference_assets.py as private-only if they appear in the public package.",
         "The output verifies that scripts/build_title_reference_sheet.py and scripts/composite_title_layer.py are present when public docs mention them.",
         "The output warns against staging .DS_Store, stale generated packages, or unrelated generated-skills output.",
         "The output treats package cleanliness as a release gate, not as a visual-style preference."

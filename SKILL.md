@@ -19,7 +19,7 @@ This is a style workflow, not an official HEYTEA asset generator. Do not add HEY
 1. Confirm there is an input image. If the user did not provide one, ask for the image before generating.
 2. Read `references/style-guide.md` before writing prompts or generating an image.
 3. For `带字版`, also read `references/lettering-guide.md`. Do not rely on a single image-generation prompt to both render the final poster and solve exact Chinese handwriting.
-4. If `private-assets/reference-cutouts/asset-index.json` exists, inspect it before prompt writing. These files are a local private extension, not part of the public skill package. Use them only as style/template references; do not claim they are official assets, do not add HEYTEA logos, and never package `private-assets/`. Treat any record with `quality: avoid-default` or `copyright_scope: private-study-only` as analysis-only unless the user explicitly asks for a private local study.
+4. If `private-assets/reference-cutouts/asset-index.json` exists, inspect it before prompt writing. Use these cutouts only as style/template references; do not claim they are official assets and do not add HEYTEA logos. Treat any record with `quality: avoid-default` or `copyright_scope: private-study-only` as analysis-only unless the user explicitly asks for a private local study. Do not package or publish raw source caches or extraction scripts.
 5. Inspect the image and identify:
    - the one real object to preserve as the anchor;
    - the emotional hook or playful action suggested by that object;
@@ -36,7 +36,7 @@ This is a style workflow, not an official HEYTEA asset generator. Do not add HEY
    - `两套都出（推荐）`: choose separate reference sets for each version; never reuse the same composition with text toggled.
 8. For `带字版`, default to a three-part workflow:
    - Pass 1: generate a clean poster base with the real object, white field, optional micro worker, and an intentionally empty title area.
-   - Pass 2: build a model-facing title construction reference sheet with `scripts/build_title_reference_sheet.py` when local private cutouts exist. Keep the exact target text in the prompt; the sheet should not render target characters as a standard system font or include English labels unless `--human-labels` is explicitly used for inspection.
+   - Pass 2: build a model-facing title construction reference sheet with `scripts/build_title_reference_sheet.py` when reference cutouts exist. Keep the exact target text in the prompt; the sheet should not render target characters as a standard system font or include English labels unless `--human-labels` is explicitly used for inspection.
    - Pass 3: generate or place a separate black handwritten title layer using the construction sheet as the reference.
    If a title image layer is available, composite it onto the base with `scripts/composite_title_layer.py`. If a tool cannot composite layers, return both prompts and explain that direct in-image Chinese text is a draft-only shortcut.
 9. If the image-generation tool can edit or use multiple reference images, generate from the uploaded user image plus the selected cutout references. If not, return the prompt packet with the selected asset paths and a short description of what each reference contributes.
@@ -78,7 +78,7 @@ If no image tool is available, omit `## 成品` and start with `## 生成 Prompt
 - Add primitive black-line micro workers that interact with the object: pouring, carrying, tasting, climbing, cleaning, exploring, lifting, throwing, dragging, or repairing.
 - For the typography-led template, make rough crooked childlike Chinese marker lettering the main style signal.
 - For the no-text narrative template, forbid all text, letters, numbers, labels, and random glyphs.
-- When private cutout assets are available, use them to anchor line weight, wobble, figure proportions, and action pose. Use lettering cutouts as typography style references, not as final copied words, unless the user explicitly asks for a private local study mockup.
+- When reference cutout assets are available, use them to anchor line weight, wobble, figure proportions, and action pose. Use lettering cutouts as typography style references, not as final copied words, unless the user explicitly asks for a private local study mockup.
 - Treat direct model-rendered Chinese text as exploratory. For publishable `带字版`, use a separate title construction sheet and title layer so the glyph skeleton can be iterated without changing the photographed object.
 - Prefer 3:4 or 2:3 portrait output; default to `1024x1536` when the image tool supports explicit size.
 - Avoid polished vector illustration, cute sticker style, comic panels, gradients, dense decoration, and realistic human faces.

@@ -1,4 +1,8 @@
-private-assets/
+private-assets/*
+!private-assets/reference-cutouts/
+!private-assets/reference-cutouts/**
+private-assets/source-cache/
+private-assets/scripts/
 __pycache__/
 *.pyc
 .DS_Store
