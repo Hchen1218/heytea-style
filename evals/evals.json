@@ -1,0 +1,98 @@
+{
+  "skill_name": "heytea-doodle-poster",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我上传了一张柠檬水瓶和冰咖啡杯的照片，帮我用喜茶那种风格分别做带字版和不带字版。带字版要有歪歪扭扭的儿童字，没字版不要出现任何文字。",
+      "expected_output": "A two-template response that treats the typography-led version and no-text narrative version as separate concepts, not the same layout with text toggled.",
+      "files": [],
+      "expectations": [
+        "The output offers or uses the three template choices: 带字版, 无字版, 两套都出（推荐）.",
+        "If private-assets/reference-cutouts/asset-index.json exists, the output lists separate selected reference assets for each template.",
+        "The 带字版 prompt makes rough crooked childlike Chinese marker lettering the first visual priority.",
+        "The 带字版 selects or describes a primary lettering/title-blocks/* cutout as the title rhythm reference.",
+        "The 带字版 uses or recommends lettering/glyphs/* and lettering/strokes/* references when the title must be more faithful.",
+        "The 带字版 uses or recommends separate poster-base, title construction reference sheet, and title-layer prompts for publishable output instead of only one all-in-one prompt.",
+        "The 无字版 prompt forbids all invented text, letters, numbers, captions, labels, and glyphs.",
+        "The 无字版 selects or describes a primary figures/full-poses/* cutout and optionally a figures/action-parts/* cutout, and does not select any lettering/* cutout.",
+        "The two versions use different composition priorities instead of sharing one layout.",
+        "Both versions preserve the real cup and bottle as photographic objects.",
+        "Both versions use primitive black-line micro workers rather than cute cartoon characters."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "这张甜品照片做一版带字的，重点还原参考里那种左上角粗黑、歪扭、小孩写坏了的中文标题。小人可以有，但不要抢标题。",
+      "expected_output": "A typography-led poster direction where the rough crooked title dominates the composition and the dessert plus micro worker support the title.",
+      "files": [],
+      "expectations": [
+        "The output selects or clearly follows the 带字版 template.",
+        "If private cutouts are available, the output uses or lists a primary lettering/title-blocks/* reference for title rhythm.",
+        "If the user emphasizes font fidelity, the output creates or recommends a title construction reference sheet before the title layer.",
+        "The title is described as large, rough, crooked, childlike, heavy black Chinese marker lettering.",
+        "The title treatment rejects perfect 2x2 grid placement and asks for loose staggered vertical columns when the title has four characters.",
+        "The real object is placed smaller or lower so it supports the title.",
+        "The micro worker action is restrained and does not compete with the lettering.",
+        "The prompt rejects clean fonts, rounded cute handwriting, neat calligraphy, and sans-serif text."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "我想要无字版，照片是一杯茶和茶包。不要留标题空位，不要任何字，只靠小人动作和附带元素讲故事。",
+      "expected_output": "A no-text narrative poster direction with no title block, no invented text, and an action-led micro-worker scene around the tea object.",
+      "files": [],
+      "expectations": [
+        "The output selects or clearly follows the 无字版 template.",
+        "If private cutouts are available, the output uses or lists a primary figures/full-poses/* reference that matches the action.",
+        "The output does not use or list lettering references for the 无字版.",
+        "The prompt explicitly forbids all text, letters, numbers, labels, captions, and random glyphs.",
+        "The composition does not reserve a title area.",
+        "The micro worker action is more explicit and narrative than in the typography-led template.",
+        "Supporting elements are limited to action-serving marks such as a liquid arc, drops, ladder, bucket, bag, arrow, thought bubble, or ground line."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "我这张生活物件照片背景很乱，想做成喜茶感白底海报。你先告诉我应该用带字版还是无字版，或者两套都出。",
+      "expected_output": "A workflow that first frames the template choice, defaults to two independent concepts if the user wants immediate output, and explains how each template would handle the same object differently.",
+      "files": [],
+      "expectations": [
+        "The output explains the template choice before generation.",
+        "If private cutouts are available, the output explains that 带字版 and 无字版 need different reference asset sets.",
+        "The default recommendation is 两套都出（推荐） when the user has not chosen.",
+        "The 带字版 concept uses typography-led composition.",
+        "The 无字版 concept uses action-led composition with no title area.",
+        "The output first isolates one primary real object from the busy background."
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "字体还是太像普通电脑字了。你不要重新跑整张图，重点想办法还原那种歪歪扭扭的小孩写坏了的中文标题。",
+      "expected_output": "A correction workflow that keeps the poster base, builds or uses a title construction reference sheet, and regenerates only the title layer.",
+      "files": [],
+      "expectations": [
+        "The output does not recommend retrying the full poster as the main fix.",
+        "The output identifies the failure as a glyph-skeleton problem, not only a texture or prompt-adjective problem.",
+        "The output uses or recommends lettering/title-blocks/* for title rhythm.",
+        "The output uses or recommends lettering/glyphs/* and lettering/strokes/* for malformed glyph anatomy.",
+        "The output builds or references a title construction reference sheet before regenerating the title layer.",
+        "The output says to keep the existing poster base unchanged and iterate only the title layer.",
+        "The revision prompt rejects clean font skeletons, neat grids, calligraphy rhythm, rounded handwriting, and standard sans-serif typography."
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "准备把这个 skill push 上去之前，帮我检查公开包里有没有不该带的本地素材、路径或旧脚本。",
+      "expected_output": "A release-boundary review that treats private reference assets as local-only and checks the package contents before push.",
+      "files": [],
+      "expectations": [
+        "The output checks for local absolute workstation paths and private cached source references in public files.",
+        "The output confirms private-assets/ is excluded from public packaging.",
+        "The output flags scripts/extract_reference_assets.py as private-only if it appears in the public package.",
+        "The output verifies that scripts/build_title_reference_sheet.py and scripts/composite_title_layer.py are present when public docs mention them.",
+        "The output warns against staging .DS_Store, stale generated packages, or unrelated generated-skills output.",
+        "The output treats package cleanliness as a release gate, not as a visual-style preference."
+      ]
+    }
+  ]
+}

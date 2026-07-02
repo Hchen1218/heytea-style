@@ -1,0 +1,5 @@
+private-assets/
+__pycache__/
+*.pyc
+.DS_Store
+*.skill
