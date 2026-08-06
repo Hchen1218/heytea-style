@@ -2,6 +2,21 @@
 
 把一张生活照片做成“真实物件 + 儿童简笔画 + 歪扭手写字”的竖版海报。这个 Skill 的重点不是把整张图转成插画，而是保留一个真实物件作为摄影锚点，再用粗黑、笨拙、带断笔感的小人和中文标题做设计介入。
 
+## 效果预览
+
+<table>
+  <tr>
+    <th width="33%">原始随拍</th>
+    <th width="33%">带字版</th>
+    <th width="33%">无字版</th>
+  </tr>
+  <tr>
+    <td><img src="assets/examples/before.jpg" alt="处理前的餐桌随拍" width="100%"></td>
+    <td><img src="assets/examples/after-typography.jpg" alt="加入歪扭手写标题后的海报效果" width="100%"></td>
+    <td><img src="assets/examples/after-doodle.jpg" alt="通过小人动作讲故事的无字海报效果" width="100%"></td>
+  </tr>
+</table>
+
 > 这是一个受喜茶海报语言启发的非官方风格工作流，不是喜茶官方资产生成器。不要生成官方 logo、官方头像、官方包装标识或任何品牌从属声明。
 
 ## 能做什么
