@@ -190,6 +190,8 @@ If the user provides product or object details, write more specifically. If Chin
 
 When `private-assets/reference-cutouts/asset-index.json` exists, use it before writing prompts. These cutouts are reference assets for line weight, wobble, figure proportions, gesture, and handwritten rhythm. Use them as style references, not as official brand assets. Do not publish raw source caches or extraction scripts.
 
+For desktop-pet work, or poster work explicitly requesting dry-media/collage mixed media, also read `mixed-media-style-guide.md`. For drinks and soft foods, it overrides generic phrases such as “rough black line”: first construct a skeleton in which every stroke visibly meanders, then lock it while assigning light colored pencil, broad childlike wax crayon, paper-white clear areas, and only optional pale smears to different material regions.
+
 Asset selection rules:
 
 - Prefer records with `"quality": "primary"`.
