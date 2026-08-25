@@ -1,0 +1,47 @@
+'use strict';
+
+const canvas=document.getElementById('pet');
+const context=canvas.getContext('2d',{alpha:true,willReadFrequently:true});
+const runtimeAPI=window.petAPI||{getActivePet:async()=>({fallback:true,paused:false,scale:.6,activityLevel:'balanced'}),setIgnoreMouse:()=>{},moveWindow:async()=>({}),beginWalk:async()=>null,beginFall:async()=>null,beginCursorChase:async()=>null,returnCursorChase:async()=>null,stopWalk:()=>{},persistPosition:()=>{},showContextMenu:async()=>{},onPetChanged:()=>()=>{},onWalkFinished:()=>()=>{},onFallFinished:()=>()=>{},onCursorNear:()=>()=>{},onCursorChaseArrived:()=>()=>{},onCursorChaseReturned:()=>()=>{}};
+if(!window.petAPI)document.body.dataset.runtime='standalone';
+const ACTIONS=['idle','walk','rest','happy','drag','land','wave','signature','curious','stretch','tiptoe','play','fall','touch'];
+const fallbackManifest={canvas:{width:256,height:256},anchor:{x:128,y:224},hitbox:{alphaThreshold:24,bounds:{x:42,y:28,width:172,height:205}},actions:Object.fromEntries(ACTIONS.map((name)=>[name,{frames:4,fps:6,loop:name==='walk'||name==='drag',mirrorable:name==='walk'}]))};
+const motionQuery=matchMedia('(prefers-reduced-motion: reduce)');
+let payload,manifest,images={},controller,tickTimer,frameTimer,idleTimer,displayedAction='idle',frameIndex=0,ignoreMouse=true,dragging=false,dragMoved=false,dragStart,pointerOffset;
+
+function loadImage(url){return new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error(`Could not load ${url}`));image.src=url;});}
+function clearTimers(){clearTimeout(tickTimer);clearTimeout(frameTimer);clearTimeout(idleTimer);runtimeAPI.stopWalk();}
+function drawFallback(action,frame){context.save();context.lineWidth=6;context.lineCap='round';context.strokeStyle='#111';context.fillStyle='#e8c84e';context.beginPath();context.moveTo(78,70);context.lineTo(91,210);context.quadraticCurveTo(128,220,165,210);context.lineTo(178,70);context.closePath();context.fill();context.stroke();context.beginPath();context.arc(112,135,4,0,Math.PI*2);context.arc(143,136,4,0,Math.PI*2);context.fillStyle='#111';context.fill();const kick=action==='walk'?(frame%2?8:-8):0;context.beginPath();context.moveTo(108,211);context.lineTo(104-kick,231);context.moveTo(148,211);context.lineTo(152+kick,231);context.stroke();context.restore();}
+function visualAction(action){if(manifest.actions[action])return action;if(['cursorChase','cursorReturn'].includes(action))return 'walk';if(action==='fall')return manifest.actions.fall?'fall':'drag';if(action==='touch')return manifest.actions.touch?'touch':'wave';return 'idle';}
+function render(action=displayedAction,frame=frameIndex){const visual=visualAction(action),config=manifest.actions[visual]||manifest.actions.idle;context.clearRect(0,0,canvas.width,canvas.height);context.save();if(controller.direction<0&&config.mirrorable){context.translate(canvas.width,0);context.scale(-1,1);}if(payload.fallback)drawFallback(visual,frame);else context.drawImage(images[visual],frame*manifest.canvas.width,0,manifest.canvas.width,manifest.canvas.height,0,0,manifest.canvas.width,manifest.canvas.height);context.restore();}
+function scheduleIdleMicro(){clearTimeout(idleTimer);idleTimer=setTimeout(()=>{if(controller.state==='idle'&&!controller.paused)playFrames('idle',false,true);},5000+Math.random()*4000);}
+function playFrames(action,loop=false,micro=false){clearTimeout(frameTimer);displayedAction=action;frameIndex=0;render();const config=manifest.actions[visualAction(action)]||manifest.actions.idle;if(action==='idle'&&!micro){scheduleIdleMicro();return;}const advance=()=>{if(controller.state!==action&&!(micro&&controller.state==='idle'))return;frameIndex+=1;if(frameIndex>=config.frames){if(loop){frameIndex=0;}else{frameIndex=0;render(micro?'idle':action,frameIndex);if(micro){displayedAction='idle';scheduleIdleMicro();}else if(action==='touch'){const state=controller.interact('cursorReturn');runtimeAPI.returnCursorChase().then((plan)=>{if(!plan){controller.finishEpisode();enterState('idle');return;}controller.setDirection(plan.direction);enterState(state);});}else controller.animationFinished(action);return;}}render(action,frameIndex);frameTimer=setTimeout(advance,1000/config.fps);};frameTimer=setTimeout(advance,1000/config.fps);}
+async function enterState(action){if(displayedAction===action&&action!=='idle')return;clearTimeout(frameTimer);clearTimeout(idleTimer);if(displayedAction==='walk'&&action!=='walk')runtimeAPI.stopWalk();displayedAction=action;frameIndex=0;if(action==='idle'){render('idle',0);scheduleIdleMicro();return;}const config=manifest.actions[visualAction(action)]||manifest.actions.idle;if(action==='walk'){const plan=await runtimeAPI.beginWalk();if(!plan){controller.animationFinished('walk');return;}controller.setDirection(plan.direction);playFrames('walk',window.shouldLoopAction(action,config));return;}playFrames(action,window.shouldLoopAction(action,config));}
+
+async function startCursorInteraction(point){
+  if(dragging||controller.paused||controller.state!=='idle')return;
+  const state=controller.interact('cursorChase');
+  const plan=await runtimeAPI.beginCursorChase(point);
+  if(!plan){controller.finishEpisode();enterState('idle');return;}
+  controller.setDirection(plan.direction);
+  enterState(state);
+}
+function scheduleTick(){clearTimeout(tickTimer);tickTimer=setTimeout(async()=>{const state=controller.tick(Date.now());await enterState(state);scheduleTick();},250);}
+async function applyPet(nextPayload){clearTimers();payload=nextPayload;manifest=payload.fallback?fallbackManifest:payload.manifest;canvas.width=manifest.canvas.width;canvas.height=manifest.canvas.height;images={};if(!payload.fallback){images=Object.fromEntries(await Promise.all(Object.entries(payload.actionUrls).map(async([name,url])=>[name,await loadImage(url)])));}const actionTimings={...manifest.actions,cursorChase:manifest.actions.walk,cursorReturn:manifest.actions.walk,fall:manifest.actions.fall||manifest.actions.drag,touch:manifest.actions.touch||manifest.actions.wave};controller=new window.BehaviorController({activityLevel:payload.activityLevel||'balanced',reducedMotion:motionQuery.matches,actionTimings});controller.setPaused(payload.paused);displayedAction='idle';frameIndex=0;render();scheduleIdleMicro();scheduleTick();}
+
+function pointerCoordinates(event){const rect=canvas.getBoundingClientRect();return{x:Math.max(0,Math.min(canvas.width-1,Math.floor((event.clientX-rect.left)/rect.width*canvas.width))),y:Math.max(0,Math.min(canvas.height-1,Math.floor((event.clientY-rect.top)/rect.height*canvas.height)))}};
+function isVisiblePixel(event){const{x,y}=pointerCoordinates(event),b=manifest.hitbox.bounds;if(x<b.x||y<b.y||x>=b.x+b.width||y>=b.y+b.height)return false;try{return context.getImageData(x,y,1,1).data[3]>=manifest.hitbox.alphaThreshold;}catch{return true;}}
+function updateClickThrough(ignore){if(ignoreMouse===ignore)return;ignoreMouse=ignore;runtimeAPI.setIgnoreMouse(ignore);}
+canvas.addEventListener('pointermove',(event)=>{if(dragging){const x=event.screenX-pointerOffset.x,y=event.screenY-pointerOffset.y;if(Math.hypot(event.screenX-dragStart.x,event.screenY-dragStart.y)>5)dragMoved=true;runtimeAPI.moveWindow({x,y,dragging:true});return;}updateClickThrough(!isVisiblePixel(event));});
+canvas.addEventListener('pointerleave',()=>{if(!dragging)updateClickThrough(true);});
+canvas.addEventListener('pointerdown',(event)=>{if(event.button!==0||!isVisiblePixel(event))return;dragging=true;dragMoved=false;dragStart={x:event.screenX,y:event.screenY};pointerOffset={x:event.screenX-window.screenX,y:event.screenY-window.screenY};canvas.setPointerCapture(event.pointerId);controller.interact('drag');enterState('drag');updateClickThrough(false);});
+function finishPointer(event){if(!dragging)return;dragging=false;if(canvas.hasPointerCapture(event.pointerId))canvas.releasePointerCapture(event.pointerId);if(dragMoved){const state=controller.interact('fall');enterState(state);runtimeAPI.beginFall();}else{enterState(controller.interact('happy'));runtimeAPI.persistPosition();}updateClickThrough(!isVisiblePixel(event));}
+canvas.addEventListener('pointerup',finishPointer);canvas.addEventListener('pointercancel',finishPointer);canvas.addEventListener('contextmenu',async(event)=>{event.preventDefault();if(!isVisiblePixel(event))return;updateClickThrough(false);try{await runtimeAPI.showContextMenu();}finally{updateClickThrough(true);}});
+runtimeAPI.onWalkFinished(()=>{if(controller.state==='walk'){controller.animationFinished('walk');enterState('idle');}});
+runtimeAPI.onFallFinished(()=>{if(controller.state==='fall')enterState(controller.interact('land'));});
+runtimeAPI.onCursorNear((point)=>startCursorInteraction(point));
+runtimeAPI.onCursorChaseArrived(({direction})=>{if(controller.state==='cursorChase'){controller.setDirection(direction);enterState(controller.interact('touch'));}});
+runtimeAPI.onCursorChaseReturned(()=>{if(controller.state==='cursorReturn'){controller.finishEpisode();enterState('idle');runtimeAPI.persistPosition();}});
+motionQuery.addEventListener('change',(event)=>{if(controller){controller.setReducedMotion(event.matches);if(event.matches&&displayedAction==='walk')enterState('idle');}});
+runtimeAPI.onPetChanged((next)=>applyPet(next).catch(()=>applyPet({fallback:true,paused:false,scale:.6,activityLevel:'balanced'})));
+runtimeAPI.getActivePet().then(applyPet).catch(()=>applyPet({fallback:true,paused:false,scale:.6,activityLevel:'balanced'}));

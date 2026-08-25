@@ -1,0 +1,41 @@
+{
+  "name": "heytea-doodle-desktop-pet-runtime",
+  "version": "2.0.0",
+  "description": "A quiet cross-platform runtime for validated hand-drawn object pet packs.",
+  "author": "Doodle Desktop Pet contributors",
+  "main": "src/main.js",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test tests/*.test.js",
+    "pack:mac": "electron-builder --mac dir",
+    "pack:win": "electron-builder --win dir"
+  },
+  "dependencies": {
+    "adm-zip": "^0.6.0"
+  },
+  "devDependencies": {
+    "electron": "^43.2.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.doodlepet.runtime",
+    "productName": "Doodle Desktop Pet",
+    "asar": true,
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "mac": {
+      "category": "public.app-category.entertainment",
+      "target": ["dir", "zip"]
+    },
+    "win": {
+      "target": ["dir", "portable"]
+    }
+  }
+}
