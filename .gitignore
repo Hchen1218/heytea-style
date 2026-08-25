@@ -7,3 +7,9 @@ __pycache__/
 *.pyc
 .DS_Store
 *.skill
+assets/desktop-pet-runtime/node_modules/
+assets/desktop-pet-runtime/dist/
+assets/desktop-pet-runtime/.cache/
+generated-pets/
+outputs/
+素材/

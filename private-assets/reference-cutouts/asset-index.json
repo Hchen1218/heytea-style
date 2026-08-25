@@ -532,5 +532,70 @@
     "quality": "secondary",
     "copyright_scope": "private-reference-only",
     "notes": "thin motion arc near cacao pieces"
+  },
+  {
+    "name": "contact_sheet_mixed_media_objects_v2",
+    "category": "desktop-pet-style/contact-sheets",
+    "path": "private-assets/reference-cutouts/desktop-pet-style/contact_sheet_mixed_media_objects_v2.png",
+    "role": "mixed-media-object-reference",
+    "template_use": "desktop-pet-candidate",
+    "stroke_weight": "thin-to-medium-variable",
+    "glyph_traits": [],
+    "action_verb": "construct",
+    "quality": "avoid-default",
+    "copyright_scope": "private-reference-only",
+    "notes": "analysis-only over-hatched study; do not use as the default color-material reference for drinks or soft foods"
+  },
+  {
+    "name": "contact_sheet_smudged_paint_structure_v3",
+    "category": "desktop-pet-style/contact-sheets",
+    "path": "private-assets/reference-cutouts/desktop-pet-style/contact_sheet_smudged_paint_structure_v3.png",
+    "role": "smudged-paint-structure-reference",
+    "template_use": "desktop-pet-candidate",
+    "stroke_weight": "mixed-variable",
+    "glyph_traits": ["structural-asymmetry", "bad-joins", "shifted-lid", "faded-edges"],
+    "action_verb": "smear-and-construct",
+    "quality": "secondary",
+    "copyright_scope": "private-reference-only",
+    "notes": "secondary model-facing board for fading edges, paper intrusion, and structurally crooked object geometry; broad smears must not dominate"
+  },
+  {
+    "name": "contact_sheet_dry_media_wavy_line_v4",
+    "category": "desktop-pet-style/contact-sheets",
+    "path": "private-assets/reference-cutouts/desktop-pet-style/contact_sheet_dry_media_wavy_line_v4.png",
+    "role": "dry-media-wavy-line-reference",
+    "template_use": "desktop-pet-candidate",
+    "stroke_weight": "continuously-wandering-variable",
+    "glyph_traits": ["wavy-line-travel", "colored-pencil", "childlike-crayon", "paper-tooth"],
+    "action_verb": "draw-and-zone",
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "primary model-facing board for continuously meandering line travel and region-specific colored-pencil/crayon treatment"
+  },
+  {
+    "name": "contact_sheet_figure_actions_v2",
+    "category": "desktop-pet-style/contact-sheets",
+    "path": "private-assets/reference-cutouts/desktop-pet-style/contact_sheet_figure_actions_v2.png",
+    "role": "figure-action-reference",
+    "template_use": "desktop-pet-motion",
+    "stroke_weight": "thin-to-medium-variable",
+    "glyph_traits": [],
+    "action_verb": "gesture",
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "model-facing study board for faceless figures, primitive props, awkward anatomy, and action economy"
+  },
+  {
+    "name": "contact_sheet_thin_stroke_anatomy_v2",
+    "category": "desktop-pet-style/contact-sheets",
+    "path": "private-assets/reference-cutouts/desktop-pet-style/contact_sheet_thin_stroke_anatomy_v2.png",
+    "role": "stroke-anatomy-reference",
+    "template_use": "desktop-pet-candidate",
+    "stroke_weight": "thin-to-medium-variable",
+    "glyph_traits": ["open-joins", "overshoot", "retracing", "dry-breaks"],
+    "action_verb": "mark",
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "model-facing study board for black and muted-green pen rhythm; isolated glyphs do not form campaign copy"
   }
 ]

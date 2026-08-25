@@ -1,96 +1,75 @@
 ---
 name: heytea-doodle-poster
 description: >-
-  Turn an uploaded life photo into HEYTEA-inspired object-and-doodle poster
-  concepts using two independent templates: a typography-led version with rough
-  crooked childlike Chinese marker lettering, and a no-text narrative version
-  driven by primitive black-line micro-worker actions. Use whenever the user asks
-  for 喜茶简笔画海报, 歪歪扭扭儿童字, 儿童手绘风, 治愈饮品海报, 实物加小人涂鸦, or 白底手写字海报.
+  Turn an uploaded photo into either a HEYTEA-inspired object-and-doodle poster
+  or a personalized hand-drawn desktop pet with approved character concepts,
+  twelve required animation states, optional fall/touch interactions, and an importable schema-v2 pet pack. Use for 喜茶简笔画海报,
+  歪扭儿童字, 实物加小人涂鸦, 桌宠, 照片变桌面宠物, 食物桌宠, or 饮料桌宠.
 ---
 
-# Heytea Doodle Poster
+# Heytea Doodle Poster and Desktop Pet
 
-Use this skill to turn a user's daily-life image into vertical poster concepts inspired by the playful HEYTEA product-poster language: real object anchors, white space, primitive black-line micro workers, and optionally rough crooked childlike Chinese marker lettering.
+Create unofficial visual work inspired by the playful HEYTEA poster language: rough black marks, awkward handmade shapes, generous white space, and restrained object-led storytelling.
 
-This is a style workflow, not an official HEYTEA asset generator. Do not add HEYTEA logos, official mascots, official packaging marks, or claims of brand affiliation unless the user supplies authorized assets and explicitly asks to use them.
+Do not add official HEYTEA logos, mascots, packaging marks, or claims of affiliation unless the user supplies authorized assets and explicitly requests their use.
 
-## First steps
+## Route the request
 
-1. Confirm there is an input image. If the user did not provide one, ask for the image before generating.
-2. Read `references/style-guide.md` before writing prompts or generating an image.
-3. For `带字版`, also read `references/lettering-guide.md`. Do not rely on a single image-generation prompt to both render the final poster and solve exact Chinese handwriting.
-4. If `private-assets/reference-cutouts/asset-index.json` exists, inspect it before prompt writing. Use these cutouts only as style/template references; do not claim they are official assets and do not add HEYTEA logos. Treat any record with `quality: avoid-default` or `copyright_scope: private-study-only` as analysis-only unless the user explicitly asks for a private local study. Do not package or publish raw source caches or extraction scripts.
-5. Inspect the image and identify:
-   - the one real object to preserve as the anchor;
-   - the emotional hook or playful action suggested by that object;
-   - one short crooked title candidate for the typography-led version;
-   - one action story for the no-text narrative version.
-6. Choose the generation template before generating:
-   - `带字版`: typography is the first visual priority.
-   - `无字版`: object-and-action story is the first visual priority, with no text anywhere.
-   - `两套都出（推荐）`: generate two independent concepts using separate compositions and prompts.
-   If the user has not chosen and wants immediate output, default to `两套都出（推荐）` and say that both templates are intentionally different.
-7. Select references by template:
-   - `带字版`: choose one primary `lettering/title-blocks/*` asset for title rhythm, two to six `lettering/glyphs/*` or `lettering/strokes/*` assets for glyph anatomy, plus zero or one quiet `figures/full-poses/*` asset if it supports the object.
-   - `无字版`: choose one primary `figures/full-poses/*` action asset and optionally one `figures/action-parts/*` asset. Do not use lettering references.
-   - `两套都出（推荐）`: choose separate reference sets for each version; never reuse the same composition with text toggled.
-8. For `带字版`, default to a three-part workflow:
-   - Pass 1: generate a clean poster base with the real object, white field, optional micro worker, and an intentionally empty title area.
-   - Pass 2: build a model-facing title construction reference sheet with `scripts/build_title_reference_sheet.py` when reference cutouts exist. Keep the exact target text in the prompt; the sheet should not render target characters as a standard system font or include English labels unless `--human-labels` is explicitly used for inspection.
-   - Pass 3: generate or place a separate black handwritten title layer using the construction sheet as the reference.
-   If a title image layer is available, composite it onto the base with `scripts/composite_title_layer.py`. If a tool cannot composite layers, return both prompts and explain that direct in-image Chinese text is a draft-only shortcut.
-9. If the image-generation tool can edit or use multiple reference images, generate from the uploaded user image plus the selected cutout references. If not, return the prompt packet with the selected asset paths and a short description of what each reference contributes.
+Choose one mode before generating:
 
-## Default output
+- **Poster mode**: the user wants a poster, social image, crooked Chinese title, or real-object-with-doodles composition. Read `references/style-guide.md`; for `带字版`, also read `references/lettering-guide.md`.
+- **Desktop-pet mode**: the user wants a 桌宠, desktop companion, animated pet, spritesheet, or importable character pack. Read `references/desktop-pet-environment.md`, `references/desktop-pet-workflow.md`, `references/mixed-media-style-guide.md`, and `references/desktop-pet-pack.md`.
+- If the request genuinely asks for both, complete the two modes independently. Do not turn a poster crop into a pet asset or reuse a pet candidate as the poster without adapting its composition.
 
-Produce the selected poster concept first, then include a compact prompt packet. For `两套都出（推荐）`, produce two concepts: one `带字版` and one `无字版`.
+## Shared input boundary
 
-Use this response shape:
+1. Require an uploaded image before visual generation.
+2. Inspect the image before proposing output.
+3. If no usable subject is visible, stop and ask for a clearer photo. Give concrete capture advice: one subject, adequate light, sharp focus, and an unobstructed outline.
+4. If several independent subjects are visible, identify them with short numbered descriptions and ask the user to choose. Do not silently select one.
+5. For a drink in a cup, food in a bowl, or water in a vessel, treat the container and contents as one subject unless the user asks otherwise.
 
-```markdown
-## 成品
-[image or output file path]
+## Poster mode
 
-## 可编辑文案
-- 主标题：...
-- 模板：带字版 / 无字版 / 两套都出
+Keep one photographed object recognizable and photographic. Do not cartoonize the full image.
 
-## 生成 Prompt
-- 带字版底图：...
-- 带字版标题参考板：...
-- 带字版标题层：...
-- 无字版：...
+Before generating:
 
-## 使用素材
-- 带字版：...
-- 无字版：...
+1. Inspect `private-assets/reference-cutouts/asset-index.json` when it exists.
+2. Choose `带字版`, `无字版`, or `两套都出（推荐）`; default to two genuinely different concepts when the user wants immediate output and has not chosen.
+3. For `带字版`, use the poster-base, title-construction-sheet, and title-layer workflow. Use `scripts/build_title_reference_sheet.py` and `scripts/composite_title_layer.py` when applicable.
+4. For `无字版`, forbid all text and let one primitive micro-worker action tell the story.
 
-## 修正 Prompt
-...
-```
+Use `references/evaluation.md` for final review.
 
-If no image tool is available, omit `## 成品` and start with `## 生成 Prompt`.
+## Desktop-pet mode
 
-## Core style rules
+The photographed subject becomes the character body. Do not preserve photographic texture as the poster mode does.
 
-- Keep one real photographed object as the visual anchor. Do not turn the whole image into a cartoon.
-- Place the object on a clean white or soft off-white background with generous empty space.
-- Add primitive black-line micro workers that interact with the object: pouring, carrying, tasting, climbing, cleaning, exploring, lifting, throwing, dragging, or repairing.
-- For the typography-led template, make rough crooked childlike Chinese marker lettering the main style signal.
-- For the no-text narrative template, forbid all text, letters, numbers, labels, and random glyphs.
-- When reference cutout assets are available, use them to anchor line weight, wobble, figure proportions, and action pose. Use lettering cutouts as typography style references, not as final copied words, unless the user explicitly asks for a private local study mockup.
-- Treat direct model-rendered Chinese text as exploratory. For publishable `带字版`, use a separate title construction sheet and title layer so the glyph skeleton can be iterated without changing the photographed object.
-- Prefer 3:4 or 2:3 portrait output; default to `1024x1536` when the image tool supports explicit size.
-- Avoid polished vector illustration, cute sticker style, comic panels, gradients, dense decoration, and realistic human faces.
+Follow the approval gates exactly:
 
-## When the source image is difficult
+1. Run `scripts/check_desktop_pet_environment.py --json` before inspecting or generating the photo. If the runner or required toolchain is missing, explain the exact repair plan and ask whether to install it. Run `scripts/install_desktop_pet_runtime.py` only after explicit approval, then rerun preflight. Do not silently install software, bypass operating-system warnings, or enable launch-at-login.
+2. Resolve the subject using the shared input boundary.
+3. Inspect the five desktop-pet boards listed in `references/mixed-media-style-guide.md`: use the dry-media, action, and stroke boards as primary controls; use the smudged-paint board only for crooked structure; treat the mixed-media-object board as an `avoid-default` failure example. Then extract the subject's silhouette, one to three identifying colors, and the features that must stay recognizable.
+4. Generate one white or warm-white candidate board containing three genuine identity variants in the same neutral front-facing stance and at the same ground anchor. Keep source identity and palette stable; vary only face system, limb proportions, structural crookedness, and stable temperament—not action or pose. For mixed-media drinks and soft foods, use the two-pass candidate construction in `references/desktop-pet-workflow.md`: first approve a skeleton in which every stroke visibly meanders, then lock every line while assigning different dry media—colored pencil, childlike wax crayon, or sparse pale wash—to different material regions. Do not substitute ruler-straight segments, one uniform fill texture, oil-paint smears, a clean template with surface wobble, or a smooth digital gradient.
+5. Ask the user to select or revise a candidate. If the three images differ only by pose, treat that as a failed candidate board: consolidate their shared identity into one neutral canonical master and reuse the discarded poses only as motion ideas. Do not generate motion assets before the user explicitly approves the identity or consolidation.
+6. Generate the twelve required actions described in `references/desktop-pet-workflow.md`, plus `fall` and `touch` when the requested runner includes high-drop or cursor-touch behavior. Use the canonical master as the sole identity reference and apply the small-size stability gate before presenting the dynamic review sheet.
+7. Ask the user to approve motion. Do not package unapproved motion assets.
+8. After approval, export transparent animation strips, build the pack and platform delivery folder with `scripts/build_desktop_pet_pack.py --delivery-dir ...`, and validate the ZIP with `scripts/validate_desktop_pet_pack.py`.
+9. Return the review artifacts, validated ZIP, manifest summary, and delivery folder. The shared Electron runner is installed once; each pet folder contains only its pack, preview, start/quit entrypoints, and short usage note.
 
-- If the background is busy, crop or isolate the main object into white space before adding doodles.
-- If there are several objects, choose the one with the clearest silhouette and strongest emotional association.
-- If text rendering is unreliable in `带字版`, do not keep retrying a full-poster prompt. Switch to a blank poster base plus a title construction reference sheet and separate title layer. For highest fidelity, use a real handwritten title image or custom lettering asset, then composite it locally.
-- If the user wants an image-model-only draft, still provide a title-layer prompt so the title can be regenerated without changing the object.
-- If the first result is too cartoonish, revise by saying: preserve the real photographed object and change only the black doodle overlays.
+For a schema-v1 pack, preserve the original pack, copy its eight actions into a new v2 draft, stabilize them, generate `curious`, `stretch`, `tiptoe`, and `play` from the canonical identity, and require a fresh motion approval. Never overwrite or silently activate the v1 pack.
+
+White backgrounds are for candidate and motion review only. Runtime animation files must have real alpha transparency.
+
+## Output boundary
+
+- Never describe exploratory image-model output as a finished pet pack.
+- Do not fabricate file paths, validation results, or runnable installers.
+- If visual generation is unavailable, return the staged prompt packet and pack specification, and state which artifacts still need to be generated.
+- Treat official-looking marks, private-study-only cutouts, and `quality: avoid-default` records as analysis-only.
+- Preserve user files and unrelated working-tree changes when running scripts or packaging output.
 
 ## Evaluation
 
-Use `references/evaluation.md` to review outputs. For this subjective visual skill, human comparison is more important than rigid numeric assertions.
+Use `references/evaluation.md` for poster and desktop-pet acceptance checks. Human visual approval is mandatory at both desktop-pet gates; automated validation cannot replace it.

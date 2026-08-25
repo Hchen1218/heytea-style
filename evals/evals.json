@@ -83,15 +83,223 @@
     {
       "id": 6,
       "prompt": "准备把这个 skill push 上去之前，帮我检查公开包里有没有不该带的本地素材、路径或旧脚本。",
-      "expected_output": "A release-boundary review that treats private reference assets as local-only and checks the package contents before push.",
+      "expected_output": "A release-boundary review that intentionally ships indexed reference-study assets while excluding caches, local paths, duplicate builds, and stale generated output.",
       "files": [],
       "expectations": [
         "The output checks for local absolute workstation paths and private cached source references in public files.",
-        "The output confirms private-assets/reference-cutouts/ can be included when reference images are intended to ship.",
+        "The output confirms private-assets/reference-cutouts/ is included because the indexed style references are intended to ship.",
+        "The output verifies every indexed reference path exists and every core desktop-pet board is readable.",
+        "The output verifies README image paths resolve under assets/examples/ and do not point to outputs/ or 素材/.",
         "The output flags raw source caches and scripts/extract_reference_assets.py as private-only if they appear in the public package.",
         "The output verifies that scripts/build_title_reference_sheet.py and scripts/composite_title_layer.py are present when public docs mention them.",
         "The output warns against staging .DS_Store, stale generated packages, or unrelated generated-skills output.",
         "The output treats package cleanliness as a release gate, not as a visual-style preference."
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "我上传了一张只拍到桌面反光、看不清任何东西的照片，帮我做成喜茶风桌宠。",
+      "expected_output": "A no-subject gate that stops before generation and asks for a clearer input image with practical capture advice.",
+      "files": [],
+      "expectations": [
+        "The output does not invent or guess a pet subject.",
+        "The output asks for a new photo with one clear, well-lit, sharply focused subject and a readable outline.",
+        "The output does not generate candidate art, motion prompts, or a pet pack."
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "照片里有一杯柠檬茶、一块蛋糕和一串钥匙，把它做成桌宠。",
+      "expected_output": "A multi-subject gate that identifies the independent objects and asks the user to select one before any character generation.",
+      "files": [],
+      "expectations": [
+        "The output provides numbered choices for the lemon tea, cake, and keys.",
+        "The output does not silently select the clearest or most food-like item.",
+        "The output waits for subject selection before generating three candidates."
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "这是一杯装在透明玻璃杯里的气泡水。把水做成桌宠，直接帮我出动作。",
+      "expected_output": "A desktop-pet character stage that treats the glass and sparkling water as one subject and requires character approval before motion generation.",
+      "files": [],
+      "expectations": [
+        "The output treats container and contents as one character by default.",
+        "The output extracts the silhouette, one to three colors, must-preserve features, and a sparkling signature-motion idea.",
+        "The output creates or proposes three same-character candidates on white or warm white.",
+        "The output does not comply with the request to skip character approval."
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "我选第二款，就用它。现在做桌宠动作。",
+      "expected_output": "A twelve-state motion-production response that uses the approved candidate as the sole identity reference, checks small-size stability, and stops for motion approval before packaging.",
+      "files": [],
+      "expectations": [
+        "The output generates or specifies idle, walk, rest, happy, drag, land, wave, and signature.",
+        "The output preserves the selected silhouette, palette, face, limb proportions, line quality, and foot anchor.",
+        "The output prepares a labeled contact sheet and looping motion preview.",
+        "The output requests explicit motion approval and does not package the result yet."
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "动作预览确认了，帮我打成可以导入运行器的包。",
+      "expected_output": "A transparent schema-v2 desktop-pet pack built and independently validated after explicit motion approval.",
+      "files": [],
+      "expectations": [
+        "The output exports transparent horizontal strips for all twelve actions.",
+        "The manifest contains schemaVersion, id, displayName, canvas, anchor, scale, palette, hitbox, and all action records.",
+        "The build script creates contact-sheet.png, motion-preview.gif, and a ZIP with one top-level directory.",
+        "The validation script is run against the resulting ZIP.",
+        "The output reports real artifacts and results rather than fabricating paths or validation."
+      ]
+    },
+    {
+      "id": 12,
+      "prompt": "这只桌宠走路时脸变了，落地动作还多出了一只手，其他动作都不错。",
+      "expected_output": "A focused identity-drift correction that regenerates only the failed walk and land states.",
+      "files": [],
+      "expectations": [
+        "The output identifies identity drift in face and limb count.",
+        "The output keeps the approved character and six successful actions unchanged.",
+        "The correction prompt locks silhouette, palette, face placement, limb count, line weight, canvas, and foot anchor.",
+        "The output requests a renewed motion approval after replacing the failed states."
+      ]
+    },
+    {
+      "id": 13,
+      "prompt": "把这张普通台灯照片做成桌宠，不是食物也可以吗？",
+      "expected_output": "A valid non-food desktop-pet workflow that treats the lamp itself as the body and invents a restrained subject-specific motion.",
+      "files": [],
+      "expectations": [
+        "The output accepts the lamp as a valid subject.",
+        "The output preserves lamp silhouette and key structural details instead of forcing it into a drink or animal shape.",
+        "The three candidates vary personality rather than source identity.",
+        "The signature action relates to light, tilting, or a pull switch."
+      ]
+    },
+    {
+      "id": 14,
+      "prompt": "我只想做喜茶风无字海报，不要桌宠。",
+      "expected_output": "A routing response that stays in poster mode and does not introduce candidate approval, motion states, or an Electron pack.",
+      "files": [],
+      "expectations": [
+        "The output selects the 无字版 poster workflow.",
+        "The photographed object stays photographic.",
+        "The output does not introduce desktop-pet candidates, animation states, manifests, or runtime instructions."
+      ]
+    },
+    {
+      "id": 15,
+      "prompt": "这个桌宠还是像普通粗描边卡通，颜色也是平滑渐变，没有还原参考图的笔触。请按喜茶混合媒介感觉重做候选。",
+      "expected_output": "A focused candidate-stage correction that uses the mixed-media reference boards and replaces generic cartoon rendering with continuously meandering line travel, structurally crooked drawing, and region-specific colored-pencil/crayon treatment.",
+      "files": [],
+      "expectations": [
+        "The output uses the dry-media, action, and stroke boards as primary controls, the smudged-paint board only for structure, and the mixed-media-object board only as an avoid-default failure example.",
+        "The correction identifies uniform thick outline and smooth gradient as style failures.",
+        "The revised candidate prompt asks for thin-to-medium hesitant pen structure with retracing, open joins, or overshoot.",
+        "For drinks or soft foods, different regions deliberately use light colored pencil, broad childlike wax crayon, paper-white clear areas, and only optional pale smears rather than one uniform or oil-painted texture.",
+        "Every long cup, rim, limb, and facial stroke visibly meanders along its full length instead of remaining ruler-straight inside a broken outline.",
+        "The revised geometry is structurally asymmetric rather than a clean template with a superficial wobble filter.",
+        "When the existing material reference is correct but the outline remains clean, the output uses a black-only line-skeleton pass followed by a line-locked color pass.",
+        "Cuteness comes from awkward proportion and action rather than a generic large-eyed chibi face.",
+        "The output keeps the source silhouette and identifying colors instead of redesigning the subject.",
+        "The output regenerates the candidate board only and still waits for explicit character approval before motion generation."
+      ]
+    },
+    {
+      "id": 16,
+      "prompt": "这三款桌宠其实只有抬手和倾斜动作不一样，角色设计本身完全一样。不要再让我硬选一个，按同一角色继续。",
+      "expected_output": "A pose-only consolidation response that acknowledges the invalid candidate comparison, creates one neutral canonical master from the shared identity, and reuses the other poses only as motion references.",
+      "files": [],
+      "expectations": [
+        "The output identifies the three images as pose sketches rather than genuine identity variants.",
+        "The output does not force a meaningless left/center/right choice.",
+        "The most neutral standing pose becomes one canonical master with fixed geometry, face, limb proportions, media zoning, and foot anchor.",
+        "The raised-arm pose is treated only as a wave reference and the tilted pose only as a happy or land reference.",
+        "The twelve actions use the canonical master as their sole identity reference."
+      ]
+    },
+    {
+      "id": 17,
+      "prompt": "第一次使用桌宠功能，我还没装过任何东西。直接帮我开始做吧。",
+      "expected_output": "A read-only macOS/Windows environment preflight that runs before image generation and requests explicit consent before repairing missing software.",
+      "files": [],
+      "expectations": [
+        "The output runs or instructs scripts/check_desktop_pet_environment.py before analyzing or generating the pet image.",
+        "The output distinguishes an installed runtime from a source-build toolchain and reports only the actual missing components.",
+        "The output does not treat the request to make a pet as installation consent.",
+        "Before installation, the output states what will be installed and the per-user destination.",
+        "The output waits for explicit approval before running scripts/install_desktop_pet_runtime.py.",
+        "Launch-at-login remains disabled unless separately requested."
+      ]
+    },
+    {
+      "id": 18,
+      "prompt": "我同意安装桌宠运行器。我的 Mac 没有 Node，但已经有 Homebrew，你自动补齐吧。",
+      "expected_output": "An approved macOS repair flow that installs the missing trusted toolchain, dependencies, current-platform runtime, and then reruns preflight.",
+      "files": [],
+      "expectations": [
+        "The output treats the user's statement as approval for the described runtime and Node.js installation.",
+        "The installer uses Homebrew for Node.js rather than an arbitrary downloaded shell script.",
+        "The installer builds only the macOS target and installs it under the user's Applications directory by default.",
+        "The output reruns environment preflight after installation and continues only if it reports ready.",
+        "The output does not bypass Gatekeeper or enable launch-at-login."
+      ]
+    },
+    {
+      "id": 19,
+      "prompt": "Windows 上第一次做桌宠，运行器和 Node 都没有。需要什么你帮我装。",
+      "expected_output": "A Windows-specific preflight and consent-aware repair plan using winget when available and a per-user runtime installation path.",
+      "files": [],
+      "expectations": [
+        "The output checks the Windows runtime path, Node.js, npm, bundled source, and dependencies.",
+        "The proposed Node.js repair uses winget when available.",
+        "The runtime destination defaults to %LOCALAPPDATA%\\Programs\\Doodle Desktop Pet.",
+        "The installer builds only the Windows target.",
+        "The output does not bypass SmartScreen, antivirus, or administrator prompts.",
+        "Preflight is rerun before image generation proceeds."
+      ]
+    },
+    {
+      "id": 20,
+      "prompt": "早期八动作和后面四个 v2 动作画风不一样，以 v2 新动作为准统一，并让动作衔接自然。",
+      "expected_output": "A focused motion replacement that treats the newest approved v2 actions as the sole style baseline and checks adjacent transition frames.",
+      "files": [],
+      "expectations": [
+        "The output does not average old and new action styles; the newest approved v2 family is authoritative.",
+        "The replacement locks line weight, continuous waviness, dry-media zoning, face system, limb construction, and cup geometry to the v2 baseline.",
+        "The first and last frames settle toward the neutral canonical identity.",
+        "Transition-linked actions are reviewed side by side rather than only as isolated strips.",
+        "The output regenerates only mismatched actions and requests renewed motion approval before final delivery."
+      ]
+    },
+    {
+      "id": 21,
+      "prompt": "我把桌宠拖高后不要瞬移落地；鼠标靠近后追一小段，伸手碰一下，再回到原处。",
+      "expected_output": "A bounded fall and cursor-touch interaction design that preserves normal desktop input.",
+      "files": [],
+      "expectations": [
+        "High drag release descends monotonically with a fall pose before land plays.",
+        "Cursor proximity locks one target and moves no more than 80 px.",
+        "The pet plays a mirrorable touch gesture and returns to the exact pre-trigger position.",
+        "The behavior does not continuously follow or capture the cursor and requests no accessibility permission.",
+        "fall and touch are recognized optional schema-v2 actions with documented fallbacks."
+      ]
+    },
+    {
+      "id": 22,
+      "prompt": "桌宠做好后给用户一个可以直接用的文件夹，要有启动和关闭入口，但不要每只宠物都再带一份 Electron。右键桌宠也要能退出。",
+      "expected_output": "A one-runner delivery workflow with lightweight per-pet launchers and native context controls.",
+      "files": [],
+      "expectations": [
+        "The shared Electron runner is installed once and is not copied into the pet folder.",
+        "The delivery folder contains a validated ZIP, preview, usage note, and platform start/quit entrypoints.",
+        "The start entrypoint uses --open-pet and the single-instance runner activates and shows that character.",
+        "The quit entrypoint uses graceful --quit rather than force-killing a process.",
+        "Right-clicking the visible pet opens pause, activity, size, switch, hide, and quit controls while the tray remains available when hidden.",
+        "A missing shared runner is reported and still requires explicit installation consent."
       ]
     }
   ]

@@ -1,0 +1,53 @@
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
+body {
+  display: grid;
+  place-items: stretch;
+}
+
+body[data-runtime='standalone'] {
+  place-items: center;
+  background: #f7f4ec;
+}
+
+body[data-runtime='standalone']::after {
+  content: '浏览器动态预览 · 正式桌宠请通过 Electron 启动 / Browser preview · Launch with Electron for the desktop pet';
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  width: min(88vw, 620px);
+  transform: translateX(-50%);
+  color: #4b4841;
+  font: 14px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  text-align: center;
+}
+
+#pet {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: transparent;
+  touch-action: none;
+}
+
+body[data-runtime='standalone'] #pet {
+  width: min(256px, 70vmin);
+  height: min(256px, 70vmin);
+}
