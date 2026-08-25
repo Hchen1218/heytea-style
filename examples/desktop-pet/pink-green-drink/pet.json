@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 2,
+  "id": "pink-green-drink",
+  "displayName": "粉绿果果杯",
+  "canvas": {
+    "width": 256,
+    "height": 256
+  },
+  "anchor": {
+    "x": 128,
+    "y": 232
+  },
+  "defaultScale": 0.6,
+  "palette": [
+    "#F4BFC0",
+    "#C8D85A",
+    "#FFB62E"
+  ],
+  "hitbox": {
+    "alphaThreshold": 24,
+    "bounds": {
+      "x": 18,
+      "y": 12,
+      "width": 220,
+      "height": 226
+    }
+  },
+  "actions": {
+    "idle": {
+      "file": "animations/idle.webp",
+      "frames": 4,
+      "fps": 3,
+      "loop": false,
+      "mirrorable": false
+    },
+    "walk": {
+      "file": "animations/walk.webp",
+      "frames": 6,
+      "fps": 4,
+      "loop": true,
+      "mirrorable": true
+    },
+    "rest": {
+      "file": "animations/rest.webp",
+      "frames": 4,
+      "fps": 3,
+      "loop": true,
+      "mirrorable": false
+    },
+    "happy": {
+      "file": "animations/happy.webp",
+      "frames": 4,
+      "fps": 3,
+      "loop": false,
+      "mirrorable": false
+    },
+    "drag": {
+      "file": "animations/drag.webp",
+      "frames": 2,
+      "fps": 3,
+      "loop": true,
+      "mirrorable": false
+    },
+    "land": {
+      "file": "animations/land.webp",
+      "frames": 4,
+      "fps": 4,
+      "loop": false,
+      "mirrorable": false
+    },
+    "wave": {
+      "file": "animations/wave.webp",
+      "frames": 4,
+      "fps": 3,
+      "loop": false,
+      "mirrorable": false
+    },
+    "signature": {
+      "file": "animations/signature.webp",
+      "frames": 6,
+      "fps": 3,
+      "loop": false,
+      "mirrorable": false
+    },
+    "curious": {
+      "file": "animations/curious.webp",
+      "frames": 4,
+      "fps": 2,
+      "loop": false,
+      "mirrorable": false
+    },
+    "stretch": {
+      "file": "animations/stretch.webp",
+      "frames": 5,
+      "fps": 2,
+      "loop": false,
+      "mirrorable": false
+    },
+    "tiptoe": {
+      "file": "animations/tiptoe.webp",
+      "frames": 4,
+      "fps": 2,
+      "loop": false,
+      "mirrorable": false
+    },
+    "play": {
+      "file": "animations/play.webp",
+      "frames": 6,
+      "fps": 3,
+      "loop": false,
+      "mirrorable": false
+    },
+    "fall": {
+      "file": "animations/fall.webp",
+      "frames": 4,
+      "fps": 3,
+      "loop": true,
+      "mirrorable": false
+    },
+    "touch": {
+      "file": "animations/touch.webp",
+      "frames": 5,
+      "fps": 3,
+      "loop": false,
+      "mirrorable": true
+    }
+  }
+}
