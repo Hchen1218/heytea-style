@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -24,7 +25,11 @@ class DesktopPetDeliveryTest(unittest.TestCase):
             delivery = Path(result["delivery"])
             start = delivery / "启动桌宠.command"
             stop = delivery / "关闭桌宠.command"
-            self.assertTrue(start.stat().st_mode & 0o111)
+            self.assertTrue(start.is_file())
+            self.assertTrue(stop.is_file())
+            if os.name == "posix":
+                self.assertTrue(start.stat().st_mode & 0o111)
+                self.assertTrue(stop.stat().st_mode & 0o111)
             self.assertIn("--open-pet", start.read_text(encoding="utf-8"))
             self.assertIn("--quit", stop.read_text(encoding="utf-8"))
             self.assertTrue((delivery / "tea-cup-v2.zip").is_file())
