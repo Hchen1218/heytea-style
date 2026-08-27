@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Normalize generated action boards into stable schema-v2 transparent sprite strips."""
+"""Normalize legacy v2 boards or split approved strips from a phase recipe."""
 
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 
 from PIL import Image, ImageFilter
@@ -137,9 +138,12 @@ def normalize_frames(frames: list[Image.Image], action: str, canvas: int = 256) 
 
 
 def write_strip(frames: list[Image.Image], destination: Path) -> None:
-    strip = Image.new("RGBA", (256 * len(frames), 256), (0, 0, 0, 0))
+    width, height = frames[0].size
+    if any(frame.size != (width, height) for frame in frames):
+        raise ValueError("all phase frames must share one canvas")
+    strip = Image.new("RGBA", (width * len(frames), height), (0, 0, 0, 0))
     for index, frame in enumerate(frames):
-        strip.alpha_composite(frame, (index * 256, 0))
+        strip.alpha_composite(frame, (index * width, 0))
     destination.parent.mkdir(parents=True, exist_ok=True)
     strip.save(destination, lossless=True, method=6)
 
@@ -161,15 +165,49 @@ def prepare_directory(source_directory: Path, destination: Path) -> None:
         print(f"prepared {action}: {count} frames")
 
 
+def prepare_phase_recipe(recipe_path: Path, source_directory: Path, destination: Path) -> None:
+    """Split already-approved strips into behavior phases without redrawing them."""
+    recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+    canvas = recipe.get("canvas", {})
+    width = canvas.get("width")
+    height = canvas.get("height")
+    behaviors = recipe.get("behaviors")
+    if not isinstance(width, int) or not isinstance(height, int) or not isinstance(behaviors, dict):
+        raise ValueError("recipe requires canvas.width, canvas.height, and behaviors")
+    planned: list[tuple[Path, list[Image.Image]]] = []
+    for behavior, config in behaviors.items():
+        source_path = source_directory / config["source"]
+        if not source_path.is_file():
+            raise ValueError(f"missing recipe source: {source_path}")
+        with Image.open(source_path) as source:
+            strip = source.convert("RGBA")
+        if strip.height != height or strip.width % width:
+            raise ValueError(f"{behavior} source does not match recipe canvas")
+        source_frames = [strip.crop((index * width, 0, (index + 1) * width, height)) for index in range(strip.width // width)]
+        for phase, phase_config in config["phases"].items():
+            indices = phase_config.get("frames")
+            if not isinstance(indices, list) or not indices or any(not isinstance(index, int) or index < 0 or index >= len(source_frames) for index in indices):
+                raise ValueError(f"{behavior}.{phase} has invalid frame indices")
+            output = destination / phase_config.get("output", f"{behavior}/{phase}.webp")
+            planned.append((output, [source_frames[index] for index in indices]))
+    for output, frames in planned:
+        write_strip(frames, output)
+        print(f"prepared {output.relative_to(destination)}: {len(frames)} frames")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("source", type=Path, help="Directory containing raw action PNGs")
     parser.add_argument("destination", type=Path, help="Destination animations directory")
+    parser.add_argument("--recipe", type=Path, help="JSON behavior-phase split recipe for approved strips")
     args = parser.parse_args()
 
     try:
-        prepare_directory(args.source, args.destination)
-    except ValueError as exc:
+        if args.recipe:
+            prepare_phase_recipe(args.recipe, args.source, args.destination)
+        else:
+            prepare_directory(args.source, args.destination)
+    except (OSError, json.JSONDecodeError, KeyError, ValueError) as exc:
         raise SystemExit(str(exc)) from exc
 
 

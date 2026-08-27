@@ -1,7 +1,7 @@
 {
   "name": "heytea-doodle-desktop-pet-runtime",
-  "version": "2.0.0",
-  "description": "A quiet cross-platform runtime for validated hand-drawn object pet packs.",
+  "version": "3.1.0",
+  "description": "A quiet cross-platform runtime for schema-v2 action packs and schema-v3 behavior packs.",
   "author": "Doodle Desktop Pet contributors",
   "main": "src/main.js",
   "license": "MIT",
@@ -20,7 +20,7 @@
     "electron-builder": "^26.0.12"
   },
   "build": {
-    "appId": "com.doodlepet.runtime",
+    "appId": "com.heytea-doodle.desktop-pet",
     "productName": "Doodle Desktop Pet",
     "asar": true,
     "files": [

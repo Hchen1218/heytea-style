@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate a desktop-pet pack directory or ZIP against schema v2."""
+"""Validate a schema-v2 or schema-v3 desktop-pet directory or ZIP."""
 
 from __future__ import annotations
 
@@ -14,23 +14,12 @@ from pathlib import Path, PurePosixPath
 
 from PIL import Image, ImageChops
 
-
-REQUIRED_ACTIONS = (
-    "idle",
-    "walk",
-    "rest",
-    "happy",
-    "drag",
-    "land",
-    "wave",
-    "signature",
-    "curious",
-    "stretch",
-    "tiptoe",
-    "play",
-)
+REQUIRED_ACTIONS = ("idle", "walk", "rest", "happy", "drag", "land", "wave", "signature", "curious", "stretch", "tiptoe", "play")
 OPTIONAL_ACTIONS = ("fall", "touch")
 ALLOWED_ACTIONS = REQUIRED_ACTIONS + OPTIONAL_ACTIONS
+REQUIRED_BINDINGS = ("idle", "sleep", "click", "pointer", "drag", "release", "ambient")
+COMPLETION_EVENTS = {"animation-finished", "motion-finished", "floor-impact", "pointer-released", "wake-requested", "timeout"}
+MOTION_TYPES = {"walk", "fall", "cursor-approach", "cursor-return"}
 ID_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 COLOR_PATTERN = re.compile(r"^#[0-9A-Fa-f]{6}$")
 MAX_ARCHIVE_BYTES = 80 * 1024 * 1024
@@ -63,19 +52,20 @@ def require_int(value: object, label: str, minimum: int, maximum: int) -> int:
 def safe_relative_path(value: object, label: str) -> Path:
     if not isinstance(value, str) or not value:
         fail(f"{label} must be a non-empty relative path")
-    normalized = value.replace("\\", "/")
-    pure = PurePosixPath(normalized)
+    pure = PurePosixPath(value.replace("\\", "/"))
     if pure.is_absolute() or any(part in {"", ".", ".."} or ":" in part for part in pure.parts):
         fail(f"{label} is unsafe: {value}")
-    return Path(*pure.parts)
+    path = Path(*pure.parts)
+    if path.suffix.lower() not in {".png", ".webp"}:
+        fail(f"{label} must be PNG or WebP")
+    return path
 
 
 def load_manifest(root: Path) -> dict:
-    manifest_path = root / "pet.json"
-    if not manifest_path.is_file():
-        fail("missing pet.json")
     try:
-        data = json.loads(manifest_path.read_text(encoding="utf-8"))
+        data = json.loads((root / "pet.json").read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        fail("missing pet.json")
     except (OSError, json.JSONDecodeError) as exc:
         fail(f"pet.json is not valid UTF-8 JSON: {exc}")
     if not isinstance(data, dict):
@@ -83,236 +73,251 @@ def load_manifest(root: Path) -> dict:
     return data
 
 
-def validate_manifest(manifest: dict) -> tuple[int, int]:
-    if manifest.get("schemaVersion") != 2:
-        fail("schemaVersion must be exactly 2")
-
+def validate_common(manifest: dict) -> tuple[int, int]:
     pack_id = manifest.get("id")
     if not isinstance(pack_id, str) or not ID_PATTERN.fullmatch(pack_id):
         fail("id must use lowercase ASCII letters, digits, and single hyphens")
     if not isinstance(manifest.get("displayName"), str) or not manifest["displayName"].strip():
         fail("displayName must be a non-empty string")
-
     canvas = manifest.get("canvas")
-    if not isinstance(canvas, dict):
-        fail("canvas must be an object")
+    if not isinstance(canvas, dict): fail("canvas must be an object")
     width = require_int(canvas.get("width"), "canvas.width", 32, 1024)
     height = require_int(canvas.get("height"), "canvas.height", 32, 1024)
-
     anchor = manifest.get("anchor")
-    if not isinstance(anchor, dict):
-        fail("anchor must be an object")
-    anchor_x = require_int(anchor.get("x"), "anchor.x", 0, width)
-    anchor_y = require_int(anchor.get("y"), "anchor.y", 0, height)
-    if anchor_x == width or anchor_y == height:
-        fail("anchor must lie inside the canvas, not on its outer edge")
-
+    if not isinstance(anchor, dict): fail("anchor must be an object")
+    require_int(anchor.get("x"), "anchor.x", 0, width - 1)
+    require_int(anchor.get("y"), "anchor.y", 0, height - 1)
     scale = manifest.get("defaultScale")
-    if isinstance(scale, bool) or not isinstance(scale, (int, float)) or not 0.5 <= scale <= 2:
-        fail("defaultScale must be a number between 0.5 and 2")
-
+    if isinstance(scale, bool) or not isinstance(scale, (int, float)) or not 0.5 <= scale <= 2: fail("defaultScale must be a number between 0.5 and 2")
+    if "floorMode" in manifest and manifest["floorMode"] not in {"work-area", "display-edge"}: fail("floorMode must be work-area or display-edge")
     palette = manifest.get("palette")
-    if not isinstance(palette, list) or not 1 <= len(palette) <= 3:
-        fail("palette must contain one to three colors")
-    if any(not isinstance(color, str) or not COLOR_PATTERN.fullmatch(color) for color in palette):
-        fail("palette colors must use #RRGGBB")
-
+    if not isinstance(palette, list) or not 1 <= len(palette) <= 3 or any(not isinstance(c, str) or not COLOR_PATTERN.fullmatch(c) for c in palette): fail("palette must contain one to three #RRGGBB colors")
     hitbox = manifest.get("hitbox")
-    if not isinstance(hitbox, dict):
-        fail("hitbox must be an object")
+    if not isinstance(hitbox, dict): fail("hitbox must be an object")
     require_int(hitbox.get("alphaThreshold"), "hitbox.alphaThreshold", 1, 254)
     bounds = hitbox.get("bounds")
-    if not isinstance(bounds, dict):
-        fail("hitbox.bounds must be an object")
+    if not isinstance(bounds, dict): fail("hitbox.bounds must be an object")
     bx = require_int(bounds.get("x"), "hitbox.bounds.x", 0, width - 1)
     by = require_int(bounds.get("y"), "hitbox.bounds.y", 0, height - 1)
     bw = require_int(bounds.get("width"), "hitbox.bounds.width", 1, width)
     bh = require_int(bounds.get("height"), "hitbox.bounds.height", 1, height)
-    if bx + bw > width or by + bh > height:
-        fail("hitbox.bounds must stay inside the canvas")
-
-    actions = manifest.get("actions")
-    if not isinstance(actions, dict):
-        fail("actions must be an object")
-    missing = [name for name in REQUIRED_ACTIONS if name not in actions]
-    if missing:
-        fail(f"missing required actions: {', '.join(missing)}")
-    extras = sorted(set(actions) - set(ALLOWED_ACTIONS))
-    if extras:
-        fail(f"schema v2 does not accept unknown actions: {', '.join(extras)}")
-
-    for name in actions:
-        action = actions[name]
-        if not isinstance(action, dict):
-            fail(f"actions.{name} must be an object")
-        path = safe_relative_path(action.get("file"), f"actions.{name}.file")
-        if path.suffix.lower() not in {".png", ".webp"}:
-            fail(f"actions.{name}.file must be PNG or WebP")
-        require_int(action.get("frames"), f"actions.{name}.frames", 1, 24)
-        require_int(action.get("fps"), f"actions.{name}.fps", 1, 30)
-        if not isinstance(action.get("loop"), bool):
-            fail(f"actions.{name}.loop must be boolean")
-        if not isinstance(action.get("mirrorable"), bool):
-            fail(f"actions.{name}.mirrorable must be boolean")
-    if actions["walk"].get("mirrorable") is not True:
-        fail("actions.walk.mirrorable must be true")
-
+    if bx + bw > width or by + bh > height: fail("hitbox.bounds must stay inside the canvas")
     return width, height
 
 
-def validate_strip(root: Path, action_name: str, action: dict, width: int, height: int, default_scale: float) -> None:
-    relative = safe_relative_path(action["file"], f"actions.{action_name}.file")
+def validate_v2(manifest: dict) -> None:
+    actions = manifest.get("actions")
+    if not isinstance(actions, dict): fail("actions must be an object")
+    missing = [name for name in REQUIRED_ACTIONS if name not in actions]
+    if missing: fail(f"missing required actions: {', '.join(missing)}")
+    extras = sorted(set(actions) - set(ALLOWED_ACTIONS))
+    if extras: fail(f"schema v2 does not accept unknown actions: {', '.join(extras)}")
+    for name, action in actions.items():
+        if not isinstance(action, dict): fail(f"actions.{name} must be an object")
+        safe_relative_path(action.get("file"), f"actions.{name}.file")
+        require_int(action.get("frames"), f"actions.{name}.frames", 1, 24)
+        require_int(action.get("fps"), f"actions.{name}.fps", 1, 30)
+        if not isinstance(action.get("loop"), bool) or not isinstance(action.get("mirrorable"), bool): fail(f"actions.{name} flags must be boolean")
+    if actions["walk"].get("mirrorable") is not True: fail("actions.walk.mirrorable must be true")
+
+
+def validate_phase(behavior: str, index: int, phase: object) -> None:
+    label = f"behaviors.{behavior}.phases[{index}]"
+    if not isinstance(phase, dict): fail(f"{label} must be an object")
+    if not isinstance(phase.get("id"), str) or not ID_PATTERN.fullmatch(phase["id"]): fail(f"{label}.id is invalid")
+    safe_relative_path(phase.get("file"), f"{label}.file")
+    frames = require_int(phase.get("frames"), f"{label}.frames", 1, 24)
+    has_fps, has_durations = "fps" in phase, "durationsMs" in phase
+    if has_fps == has_durations: fail(f"{label} must declare exactly one of fps or durationsMs")
+    if has_fps: require_int(phase["fps"], f"{label}.fps", 1, 30)
+    if has_durations:
+        values = phase["durationsMs"]
+        if not isinstance(values, list) or len(values) != frames: fail(f"{label}.durationsMs must match frames")
+        for duration in values: require_int(duration, f"{label}.durationsMs value", 34, 10000)
+    if phase.get("playback") not in {"once", "loop"}: fail(f"{label}.playback must be once or loop")
+    complete = phase.get("completeOn")
+    if complete not in COMPLETION_EVENTS: fail(f"{label}.completeOn is unsupported")
+    if not isinstance(phase.get("mirrorable"), bool): fail(f"{label}.mirrorable must be boolean")
+    if "grounding" in phase and phase["grounding"] not in {"floor", "free"}: fail(f"{label}.grounding must be floor or free")
+    if phase["playback"] == "loop" and complete == "animation-finished": fail(f"{label} loop must have an external exit event")
+    motion = phase.get("motion")
+    if motion is not None and motion not in MOTION_TYPES: fail(f"{label}.motion is unsupported")
+    if complete == "timeout": require_int(phase.get("timeoutMs"), f"{label}.timeoutMs", 100, 24 * 60 * 60 * 1000)
+    if complete == "motion-finished" and motion not in {"walk", "cursor-approach", "cursor-return"}: fail(f"{label} motion-finished requires horizontal motion")
+    if complete == "floor-impact" and motion != "fall": fail(f"{label} floor-impact requires fall motion")
+
+
+def validate_range(value: object, label: str, minimum: int = 1000, maximum: int = 24 * 60 * 60 * 1000) -> None:
+    if not isinstance(value, list) or len(value) != 2:
+        fail(f"{label} must have two values")
+    low = require_int(value[0], f"{label}[0]", minimum, maximum)
+    high = require_int(value[1], f"{label}[1]", minimum, maximum)
+    if low > high: fail(f"{label} must be ascending")
+
+
+def validate_cadence(cadence: object) -> None:
+    if cadence is None: return
+    if not isinstance(cadence, dict): fail("cadence must be an object")
+    validate_range(cadence.get("idleIntervalMs"), "cadence.idleIntervalMs")
+    validate_range(cadence.get("ambientIntervalMs"), "cadence.ambientIntervalMs")
+    require_int(cadence.get("postEpisodeQuietMs"), "cadence.postEpisodeQuietMs", 0, 24 * 60 * 60 * 1000)
+    require_int(cadence.get("pointerDwellMs"), "cadence.pointerDwellMs", 250, 60 * 1000)
+    require_int(cadence.get("pointerCooldownMs"), "cadence.pointerCooldownMs", 0, 24 * 60 * 60 * 1000)
+    require_int(cadence.get("dragThresholdPx"), "cadence.dragThresholdPx", 1, 64)
+    if not isinstance(cadence.get("pointerResetsSleep"), bool): fail("cadence.pointerResetsSleep must be boolean")
+    multipliers = cadence.get("profileMultipliers")
+    if not isinstance(multipliers, dict): fail("cadence.profileMultipliers must be an object")
+    for level in ("quiet", "balanced", "lively"):
+        value = multipliers.get(level)
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not 0.25 <= value <= 4:
+            fail(f"cadence.profileMultipliers.{level} must be between 0.25 and 4")
+
+
+def validate_v3(manifest: dict) -> None:
+    if manifest.get("characterMode") != "flavor-monster": fail("schema v3 characterMode must be flavor-monster")
+    validate_cadence(manifest.get("cadence"))
+    behaviors = manifest.get("behaviors")
+    if not isinstance(behaviors, dict) or not 6 <= len(behaviors) <= 10: fail("schema v3 requires 6-10 behaviors")
+    for name, behavior in behaviors.items():
+        if not ID_PATTERN.fullmatch(name) or not isinstance(behavior, dict): fail(f"invalid behavior: {name}")
+        phases = behavior.get("phases")
+        if not isinstance(phases, list) or not 1 <= len(phases) <= 12: fail(f"behaviors.{name}.phases must contain 1-12 phases")
+        ids = [phase.get("id") if isinstance(phase, dict) else None for phase in phases]
+        if len(ids) != len(set(ids)): fail(f"behaviors.{name} phase ids must be unique")
+        for index, phase in enumerate(phases): validate_phase(name, index, phase)
+    bindings = manifest.get("bindings")
+    if not isinstance(bindings, dict) or any(name not in bindings for name in REQUIRED_BINDINGS): fail("all schema-v3 bindings are required")
+    names = set(behaviors)
+    direct = ("idle", "click", "pointer", "drag", "release")
+    for name in direct:
+        if bindings.get(name) not in names: fail(f"bindings.{name} must reference a behavior")
+    sleep = bindings.get("sleep")
+    if not isinstance(sleep, dict) or sleep.get("behavior") not in names: fail("bindings.sleep.behavior must reference a behavior")
+    require_int(sleep.get("afterMs"), "bindings.sleep.afterMs", 1000, 24 * 60 * 60 * 1000)
+    wake = sleep.get("wakeAfterMs")
+    if not isinstance(wake, list) or len(wake) != 2: fail("bindings.sleep.wakeAfterMs must have two values")
+    low = require_int(wake[0], "bindings.sleep.wakeAfterMs[0]", 1000, 24 * 60 * 60 * 1000)
+    high = require_int(wake[1], "bindings.sleep.wakeAfterMs[1]", 1000, 24 * 60 * 60 * 1000)
+    if low > high: fail("bindings.sleep.wakeAfterMs must be ascending")
+    ambient = bindings.get("ambient")
+    if not isinstance(ambient, list) or not ambient: fail("bindings.ambient must not be empty")
+    for index, item in enumerate(ambient):
+        if not isinstance(item, dict) or item.get("behavior") not in names: fail(f"bindings.ambient[{index}].behavior must reference a behavior")
+        require_int(item.get("weight"), f"bindings.ambient[{index}].weight", 1, 100)
+        require_int(item.get("cooldownMs"), f"bindings.ambient[{index}].cooldownMs", 0, 24 * 60 * 60 * 1000)
+    reachable = {bindings[name] for name in direct} | {sleep["behavior"]} | {item["behavior"] for item in ambient}
+    unbound = sorted(names - reachable)
+    if unbound: fail(f"unbound behaviors: {', '.join(unbound)}")
+
+
+def validate_manifest(manifest: dict) -> tuple[int, int]:
+    width, height = validate_common(manifest)
+    if manifest.get("schemaVersion") == 2: validate_v2(manifest)
+    elif manifest.get("schemaVersion") == 3: validate_v3(manifest)
+    else: fail("schemaVersion must be 2 or 3")
+    return width, height
+
+
+def iter_assets(manifest: dict):
+    if manifest["schemaVersion"] == 2:
+        for name, spec in manifest["actions"].items(): yield f"actions.{name}", spec, name
+    else:
+        for behavior, value in manifest["behaviors"].items():
+            for phase in value["phases"]: yield f"behaviors.{behavior}.{phase['id']}", phase, None
+
+
+def validate_strip(root: Path, label: str, spec: dict, width: int, height: int, default_scale: float, v2_action: str | None) -> None:
+    relative = safe_relative_path(spec["file"], f"{label}.file")
     image_path = root / relative
     try:
-        resolved = image_path.resolve(strict=True)
-        resolved.relative_to(root.resolve(strict=True))
-    except (OSError, ValueError):
-        fail(f"actions.{action_name}.file escapes the pack or does not exist")
-    if not resolved.is_file() or resolved.is_symlink():
-        fail(f"actions.{action_name}.file must be a regular file")
-    if resolved.stat().st_size > MAX_FILE_BYTES:
-        fail(f"actions.{action_name}.file exceeds {MAX_FILE_BYTES // (1024 * 1024)} MB")
-
+        resolved = image_path.resolve(strict=True); resolved.relative_to(root.resolve(strict=True))
+    except (OSError, ValueError): fail(f"{label}.file escapes the pack or does not exist")
+    if not resolved.is_file() or resolved.is_symlink(): fail(f"{label}.file must be a regular file")
+    if resolved.stat().st_size > MAX_FILE_BYTES: fail(f"{label}.file exceeds 24 MB")
     try:
         with Image.open(resolved) as source:
             has_alpha = "A" in source.getbands() or "transparency" in source.info
-            source.load()
-            image = source.convert("RGBA")
-    except (OSError, ValueError) as exc:
-        fail(f"actions.{action_name}.file is not a readable image: {exc}")
-
-    frames = action["frames"]
-    expected = (width * frames, height)
-    if image.size != expected:
-        fail(f"actions.{action_name} has size {image.size}; expected {expected}")
-    if not has_alpha:
-        fail(f"actions.{action_name} has no alpha channel")
-
+            source.load(); image = source.convert("RGBA")
+    except (OSError, ValueError) as exc: fail(f"{label}.file is not a readable image: {exc}")
+    frames = spec["frames"]
+    if image.size != (width * frames, height): fail(f"{label} has size {image.size}; expected {(width * frames, height)}")
+    if not has_alpha: fail(f"{label} has no alpha channel")
     alpha = image.getchannel("A")
-    if alpha.getextrema() == (255, 255):
-        fail(f"actions.{action_name} is fully opaque; runtime assets need transparency")
+    if alpha.getextrema() == (255, 255): fail(f"{label} is fully opaque; runtime assets need transparency")
     corners = ((0, 0), (image.width - 1, 0), (0, image.height - 1), (image.width - 1, image.height - 1))
-    if any(alpha.getpixel(point) != 0 for point in corners):
-        fail(f"actions.{action_name} has non-transparent strip corners")
-
+    if any(alpha.getpixel(point) != 0 for point in corners): fail(f"{label} has non-transparent strip corners")
     boxes = []
     for index in range(frames):
-        frame_alpha = alpha.crop((index * width, 0, (index + 1) * width, height))
-        box = frame_alpha.getbbox()
-        if box is None:
-            fail(f"actions.{action_name} frame {index + 1} is empty")
+        frame_alpha = alpha.crop((index * width, 0, (index + 1) * width, height)); box = frame_alpha.getbbox()
+        if box is None: fail(f"{label} frame {index + 1} is empty")
+        if frame_alpha.crop((width // 4, 0, width * 3 // 4, height)).getbbox() is None: fail(f"{label} frame {index + 1} has no visible body core")
         boxes.append(box)
-
-    core_boxes = []
-    for index in range(frames):
-        frame_alpha = alpha.crop((index * width, 0, (index + 1) * width, height))
-        core = frame_alpha.crop((width // 4, 0, width * 3 // 4, height)).getbbox()
-        if core is None:
-            fail(f"actions.{action_name} frame {index + 1} has no visible body core")
-        core_boxes.append(core)
-    stable_x = {"idle", "walk"}
-    grounded = {"idle", "walk"}
-    if action_name in stable_x:
-        centers = [(box[0] + box[2]) / 2 for box in boxes]
-        if max(centers) - min(centers) > 1:
-            fail(f"actions.{action_name} body center drifts more than 1 px")
-    if action_name in grounded:
-        bottoms = [box[3] for box in boxes]
-        if max(bottoms) - min(bottoms) > 1:
-            fail(f"actions.{action_name} foot baseline drifts more than 1 px")
-    if action_name == "idle":
+    if v2_action in {"idle", "walk"}:
+        centers = [(box[0] + box[2]) / 2 for box in boxes]; bottoms = [box[3] for box in boxes]
+        if max(centers) - min(centers) > 1: fail(f"{label} body center drifts more than 1 px")
+        if max(bottoms) - min(bottoms) > 1: fail(f"{label} foot baseline drifts more than 1 px")
+    if v2_action == "idle":
         heights = [box[3] - box[1] for box in boxes]
-        if max(heights) - min(heights) > max(1, round(sum(heights) / len(heights) * 0.015)):
-            fail("actions.idle visible height changes more than 1.5%")
-        if height >= 200:
-            displayed_height = heights[0] * default_scale
-            if not 120 <= displayed_height <= 140:
-                fail(f"default desktop visible height is {displayed_height:.1f}px; expected 120-140px")
-    if action.get("loop") and frames > 1:
-        first = alpha.crop((0, 0, width, height))
-        last = alpha.crop(((frames - 1) * width, 0, frames * width, height))
+        if max(heights) - min(heights) > max(1, round(sum(heights) / len(heights) * .015)): fail("actions.idle visible height changes more than 1.5%")
+        displayed = heights[0] * default_scale
+        if height >= 200 and not 120 <= displayed <= 140: fail(f"default desktop visible height is {displayed:.1f}px; expected 120-140px")
+    is_loop = spec.get("loop") if v2_action else spec.get("playback") == "loop"
+    if is_loop and frames > 1:
+        first = alpha.crop((0, 0, width, height)); last = alpha.crop(((frames - 1) * width, 0, frames * width, height))
         changed = ImageChops.difference(first, last).point(lambda value: 255 if value > 24 else 0)
         changed_ratio = sum(changed.histogram()[1:]) / (width * height)
-        if changed_ratio > 0.18:
-            fail(f"actions.{action_name} loop seam changes too much ({changed_ratio:.1%})")
+        limit = .18 if v2_action else .35
+        if changed_ratio > limit: fail(f"{label} loop seam changes too much ({changed_ratio:.1%})")
 
 
 def validate_pack_directory(root: Path, *, require_root_name: bool = True) -> ValidationResult:
     root = root.resolve(strict=True)
-    if not root.is_dir():
-        fail(f"not a directory: {root}")
-    manifest = load_manifest(root)
-    width, height = validate_manifest(manifest)
-    if require_root_name and root.name != manifest["id"]:
-        fail(f"pack directory must be named {manifest['id']}")
-
+    if not root.is_dir(): fail(f"not a directory: {root}")
+    manifest = load_manifest(root); width, height = validate_manifest(manifest)
+    if require_root_name and root.name != manifest["id"]: fail(f"pack directory must be named {manifest['id']}")
     preview = root / "preview.png"
-    if not preview.is_file() or preview.is_symlink():
-        fail("missing regular preview.png")
+    if not preview.is_file() or preview.is_symlink(): fail("missing regular preview.png")
     try:
-        with Image.open(preview) as image:
-            image.verify()
-    except (OSError, ValueError) as exc:
-        fail(f"preview.png is invalid: {exc}")
-
-    for name in manifest["actions"]:
-        validate_strip(root, name, manifest["actions"][name], width, height, float(manifest["defaultScale"]))
+        with Image.open(preview) as image: image.verify()
+    except (OSError, ValueError) as exc: fail(f"preview.png is invalid: {exc}")
+    for label, spec, action in iter_assets(manifest): validate_strip(root, label, spec, width, height, float(manifest["defaultScale"]), action)
     return ValidationResult(manifest["id"], root, manifest)
 
 
 def validate_archive_members(archive: zipfile.ZipFile) -> str:
     infos = archive.infolist()
-    if not infos:
-        fail("ZIP is empty")
-    total = 0
-    roots: set[str] = set()
+    if not infos: fail("ZIP is empty")
+    total = 0; roots: set[str] = set()
     for info in infos:
-        name = info.filename.replace("\\", "/")
-        pure = PurePosixPath(name)
-        if pure.is_absolute() or any(part in {"", ".", ".."} or ":" in part for part in pure.parts):
-            fail(f"ZIP contains unsafe path: {info.filename}")
+        pure = PurePosixPath(info.filename.replace("\\", "/"))
+        if pure.is_absolute() or any(part in {"", ".", ".."} or ":" in part for part in pure.parts): fail(f"ZIP contains unsafe path: {info.filename}")
         roots.add(pure.parts[0])
-        if info.flag_bits & 0x1:
-            fail(f"ZIP contains encrypted entry: {info.filename}")
-        mode = info.external_attr >> 16
-        if stat.S_ISLNK(mode):
-            fail(f"ZIP contains symlink: {info.filename}")
-        if info.file_size > MAX_FILE_BYTES:
-            fail(f"ZIP entry is too large: {info.filename}")
+        if info.flag_bits & 1: fail(f"ZIP contains encrypted entry: {info.filename}")
+        if stat.S_ISLNK(info.external_attr >> 16): fail(f"ZIP contains symlink: {info.filename}")
+        if info.file_size > MAX_FILE_BYTES: fail(f"ZIP entry is too large: {info.filename}")
         total += info.file_size
-        if total > MAX_ARCHIVE_BYTES:
-            fail("ZIP expands beyond the 80 MB safety limit")
-    if len(roots) != 1:
-        fail("ZIP must contain exactly one top-level pet directory")
+        if total > MAX_ARCHIVE_BYTES: fail("ZIP expands beyond the 80 MB safety limit")
+    if len(roots) != 1: fail("ZIP must contain exactly one top-level pet directory")
     return next(iter(roots))
 
 
 def validate_pack(path: Path) -> ValidationResult:
-    if path.is_dir():
-        return validate_pack_directory(path)
-    if path.suffix.lower() != ".zip" or not path.is_file():
-        fail("input must be a pet directory or .zip file")
+    if path.is_dir(): return validate_pack_directory(path)
+    if path.suffix.lower() != ".zip" or not path.is_file(): fail("input must be a pet directory or .zip file")
     try:
         with zipfile.ZipFile(path) as archive:
             root_name = validate_archive_members(archive)
             with tempfile.TemporaryDirectory(prefix="desktop-pet-validate-") as temp:
-                archive.extractall(temp)
-                result = validate_pack_directory(Path(temp) / root_name)
+                archive.extractall(temp); result = validate_pack_directory(Path(temp) / root_name)
                 return ValidationResult(result.pack_id, path.resolve(), result.manifest)
-    except zipfile.BadZipFile as exc:
-        fail(f"invalid ZIP: {exc}")
+    except zipfile.BadZipFile as exc: fail(f"invalid ZIP: {exc}")
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("pack", type=Path, help="Pet directory or ZIP to validate")
-    args = parser.parse_args()
-    try:
-        result = validate_pack(args.pack)
-    except (OSError, PackValidationError) as exc:
-        raise SystemExit(f"INVALID: {exc}") from exc
-    print(f"VALID: {result.pack_id} (schema v2)")
+    parser = argparse.ArgumentParser(description=__doc__); parser.add_argument("pack", type=Path); args = parser.parse_args()
+    try: result = validate_pack(args.pack)
+    except (OSError, PackValidationError) as exc: raise SystemExit(f"INVALID: {exc}") from exc
+    print(f"VALID: {result.pack_id} (schema v{result.manifest['schemaVersion']})")
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == "__main__": main()

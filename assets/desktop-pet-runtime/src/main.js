@@ -7,10 +7,12 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const { inspectSchemaVersion, validateManifest } = require('./core/manifest');
-const { parseCommandLine } = require('./core/command-line');
+const { compileRuntimeModel } = require('./core/runtime-model');
+const { forwardedCommandLine, parseCommandLine } = require('./core/command-line');
 const { createCommandQueue } = require('./core/command-queue');
 const { planWalk } = require('./core/walk-planner');
 const { fallY, planCursorChase, planFall } = require('./core/motion-planner');
+const { floorBottom } = require('./core/floor-policy');
 
 // Keeps local QA and screenshots isolated from a user's real imported pets.
 // Production launches do not set this variable and continue using Electron's
@@ -131,14 +133,16 @@ function activePet() {
 function petPayload() {
   const pet = activePet();
   if (!pet) return { fallback: true, paused: settings.paused, scale: settings.scale, activityLevel: settings.activityLevel, cursorAwareness: settings.cursorAwareness };
-  const actionUrls = {};
-  for (const [name, action] of Object.entries(pet.manifest.actions)) {
-    actionUrls[name] = pathToFileURL(path.join(pet.root, action.file)).href;
+  const runtimeModel = compileRuntimeModel(pet.manifest);
+  const clipUrls = {};
+  for (const [name, clip] of Object.entries(runtimeModel.clips)) {
+    clipUrls[name] = pathToFileURL(path.join(pet.root, clip.file)).href;
   }
   return {
     fallback: false,
     manifest: pet.manifest,
-    actionUrls,
+    runtimeModel,
+    clipUrls,
     paused: settings.paused,
     scale: settings.scale,
     activityLevel: settings.activityLevel,
@@ -167,9 +171,10 @@ function windowSize() {
 function floorPosition(display, x) {
   const size = windowSize();
   const anchor = currentAnchor();
+  const floorMode = activePet()?.manifest?.floorMode || 'work-area';
   return {
     x: Math.round(Math.min(Math.max(x, display.workArea.x - size.width * 0.25), display.workArea.x + display.workArea.width - size.width * 0.75)),
-    y: Math.round(display.workArea.y + display.workArea.height - anchor.y * settings.scale),
+    y: Math.round(floorBottom(display, floorMode) - anchor.y * settings.scale),
   };
 }
 
@@ -319,14 +324,30 @@ function returnCursorChase() {
   return { direction, targetX };
 }
 
-function cursorCooldownMs() { return { quiet: 60000, balanced: 30000, lively: 18000 }[settings.activityLevel] || 30000; }
+function activeCadence() {
+  const pet = activePet();
+  return pet?.manifest?.schemaVersion === 3 ? pet.manifest.cadence : null;
+}
+
+function cadenceMultiplier() {
+  const cadence = activeCadence();
+  return cadence?.profileMultipliers?.[settings.activityLevel] || 1;
+}
+
+function cursorCooldownMs() {
+  const cadence = activeCadence();
+  if (cadence) return cadence.pointerCooldownMs * cadenceMultiplier();
+  return { quiet: 60000, balanced: 30000, lively: 18000 }[settings.activityLevel] || 30000;
+}
+
+function cursorDwellMs() { return activeCadence()?.pointerDwellMs || 1500; }
 function pollCursor() {
   if (!petWindow || petWindow.isDestroyed() || !settings.visible || settings.paused || !settings.cursorAwareness) { cursorEnteredAt=0; cursorFired=false; return; }
   const point=screen.getCursorScreenPoint(); const b=petWindow.getBounds(); const pad=96;
   const near=point.x>=b.x-pad&&point.x<=b.x+b.width+pad&&point.y>=b.y-pad&&point.y<=b.y+b.height+pad;
   if(!near){cursorEnteredAt=0;cursorFired=false;return;}
   if(!cursorEnteredAt)cursorEnteredAt=Date.now();
-  if(!cursorFired&&Date.now()-cursorEnteredAt>=1500&&Date.now()-lastCursorResponseAt>=cursorCooldownMs()){
+  if(!cursorFired&&Date.now()-cursorEnteredAt>=cursorDwellMs()&&Date.now()-lastCursorResponseAt>=cursorCooldownMs()){
     cursorFired=true;lastCursorResponseAt=Date.now();petWindow.webContents.send('pet:cursor-near', point);
   }
 }
@@ -566,8 +587,10 @@ async function installPetPack(filePath, { interactive = false } = {}) {
     const manifest = validateManifest(rawManifest);
     if (manifest.id !== rootName) throw new Error(t('顶层目录必须与角色 id 相同', 'Top-level directory must match the pet id'));
     if (!fs.existsSync(path.join(sourceRoot, 'preview.png'))) throw new Error(t('缺少 preview.png', 'preview.png is missing'));
-    for (const action of Object.values(manifest.actions)) {
-      if (!fs.statSync(path.join(sourceRoot, action.file)).isFile()) throw new Error(t('缺少动作素材', 'An animation file is missing'));
+    const runtimeModel = compileRuntimeModel(manifest);
+    for (const clip of Object.values(runtimeModel.clips)) {
+      const assetPath = path.join(sourceRoot, clip.file);
+      if (!fs.existsSync(assetPath) || !fs.statSync(assetPath).isFile()) throw new Error(t('缺少行为阶段素材', 'A behavior phase asset is missing'));
     }
 
     destination = path.join(petsPath(), manifest.id);
@@ -669,12 +692,14 @@ function registerIpc() {
   ipcMain.handle('pet:show-context-menu', showPetContextMenu);
 }
 
-if (!app.requestSingleInstanceLock()) {
+const launchArgv = [...process.argv];
+if (!app.requestSingleInstanceLock({ argv: launchArgv })) {
   app.quit();
 } else {
-  commandQueue.dispatch(process.argv);
-  app.on('second-instance', (_event, commandLine) => {
-    commandQueue.dispatch(commandLine).catch((error) => console.error('Could not handle launcher command:', error));
+  commandQueue.dispatch(launchArgv);
+  app.on('second-instance', (_event, commandLine, _workingDirectory, additionalData) => {
+    const forwardedArgv = forwardedCommandLine(commandLine, additionalData);
+    commandQueue.dispatch(forwardedArgv).catch((error) => console.error('Could not handle launcher command:', error));
   });
 
   app.whenReady().then(async () => {

@@ -301,6 +301,58 @@
         "Right-clicking the visible pet opens pause, activity, size, switch, hide, and quit controls while the tray remains available when hidden.",
         "A missing shared runner is reported and still requires explicit installation consent."
       ]
+    },
+    {
+      "id": 23,
+      "prompt": "把这杯粉绿饮料做成一个桌宠。",
+      "expected_output": "A mandatory character-mode choice that asks whether the user wants a source-faithful cartoon pet or a flavor-monster pet before candidate generation.",
+      "files": [],
+      "expectations": [
+        "The output presents 写实卡通桌宠 and 风味小怪兽桌宠 as two parallel choices.",
+        "The source-faithful choice is explained as keeping the photographed subject's silhouette and structure.",
+        "The flavor-monster choice is explained as extracting color, ingredient, material, and motion DNA into an independent creature.",
+        "The output does not infer a default from the fact that the subject is a drink.",
+        "No candidate art or motion assets are generated before the choice is explicit."
+      ]
+    },
+    {
+      "id": 24,
+      "prompt": "这杯气泡水做写实卡通桌宠，保留玻璃杯和气泡结构。",
+      "expected_output": "A source-faithful candidate workflow that preserves the photographed object as the body without asking the already-answered mode question again.",
+      "files": [],
+      "expectations": [
+        "The output records source-faithful mode and does not ask the user to choose a character mode again.",
+        "The glass, water, bubbles, outer silhouette, and key internal divisions remain identity locks.",
+        "Candidate differences come from face, limb proportions, structural crookedness, and temperament rather than monster body archetypes.",
+        "The signature-motion idea uses a real source property such as bubbles or slosh.",
+        "The output still waits for explicit character approval before motion generation."
+      ]
+    },
+    {
+      "id": 25,
+      "prompt": "把这杯粉色果茶做成风味小怪兽桌宠，杯子本身不要保留。",
+      "expected_output": "A flavor-monster candidate workflow that uses source DNA to design an independent creature and does not retain the source container silhouette.",
+      "files": [],
+      "expectations": [
+        "The output records flavor-monster mode and does not ask the user to choose a character mode again.",
+        "The identity brief extracts one to three colors, ingredient or material cues, and one motion verb.",
+        "The first impression is a biological creature rather than a cup, lid, straw, or drink cross-section with limbs.",
+        "Ingredients become anatomy, internal features, or markings rather than contents sitting at a vessel bottom.",
+        "Candidate and later behavior rules keep the shared approval gates, runner, and delivery contract while using the schema-v3 6–10 behavior protocol."
+      ]
+    },
+    {
+      "id": 26,
+      "prompt": "风味小怪兽的八个动作已经确认。请拆成睡眠、行走、抓取、掉落和鼠标相遇的完整阶段，打成能与旧桌宠共存的包。",
+      "expected_output": "A schema-v3 flavor-monster behavior pack that preserves approved art, compiles beside unchanged v2 packs, and is independently validated.",
+      "files": [],
+      "expectations": [
+        "The output uses 6–10 freely named behaviors rather than padding the monster to twelve v2 action names.",
+        "Sleep follows sleep-enter, persistent sleeping-loop, and wake-exit without snapping directly to neutral.",
+        "Walk, cursor encounter, held, and drop recovery advance through animation or physical completion events.",
+        "The approved strips are split or ping-ponged without unnecessary visual regeneration.",
+        "The schema-v3 ZIP passes independent validation and existing schema-v2 packs are not migrated or overwritten."
+      ]
     }
   ]
 }

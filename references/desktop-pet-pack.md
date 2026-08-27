@@ -1,8 +1,8 @@
-# Desktop Pet Pack v2
+# Desktop Pet Pack v2 / v3
 
 Read this reference when exporting, validating, importing, or upgrading a desktop-pet pack.
 
-## Directory contract
+## Schema-v2 directory contract
 
 ```text
 pet-id/
@@ -35,13 +35,36 @@ Required actions are `idle`, `walk`, `rest`, `happy`, `drag`, `land`, `wave`, `s
 
 Recognized optional actions are `fall` and `touch`. A v2 pack remains valid without them; the runner falls back to `drag → land` and `wave`. Unknown action names remain invalid. If present, `fall` should loop and `touch` should be mirrorable.
 
+## Manifest v3
+
+Schema v3 is the public format for `flavor-monster`. It keeps the common identity, canvas, anchor, hitbox, palette, and scale fields, replaces `actions` with 6–10 freely named `behaviors`, and adds trigger `bindings`. Required bindings are `idle`, `ambient`, `sleep`, `click`, `pointer`, `drag`, and `release`.
+
+Packs using the current v3 grounding and physical-floor contract require runner 3.1.0 or newer.
+
+The optional common field `floorMode` chooses the physical bottom plane: `work-area` stays above the macOS Dock or Windows taskbar and remains the backward-compatible default; `display-edge` uses the true display edge for pets that should not appear suspended above an unused reserved strip.
+
+Each behavior contains one or more ordered phases. Every phase owns a PNG/WebP horizontal strip and declares:
+
+- a unique phase `id`, safe relative `file`, and `frames`;
+- exactly one timing form: `fps` or per-frame `durationsMs`;
+- `playback` as `once` or `loop`;
+- `completeOn` as `animation-finished`, `motion-finished`, `floor-impact`, `pointer-released`, `wake-requested`, or `timeout`;
+- optional `motion` as `walk`, `fall`, `cursor-approach`, or `cursor-return`;
+- a boolean `mirrorable`.
+- optional `grounding` as `floor` or `free`; floor phases align each visible frame's transparent-pixel bottom to `anchor.y`, while free phases preserve airborne or held poses.
+
+An optional v3 `cadence` object may define `idleIntervalMs`, `ambientIntervalMs`, `postEpisodeQuietMs`, `pointerDwellMs`, `pointerCooldownMs`, `dragThresholdPx`, `pointerResetsSleep`, and `profileMultipliers` (`quiet`, `balanced`, `lively`). Cadence is character data: the runner applies the profile multiplier only to autonomous timing and cooldowns; click, drag, sleep duration, and animation timing remain unscaled.
+
+A loop may not complete on `animation-finished`; it needs an explicit external exit. All behaviors must be reachable through bindings. Sleep declares inactivity delay and an automatic wake range, and its behavior must include a persistent wake-requested phase.
+
 ## Invariants
 
-- `schemaVersion` is exactly `2`; ids use lowercase ASCII letters, digits, and hyphens.
+- `schemaVersion` is `2` or `3`; ids use lowercase ASCII letters, digits, and hyphens.
 - Canvas is 32–1024 px; anchor and hitbox stay inside it; palette has one to three `#RRGGBB` colors.
-- Every action path is safe and relative, uses PNG or WebP, and has 1–24 frames at 1–30 FPS.
+- Every action or phase path is safe and relative, uses PNG or WebP, and has 1–24 frames. v2 uses 1–30 FPS; v3 may instead use per-frame durations.
 - Strip width is `canvas.width × frames`; height is `canvas.height`; every frame is non-empty and corners are transparent.
-- Stable `idle` and `walk` body-center drift is at most 1 px; their grounded baseline drift is at most 1 px.
+- In schema v2, stable `idle` and `walk` body-center drift is at most 1 px and their grounded baseline drift is at most 1 px. In schema v3, use phase-level `grounding: "floor"` for variable-height poses; the runner normalizes each visible frame to the shared anchor.
+- `floorMode: "display-edge"` is appropriate only when the approved pet should sit on the actual screen frame; omit it to preserve Dock/taskbar avoidance.
 - `idle` visible-height variation is at most 1.5%; loop seams must not make a large silhouette jump.
 - At `defaultScale`, visible height should land near 120–140 px.
 - ZIP has one top-level directory named after the id and contains no traversal, symlink, encryption, or oversized members.
@@ -55,18 +78,18 @@ python scripts/build_desktop_pet_pack.py path/to/pet-id \
   --review-only --review-dir path/to/review
 ```
 
-The required-only contact sheet is 3×4; rows expand automatically when optional actions are present. The builder also writes `frame-audit.png`, which places every frame on a contrasting dark background so detached marks and partial white boxes cannot hide in transparency. After explicit approval, build and independently validate:
+For v2, the required-only contact sheet is 3×4. For v3, the overview contains one cell per behavior and `behavior-timelines.png` shows phase boundaries and completion events. Both formats also produce `motion-preview.gif` and `frame-audit.png`, which places every frame on a contrasting dark background. After explicit approval, build and independently validate:
 
 ```bash
-python scripts/build_desktop_pet_pack.py path/to/pet-id --out path/to/pet-id-v2.zip --review-dir path/to/review
-python scripts/validate_desktop_pet_pack.py path/to/pet-id-v2.zip
+python scripts/build_desktop_pet_pack.py path/to/pet-id --out path/to/pet-id.zip --review-dir path/to/review
+python scripts/validate_desktop_pet_pack.py path/to/pet-id.zip
 ```
 
 For a non-technical-user delivery, build the platform folder in the same validated step:
 
 ```bash
 python scripts/build_desktop_pet_pack.py path/to/pet-id \
-  --out path/to/pet-id-v2.zip \
+  --out path/to/pet-id.zip \
   --review-dir path/to/review \
   --delivery-dir path/to/pet-delivery \
   --delivery-platform macos   # or windows; use all only for cross-platform distribution
@@ -80,6 +103,8 @@ The runner must never run, delete, or overwrite a schema-v1 pack. It lists v1 pa
 
 ## Runner contract
 
-The Electron source template imports validated v2 ZIPs, keeps one active pet, uses alpha click-through, constrains targeted walks to display work areas, and persists scale, activity level, cursor awareness, position, pause, visibility, topmost, and launch-at-login. Stable idle is event-driven; interactions preempt autonomous episodes; reduced-motion selects quiet behavior and disables autonomous walk. With `fall` and `touch`, high releases descend before landing, and cursor awareness runs one short chase-touch-return episode instead of continuous tracking. Right-clicking an opaque pet pixel opens the native pause/activity/size/switch/hide/quit menu; the tray remains the fallback when the pet is hidden.
+The Electron source template imports validated v2 and v3 ZIPs and compiles both into one internal episode model. It keeps one active pet, uses alpha click-through, constrains movement to display work areas, and persists scale, activity level, cursor awareness, position, pause, visibility, topmost, and launch-at-login. Interactions preempt autonomous episodes; reduced-motion selects quiet behavior and disables autonomous exploration and cursor chase while preserving required drag-release recovery. v3 sleep remains in its loop until a wake request, and physical completion events advance walk, cursor, and fall phases. Right-clicking an opaque pet pixel opens the native pause/activity/size/switch/hide/quit menu; the tray remains the fallback when the pet is hidden.
+
+For v3, a pointer press is pending until it moves past `dragThresholdPx`: release before the threshold is one click, while movement past it is one drag/release chain. Pointer proximity does not count as sleep-resetting interaction when `pointerResetsSleep` is false.
 
 Do not copy `node_modules`, build output, imported packs, or user app data into the skill.

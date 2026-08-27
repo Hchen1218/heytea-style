@@ -6,6 +6,11 @@ private-assets/scripts/
 __pycache__/
 *.pyc
 .DS_Store
+.venv/
+.pytest_cache/
+.coverage
+coverage/
+*.log
 *.skill
 assets/desktop-pet-runtime/node_modules/
 assets/desktop-pet-runtime/dist/

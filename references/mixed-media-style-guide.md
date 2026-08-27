@@ -40,7 +40,7 @@ The target is an observed hand making decisions in real time. Smooth Bézier cur
 - Preserve generous negative space. Review boards should feel like objects placed on paper, not a filled sticker sheet.
 - Cuteness comes from awkward scale, a clear verb, and the relationship between body and prop—not from large eyes or a detailed face.
 - Human figures are faceless, back-facing, or reduced to functional contours. Limbs bend simply and may be anatomically naive.
-- For a desktop pet, the photographed object remains the body. Use only tiny, sparse facial marks when an action cannot otherwise be read.
+- For a `source-faithful` desktop pet, the photographed object remains the body. For a `flavor-monster` desktop pet, the approved creature remains the body and the photo survives only as color, ingredient, material, and motion DNA. Use only tiny, sparse facial marks when an action cannot otherwise be read.
 - Keep appendages short and slightly clumsy. Let pose, tilt, squash, crumbs, bubbles, steam, or wobble carry emotion.
 
 ## Model-facing reference boards
@@ -59,13 +59,25 @@ When a generated object still has a clean cartoon framework, borrow line anatomy
 
 ## Desktop-pet translation
 
-For the three-candidate board:
+For every three-candidate board:
 
-- preserve the source silhouette, major internal divisions, and identifying colors;
 - draw structural edges with thin-to-medium hesitant pen, not one smooth heavy contour;
 - zone drinks and soft foods across light colored pencil, broad childlike wax crayon, paper-white clear areas, and only occasional pale smear; never give the full body one uniform texture;
-- vary face placement, limb proportions, and temperament only;
 - use a warm-white review background with enough separation to inspect edge quality.
+
+For `source-faithful`:
+
+- preserve the source silhouette, major internal divisions, identifying colors, and must-preserve object details;
+- vary face placement, limb proportions, structural crookedness, and temperament only;
+- reject animal costumes, monster substitution, or loss of object recognition.
+
+For `flavor-monster`:
+
+- preserve the extracted color, ingredient/material, and motion DNA instead of the photographed container silhouette;
+- use an unmistakably biological creature silhouette and translate ingredients into anatomy or skin/belly markings;
+- vary simple body archetype, minimal face system, appendage proportions, placement of flavor-DNA features, and temperament while keeping stance, scale, and ground anchor fixed;
+- reject complete cup, bowl, bottle, wrapper, lid, rim, straw, container walls, layered drink cross-sections, or loose ingredients sitting at a vessel bottom;
+- reject generic unrelated monsters whose palette could be changed without losing all connection to the source.
 
 For animation frames, preserve the same stroke logic even when poses change. Runtime interpolation may move or squash the complete drawing, but it must not replace hand-drawn silhouette-changing key poses.
 
@@ -83,3 +95,6 @@ Reject and regenerate when any of these dominate:
 - generic chibi face as the main source of cuteness;
 - excessive props, decorations, text, logos, or campaign layout;
 - photographic desktop-pet body with doodles merely pasted on top.
+- `source-faithful` output that replaces the source object with a generic creature.
+- `flavor-monster` output that is still a cup, bowl, bottle, wrapper, or food package with limbs.
+- `flavor-monster` output that copies source colors but omits all ingredient/material and motion DNA.

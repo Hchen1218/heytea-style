@@ -14,4 +14,9 @@ function parseCommandLine(argv) {
   return result;
 }
 
-module.exports = { parseCommandLine };
+function forwardedCommandLine(commandLine, additionalData) {
+  if (Array.isArray(additionalData?.argv)) return additionalData.argv;
+  return Array.isArray(commandLine) ? commandLine : [];
+}
+
+module.exports = { forwardedCommandLine, parseCommandLine };
