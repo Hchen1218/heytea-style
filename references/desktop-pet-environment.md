@@ -7,12 +7,13 @@ Read this reference at the beginning of every desktop-pet request, before inspec
 Run the read-only preflight first:
 
 ```bash
-python scripts/check_desktop_pet_environment.py --json
+python scripts/check_desktop_pet_environment.py --json --required-schema 3
 ```
 
 Interpret the result:
 
-- `ready`: the runner is already installed. Continue to the subject gate without discussing Node or build tools.
+- `ready`: the installed runner meets the requested schema's minimum version.
+- `upgradeable`: a runner exists but is too old for the requested schema; show the exact in-place or side-by-side plan and request upgrade consent.
 - `installable`: the runner is missing, but the bundled source and local Node/npm toolchain can build it.
 - `needs-toolchain`: the runner is missing and Node.js 20+ or npm must be installed first.
 - `missing-source`: the skill package does not contain the runner source. Stop and report that the runtime cannot be installed from this package.
@@ -55,7 +56,17 @@ When Node.js/npm are also missing and the preflight reports Homebrew or winget:
 python scripts/install_desktop_pet_runtime.py --yes --install-toolchain
 ```
 
-The script uses no shell interpolation and refuses to replace an existing application. It installs to a per-user location by default:
+For an installed legacy runner that preflight marks `upgradeable`, explicit consent authorizes:
+
+```bash
+python scripts/install_desktop_pet_runtime.py --yes --upgrade
+```
+
+The JSON report identifies the installed runner as `runtimeScope: "user"` or `"system"`. The install plan exposes the matching `installMode`: `in-place-upgrade` for a per-user legacy runner and `user-side-by-side` for a system-wide legacy runner.
+
+For `in-place-upgrade`, the upgrader first asks the running app to quit, preserves it as a versioned backup beside the application, copies the new build atomically with rollback on copy failure, and leaves imported pets/settings in Application Support untouched. For `user-side-by-side`, it asks the system-wide runner to quit, leaves that installation unchanged, and installs the new runner in the per-user location without requesting administrator privileges or claiming to create a system-level backup.
+
+The script uses no shell interpolation. It refuses to replace a per-user installed application unless both `--yes` and `--upgrade` are supplied, never overwrites an existing backup (repeated refreshes receive a numbered backup), and installs new or side-by-side builds to:
 
 - macOS: `~/Applications/Doodle Desktop Pet.app`
 - Windows: `%LOCALAPPDATA%\Programs\Doodle Desktop Pet\Doodle Desktop Pet.exe`
@@ -78,7 +89,7 @@ It does not:
 - bypass Gatekeeper, SmartScreen, antivirus, or browser security warnings;
 - grant accessibility, screen-recording, camera, microphone, or other sensitive permissions;
 - enable launch-at-login;
-- replace an existing runtime;
+- replace a compatible runtime or silently delete the versioned backup;
 - claim that an unsigned local build is a notarized production release.
 
 ## After installation
@@ -87,4 +98,4 @@ Run the preflight again. Continue only when it reports `ready`. If installation 
 
 Once the role pack is built, import it through the runner. Installation is a one-time system step; future pets receive a lightweight delivery folder with the validated ZIP plus start/quit entrypoints. Never copy Electron, `node_modules`, or another full application into each role folder.
 
-The start entrypoint invokes the installed runner with `--open-pet <zip>`; the single running instance validates, imports or refreshes that pack, activates it, and shows the pet. Commands that arrive while the runner is still initializing are queued and executed after its window, settings, and import directories are ready. The quit entrypoint invokes `--quit`, allowing settings and position to be saved before exit. If the shared runner is absent, the launcher reports that installation is required; it must not install software silently.
+The start entrypoint checks the installed runner's full semantic version against the pack schema before invoking `--open-pet <zip>`. Schema v3 currently requires 3.1.0 because phase grounding and display-edge floor policy are runtime features. It must report an actionable upgrade message instead of handing a newer pack to an older runner. A compatible single running instance validates, imports or refreshes that pack, activates it, and shows the pet. Commands that arrive while the runner is still initializing are queued until ready. The quit entrypoint invokes `--quit`, allowing settings and position to be saved before exit. Launchers never install or upgrade software silently.

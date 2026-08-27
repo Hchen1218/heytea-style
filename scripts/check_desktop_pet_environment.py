@@ -7,6 +7,7 @@ import argparse
 import json
 import os
 import platform
+import plistlib
 import re
 import shutil
 import subprocess
@@ -18,6 +19,7 @@ from typing import Callable, Mapping
 
 PRODUCT_NAME = "Doodle Desktop Pet"
 MIN_NODE_MAJOR = 20
+MIN_RUNTIME_BY_SCHEMA = {2: "2.0.0", 3: "3.1.0"}
 
 
 @dataclass(frozen=True)
@@ -27,7 +29,14 @@ class EnvironmentReport:
     status: str
     runtimeInstalled: bool
     runtimePath: str | None
+    runtimeScope: str | None
+    runtimeVersion: str | None
+    runtimeCompatible: bool
+    requiredSchema: int
+    minimumRuntimeVersion: str
     sourceAvailable: bool
+    sourceVersion: str | None
+    sourceCompatible: bool
     runtimeRoot: str
     nodeAvailable: bool
     nodeVersion: str | None
@@ -73,6 +82,38 @@ def command_version(executable: str | None) -> str | None:
     return (completed.stdout or completed.stderr).strip() or None
 
 
+def version_tuple(value: str | None) -> tuple[int, int, int] | None:
+    if not value:
+        return None
+    match = re.match(r"^\s*(\d+)(?:\.(\d+))?(?:\.(\d+))?", value)
+    if not match:
+        return None
+    return tuple(int(part or 0) for part in match.groups())
+
+
+def runtime_version(platform_name: str, application: Path) -> str | None:
+    if platform_name == "macos":
+        try:
+            with (application / "Contents" / "Info.plist").open("rb") as handle:
+                value = plistlib.load(handle).get("CFBundleShortVersionString")
+            return str(value) if value else None
+        except (OSError, plistlib.InvalidFileException):
+            return None
+    if platform_name == "windows":
+        powershell = shutil.which("powershell") or shutil.which("powershell.exe")
+        if not powershell:
+            return None
+        try:
+            completed = subprocess.run(
+                [powershell, "-NoProfile", "-Command", "(Get-Item $args[0]).VersionInfo.ProductVersion", str(application)],
+                check=True, capture_output=True, text=True, timeout=8,
+            )
+            return completed.stdout.strip() or None
+        except (OSError, subprocess.SubprocessError):
+            return None
+    return None
+
+
 def runtime_candidates(platform_name: str, home: Path, environ: Mapping[str, str]) -> list[Path]:
     if platform_name == "macos":
         return [
@@ -105,15 +146,35 @@ def detect_environment(
     home: Path | None = None,
     environ: Mapping[str, str] | None = None,
     which: Callable[[str], str | None] = shutil.which,
+    required_schema: int = 3,
 ) -> EnvironmentReport:
     current_platform = normalize_platform(platform_name)
     current_home = (home or Path.home()).expanduser()
     current_environ = environ or os.environ
     root = (runtime_root or Path(__file__).resolve().parents[1] / "assets" / "desktop-pet-runtime").resolve()
     supported = current_platform in {"macos", "windows"}
+    if required_schema not in MIN_RUNTIME_BY_SCHEMA:
+        raise ValueError(f"unsupported required schema: {required_schema}")
 
-    installed = next((candidate for candidate in runtime_candidates(current_platform, current_home, current_environ) if candidate.exists()), None)
+    candidates = runtime_candidates(current_platform, current_home, current_environ)
+    installed = next((candidate for candidate in candidates if candidate.exists()), None)
+    installed_scope = None
+    if installed:
+        installed_scope = "user" if candidates and installed == candidates[0] else "system"
+    installed_version = runtime_version(current_platform, installed) if installed else None
+    minimum_version = MIN_RUNTIME_BY_SCHEMA[required_schema]
+    installed_tuple = version_tuple(installed_version)
+    minimum_tuple = version_tuple(minimum_version)
+    runtime_compatible = bool(installed and installed_tuple and minimum_tuple and installed_tuple >= minimum_tuple)
     source_available = (root / "package.json").is_file() and (root / "src" / "main.js").is_file()
+    source_version = None
+    if source_available:
+        try:
+            source_version = str(json.loads((root / "package.json").read_text(encoding="utf-8")).get("version") or "") or None
+        except (OSError, json.JSONDecodeError):
+            source_version = None
+    source_tuple = version_tuple(source_version)
+    source_compatible = bool(source_available and source_tuple and minimum_tuple and source_tuple >= minimum_tuple)
     node_path = which("node")
     npm_path = which("npm") or which("npm.cmd")
     version = command_version(node_path)
@@ -133,8 +194,12 @@ def detect_environment(
         missing.append("supported-platform")
     if not installed:
         missing.append("desktop-pet-runtime")
+    elif not runtime_compatible:
+        missing.append(f"desktop-pet-runtime>={minimum_version}")
     if not source_available:
         missing.append("runtime-source")
+    elif not source_compatible:
+        missing.append(f"runtime-source>={minimum_version}")
     if not node_path:
         missing.append("node")
     elif not node_supported:
@@ -144,14 +209,23 @@ def detect_environment(
     if source_available and node_supported and npm_path and not dependencies_installed:
         missing.append("runtime-dependencies")
 
-    if installed:
+    if runtime_compatible:
         status = "ready"
         next_action = "launch-runtime"
     elif not supported:
         status = "unsupported"
         next_action = "stop"
-    elif not source_available:
-        status = "missing-source"
+    elif installed and not source_compatible:
+        status = "upgrade-source-missing" if not source_available else "upgrade-source-incompatible"
+        next_action = "provide-runtime-package"
+    elif installed and (not node_supported or not npm_path):
+        status = "needs-toolchain"
+        next_action = "ask-to-install-toolchain-for-upgrade"
+    elif installed:
+        status = "upgradeable"
+        next_action = "ask-to-upgrade-runtime"
+    elif not source_compatible:
+        status = "missing-source" if not source_available else "incompatible-source"
         next_action = "provide-runtime-package"
     elif not node_supported or not npm_path:
         status = "needs-toolchain"
@@ -167,7 +241,14 @@ def detect_environment(
         status=status,
         runtimeInstalled=installed is not None,
         runtimePath=str(installed) if installed else None,
+        runtimeScope=installed_scope,
+        runtimeVersion=installed_version,
+        runtimeCompatible=runtime_compatible,
+        requiredSchema=required_schema,
+        minimumRuntimeVersion=minimum_version,
         sourceAvailable=source_available,
+        sourceVersion=source_version,
+        sourceCompatible=source_compatible,
         runtimeRoot=str(root),
         nodeAvailable=node_path is not None,
         nodeVersion=version,
@@ -177,7 +258,7 @@ def detect_environment(
         packageManager=package_manager,
         installDirectory=str(destination) if destination else None,
         missing=missing,
-        needsConfirmation=not bool(installed) and supported,
+        needsConfirmation=supported and not runtime_compatible and source_compatible,
         nextAction=next_action,
     )
 
@@ -190,9 +271,12 @@ def human_summary(report: EnvironmentReport) -> str:
     ]
     if report.runtimePath:
         lines.append(f"runtime path: {report.runtimePath}")
+        lines.append(f"runtime scope: {report.runtimeScope}")
+    lines.append(f"runtime version: {report.runtimeVersion or 'unknown'} (required >= {report.minimumRuntimeVersion})")
     lines.extend(
         [
             f"runtime source: {'yes' if report.sourceAvailable else 'no'}",
+            f"runtime source version: {report.sourceVersion or 'unknown'}",
             f"node: {report.nodeVersion or 'missing'}",
             f"npm: {'yes' if report.npmAvailable else 'no'}",
             f"dependencies: {'yes' if report.dependenciesInstalled else 'no'}",
@@ -209,9 +293,10 @@ def main() -> None:
     parser.add_argument("--json", action="store_true", help="Print a machine-readable report")
     parser.add_argument("--platform", choices=("macos", "windows"), help="Override platform for diagnostics/tests")
     parser.add_argument("--runtime-root", type=Path, help="Override the bundled runtime source directory")
+    parser.add_argument("--required-schema", type=int, choices=(2, 3), default=3, help="Pack schema that the installed runner must support")
     args = parser.parse_args()
 
-    report = detect_environment(platform_name=args.platform, runtime_root=args.runtime_root)
+    report = detect_environment(platform_name=args.platform, runtime_root=args.runtime_root, required_schema=args.required_schema)
     print(json.dumps(asdict(report), ensure_ascii=False, indent=2) if args.json else human_summary(report))
     if not report.supported:
         raise SystemExit(2)

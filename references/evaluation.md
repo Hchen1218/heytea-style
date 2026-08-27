@@ -88,22 +88,22 @@ A desktop-pet request succeeds only when the staged workflow is visible in the r
 - no-subject inputs ask for a clearer photo instead of inventing a character;
 - multi-subject inputs present numbered choices instead of silently selecting one;
 - a container and its contents are treated as one subject by default;
+- if the user did not already choose one, the response asks whether to make a 写实卡通桌宠 or 风味小怪兽桌宠 before generating candidates;
+- the chosen character mode is recorded and remains fixed through character and motion approval;
 - the candidate board contains three versions of the same source identity and palette in one identical neutral stance and ground anchor;
 - candidates differ through face system, short-limb proportions, structural crookedness, and stable temperament—not action poses;
 - pose-only boards are explicitly consolidated into one neutral canonical master instead of forcing a meaningless selection;
 - every candidate has the intended limb inventory; by default exactly two arms and two clearly visible legs, even when strokes contain deliberate gaps;
 - the user explicitly approves a candidate before motion generation;
-- all twelve required actions are present and share one stable identity;
-- when optional `fall` and `touch` are present, their line/color language matches the newest approved v2 action family and their transition frames connect `drag → fall → land` and `walk → touch → walk` without a visible redesign;
+- source-faithful schema-v2 packs contain all twelve required actions with one stable identity; optional `fall` and `touch` connect `drag → fall → land` and `walk → touch → walk` without redesign;
+- flavor-monster schema-v3 packs contain 6–10 reachable behaviors, complete bindings, explicit phase exits, and persistent `sleep-enter → sleeping-loop → wake-exit` behavior;
 - the user explicitly approves the contact sheet and looping preview before packaging;
 - review images may use white, but runtime strips have transparent corners and no white rectangle;
-- the result includes a validated schema-v2 ZIP or honestly states which artifacts remain unbuilt.
+- the result includes an independently validated mode-appropriate ZIP (v2 for source-faithful, v3 for flavor-monster) or honestly states which artifacts remain unbuilt.
 - the non-technical delivery folder contains only the validated pack, preview, usage note, and platform start/quit entrypoints; it does not duplicate the Electron runtime.
 
-Desktop-pet visual quality passes when:
+Shared desktop-pet visual quality passes when:
 
-- the photographed subject remains recognizable after full illustration conversion;
-- the subject itself is the character body;
 - one to three source colors, hesitant thin-to-medium pen structure, minimal face, and short limbs remain consistent;
 - drinks and soft foods use deliberate media zoning—light colored pencil, broad childlike wax crayon, paper-white clear areas, and only optional pale smears—rather than one uniform texture, oil-paint mass, smooth gradient, or flat digital fill;
 - every long structural or limb stroke visibly meanders; no ruler-straight segment survives merely because the overall object is asymmetric;
@@ -115,11 +115,30 @@ Desktop-pet visual quality passes when:
 - `signature` expresses the subject instead of adding a generic animation;
 - no official logos, mascots, random text, costume, glossy 3D treatment, or polished sticker outline appears.
 
-Desktop-pet pack quality passes when both build and independent validation succeed. The validator must reject missing actions, unsafe paths, incorrect strip dimensions, fully opaque assets, non-transparent corners, empty frames, invalid hitboxes, and mismatched ZIP roots.
+`source-faithful` visual quality also requires:
+
+- the photographed subject remains recognizable after full illustration conversion;
+- the subject itself is the character body;
+- the outer silhouette, major internal divisions, and must-preserve object/container features remain stable across candidates and actions;
+- the output does not silently turn into an animal, mascot, or flavor monster.
+
+`flavor-monster` visual quality also requires:
+
+- the first impression is an independent creature rather than a source container with limbs;
+- source recognition comes from a stable combination of color, ingredient/material, and motion DNA;
+- ingredients become anatomy, internal features, or markings rather than contents sitting at the bottom of a vessel;
+- no complete cup, bowl, bottle, wrapper, lid, rim, straw, container wall, or layered drink cross-section survives;
+- the approved monster silhouette, appendage inventory, restrained asymmetry, and flavor-DNA features remain stable across actions;
+- behavior interpretation uses the monster's anatomy, larger episode arcs, and explicit enter/loop/exit phases rather than preserving the v2 state names.
+
+Desktop-pet pack quality passes when both build and independent validation succeed. The validator must reject missing v2 actions or v3 bindings, unreachable behaviors, non-terminating loops, illegal completion events, unsafe paths, incorrect strip dimensions, fully opaque assets, non-transparent corners, empty frames, invalid hitboxes, and mismatched ZIP roots.
 
 ## Desktop-Pet Failure Modes
 
 - **Gate skipping**: motion is generated before character approval, or packaging begins before motion approval.
+- **Missing mode gate**: candidate generation starts from an unspecified “桌宠” request without asking 写实卡通 or 风味小怪兽.
+- **Silent mode inference**: food or drink is automatically routed to one character mode without the user choosing it.
+- **Cross-mode leakage**: `source-faithful` becomes a generic monster, or `flavor-monster` retains a complete source container body.
 - **Silent subject choice**: one item is selected from a multi-object photo without asking.
 - **Identity drift**: face, outline, palette, or appendages change between actions.
 - **Poster leakage**: photographic texture or micro-worker poster composition is reused as the pet body.
@@ -147,14 +166,15 @@ Desktop-pet pack quality passes when both build and independent validation succe
 ## Desktop-Pet Review Questions
 
 1. Was subject ambiguity resolved before generation?
-2. Which must-preserve features identify the source object?
-3. Are the three candidates genuinely the same character?
-4. Is there explicit approval for the selected character?
-5. Are all twelve states present, readable, and consistently anchored?
-6. Is there explicit approval for the motion preview?
-7. Are runtime strips transparent and structurally valid?
-8. Did both the builder and validator succeed?
-9. Does the imported runner remain usable without blocking normal desktop input?
+2. Did the user explicitly choose 写实卡通 or 风味小怪兽?
+3. Which source silhouette/details or flavor-DNA features identify the result in that mode?
+4. Are the three candidates genuine identity variants in one neutral stance?
+5. Is there explicit approval for the selected character?
+6. Are all twelve states present, mode-appropriate, readable, and consistently anchored?
+7. Is there explicit approval for the motion preview?
+8. Are runtime strips transparent and structurally valid?
+9. Did both the builder and validator succeed?
+10. Does the imported runner remain usable without blocking normal desktop input?
 
 ## Release Checks
 

@@ -1,0 +1,23 @@
+{
+  "canvas": { "width": 384, "height": 384 },
+  "behaviors": {
+    "awake-story": { "source": "awake-story.webp", "phases": { "story": { "frames": [0, 1, 2, 3, 4, 5, 6, 7] } } },
+    "explore-walk": { "source": "explore-walk.webp", "phases": {
+      "start": { "frames": [0, 1] }, "walk-loop": { "frames": [2, 3, 4, 3] }, "stop": { "frames": [5, 6, 7] }
+    } },
+    "sleep-cycle": { "source": "sleep-cycle.webp", "phases": {
+      "sleep-enter": { "frames": [0, 1, 2, 3] }, "sleeping-loop": { "frames": [3, 4, 3] }, "wake-exit": { "frames": [5, 6, 7] }
+    } },
+    "affection-click": { "source": "affection-click.webp", "phases": { "response": { "frames": [0, 1, 2, 3, 4, 5, 6, 7] } } },
+    "cursor-encounter": { "source": "cursor-encounter.webp", "phases": {
+      "notice": { "frames": [0, 1, 2] }, "approach": { "frames": [3, 4, 3] }, "touch": { "frames": [5] }, "retreat": { "frames": [6] }, "settle": { "frames": [7] }
+    } },
+    "held": { "source": "held.webp", "phases": {
+      "grab-enter": { "frames": [0, 1, 2, 3] }, "held-loop": { "frames": [4, 5, 4] }
+    } },
+    "drop-recover": { "source": "drop-recover.webp", "phases": {
+      "fall-loop": { "frames": [1, 2, 3, 2] }, "impact": { "frames": [4] }, "rebound": { "frames": [5] }, "settle": { "frames": [6, 7] }
+    } },
+    "fruit-hiccup": { "source": "fruit-hiccup.webp", "phases": { "hiccup": { "frames": [0, 1, 2, 3, 4, 5, 6, 7] } } }
+  }
+}

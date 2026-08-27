@@ -9,6 +9,7 @@ import os
 import shutil
 import subprocess
 import sys
+import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -28,7 +29,13 @@ class InstallError(RuntimeError):
 @dataclass(frozen=True)
 class InstallPlan:
     platform: str
+    installMode: str
     alreadyInstalled: bool
+    installedVersion: str | None
+    minimumVersion: str
+    upgradeExisting: bool
+    stopExisting: bool
+    backupPath: str | None
     installToolchain: list[list[str]]
     installDependencies: list[str] | None
     buildRuntime: list[str] | None
@@ -57,12 +64,38 @@ def toolchain_commands(report: EnvironmentReport) -> list[list[str]]:
 def make_plan(report: EnvironmentReport, *, launch: bool = True) -> InstallPlan:
     npm = "npm.cmd" if report.platform == "windows" else "npm"
     build_script = "pack:win" if report.platform == "windows" else "pack:mac"
+    replacement_needed = report.runtimeInstalled and not report.runtimeCompatible
+    upgrade = replacement_needed and report.runtimeScope == "user"
+    side_by_side = replacement_needed and report.runtimeScope == "system"
+    if report.runtimeCompatible:
+        install_mode = "launch-existing"
+    elif upgrade:
+        install_mode = "in-place-upgrade"
+    elif side_by_side:
+        install_mode = "user-side-by-side"
+    elif not report.runtimeInstalled:
+        install_mode = "fresh-install"
+    else:
+        install_mode = "unavailable"
+    backup = None
+    if upgrade and report.runtimePath:
+        installed = Path(report.runtimePath)
+        if report.platform == "macos":
+            backup = str(installed.with_name(f"{PRODUCT_NAME} {report.runtimeVersion or 'Unknown'} Backup.app"))
+        else:
+            backup = str(installed.parent.with_name(f"{PRODUCT_NAME} {report.runtimeVersion or 'Unknown'} Backup"))
     return InstallPlan(
         platform=report.platform,
+        installMode=install_mode,
         alreadyInstalled=report.runtimeInstalled,
+        installedVersion=report.runtimeVersion,
+        minimumVersion=report.minimumRuntimeVersion,
+        upgradeExisting=upgrade,
+        stopExisting=replacement_needed,
+        backupPath=backup,
         installToolchain=toolchain_commands(report),
-        installDependencies=None if report.runtimeInstalled or report.dependenciesInstalled else [npm, "install"],
-        buildRuntime=None if report.runtimeInstalled else [npm, "run", build_script],
+        installDependencies=None if report.dependenciesInstalled or not report.sourceCompatible else [npm, "install"],
+        buildRuntime=None if report.runtimeCompatible or not report.sourceCompatible else [npm, "run", build_script],
         installDirectory=report.installDirectory,
         launchAfterInstall=launch,
     )
@@ -89,29 +122,74 @@ def find_windows_directory(dist: Path) -> Path:
     raise InstallError("Windows build did not produce a runnable unpacked directory")
 
 
-def install_built_runtime(report: EnvironmentReport, *, dry_run: bool = False) -> Path:
+def available_backup_path(preferred: Path, *, suffix: str | None = None) -> Path:
+    if not preferred.exists():
+        return preferred
+    effective_suffix = preferred.suffix if suffix is None else suffix
+    stem = preferred.name[: -len(effective_suffix)] if effective_suffix else preferred.name
+    for index in range(2, 1000):
+        candidate = preferred.with_name(f"{stem} {index}{effective_suffix}")
+        if not candidate.exists():
+            return candidate
+    raise InstallError(f"could not allocate a backup path beside: {preferred}")
+
+
+def install_built_runtime(report: EnvironmentReport, *, upgrade: bool = False, dry_run: bool = False) -> Path:
     root = Path(report.runtimeRoot)
     dist = root / "dist"
     destination_root = Path(report.installDirectory or "")
     if report.platform == "macos":
         source = find_mac_app(dist)
         destination = destination_root / source.name
+        backup = None
+        if destination.exists():
+            if not upgrade:
+                raise InstallError(f"refusing to replace existing application: {destination}")
+            backup = available_backup_path(destination.with_name(f"{PRODUCT_NAME} {report.runtimeVersion or 'Unknown'} Backup.app"))
+            print(f"+ backup {destination} -> {backup}")
         print(f"+ copy {source} -> {destination}")
         if not dry_run:
             destination_root.mkdir(parents=True, exist_ok=True)
-            if destination.exists():
-                raise InstallError(f"refusing to replace existing application: {destination}")
-            shutil.copytree(source, destination, symlinks=True)
+            if backup:
+                destination.rename(backup)
+                try:
+                    shutil.copytree(source, destination, symlinks=True)
+                except BaseException:
+                    if destination.exists():
+                        shutil.rmtree(destination)
+                    if backup.exists():
+                        backup.rename(destination)
+                    raise
+            else:
+                shutil.copytree(source, destination, symlinks=True)
         return destination
 
     source = find_windows_directory(dist)
     destination = destination_root
+    backup = None
+    if destination.exists():
+        if not upgrade:
+            raise InstallError(f"refusing to replace existing application: {destination}")
+        backup = available_backup_path(
+            destination.with_name(f"{PRODUCT_NAME} {report.runtimeVersion or 'Unknown'} Backup"),
+            suffix="",
+        )
+        print(f"+ backup {destination} -> {backup}")
     print(f"+ copy {source} -> {destination}")
     if not dry_run:
         destination.parent.mkdir(parents=True, exist_ok=True)
-        if destination.exists():
-            raise InstallError(f"refusing to replace existing application: {destination}")
-        shutil.copytree(source, destination)
+        if backup:
+            destination.rename(backup)
+            try:
+                shutil.copytree(source, destination)
+            except BaseException:
+                if destination.exists():
+                    shutil.rmtree(destination)
+                if backup.exists():
+                    backup.rename(destination)
+                raise
+        else:
+            shutil.copytree(source, destination)
     return destination / f"{PRODUCT_NAME}.exe"
 
 
@@ -126,22 +204,38 @@ def launch_runtime(platform_name: str, application: Path, *, dry_run: bool = Fal
         subprocess.Popen(command, close_fds=True)
 
 
+def request_runtime_quit(platform_name: str, application: Path, *, dry_run: bool = False) -> None:
+    command = ["open", "-n", str(application), "--args", "--quit"] if platform_name == "macos" else [str(application), "--quit"]
+    print("+", " ".join(command))
+    if dry_run:
+        return
+    subprocess.run(command, check=True, timeout=15)
+    time.sleep(2)
+
+
 def install(
     report: EnvironmentReport,
     *,
     allow_toolchain: bool,
+    allow_upgrade: bool,
     launch: bool,
     dry_run: bool,
 ) -> Path | None:
-    if report.runtimeInstalled:
+    if report.runtimeCompatible and not allow_upgrade:
         application = Path(report.runtimePath or "")
         if launch:
             launch_runtime(report.platform, application, dry_run=dry_run)
         return application
+    if report.runtimeInstalled and not allow_upgrade:
+        raise InstallError(
+            f"installed runtime {report.runtimeVersion or 'unknown'} is older than required {report.minimumRuntimeVersion}; rerun with --upgrade after confirmation"
+        )
     if not report.supported:
         raise InstallError(f"unsupported platform: {report.platform}")
     if not report.sourceAvailable:
         raise InstallError("bundled runtime source is missing")
+    if not report.sourceCompatible:
+        raise InstallError(f"bundled runtime source {report.sourceVersion or 'unknown'} is older than required {report.minimumRuntimeVersion}")
 
     commands = toolchain_commands(report)
     if not report.nodeSupported or not report.npmAvailable:
@@ -167,11 +261,15 @@ def install(
     if not report.dependenciesInstalled:
         run([npm, "install"], cwd=root, dry_run=dry_run)
     run([npm, "run", "pack:win" if report.platform == "windows" else "pack:mac"], cwd=root, dry_run=dry_run)
-    if dry_run:
-        return None
-    application = install_built_runtime(report)
+    if report.runtimeInstalled:
+        request_runtime_quit(report.platform, Path(report.runtimePath or ""), dry_run=dry_run)
+    application = install_built_runtime(
+        report,
+        upgrade=report.runtimeInstalled and report.runtimeScope == "user",
+        dry_run=dry_run,
+    )
     if launch:
-        launch_runtime(report.platform, application)
+        launch_runtime(report.platform, application, dry_run=dry_run)
     return application
 
 
@@ -179,6 +277,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--yes", action="store_true", help="Confirm installation was explicitly approved by the user")
     parser.add_argument("--install-toolchain", action="store_true", help="Allow installing Node.js through brew or winget")
+    parser.add_argument("--upgrade", action="store_true", help="Allow replacing or refreshing an installed runtime while preserving a versioned backup")
     parser.add_argument("--no-launch", action="store_true", help="Do not launch after installation")
     parser.add_argument("--dry-run", action="store_true", help="Print actions without changing the system")
     parser.add_argument("--json-plan", action="store_true", help="Print the planned actions and exit")
@@ -198,6 +297,7 @@ def main() -> None:
         application = install(
             report,
             allow_toolchain=args.install_toolchain,
+            allow_upgrade=args.upgrade,
             launch=not args.no_launch,
             dry_run=args.dry_run,
         )
