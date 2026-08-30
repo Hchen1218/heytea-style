@@ -115,18 +115,18 @@
       "expectations": [
         "The output provides numbered choices for the lemon tea, cake, and keys.",
         "The output does not silently select the clearest or most food-like item.",
-        "The output waits for subject selection before generating three candidates."
+        "The output waits for subject selection before asking for or applying the character mode and generating any identity art."
       ]
     },
     {
       "id": 9,
       "prompt": "这是一杯装在透明玻璃杯里的气泡水。把水做成桌宠，直接帮我出动作。",
-      "expected_output": "A desktop-pet character stage that treats the glass and sparkling water as one subject and requires character approval before motion generation.",
+      "expected_output": "A desktop-pet character stage that treats the glass and sparkling water as one subject, asks for the unspecified character mode, and requires character approval before motion generation.",
       "files": [],
       "expectations": [
         "The output treats container and contents as one character by default.",
-        "The output extracts the silhouette, one to three colors, must-preserve features, and a sparkling signature-motion idea.",
-        "The output creates or proposes three same-character candidates on white or warm white.",
+        "The output asks whether to use source-faithful or flavor-monster mode instead of inferring one from the drink.",
+        "No identity or action art is generated until the character mode is explicit.",
         "The output does not comply with the request to skip character approval."
       ]
     },
@@ -169,7 +169,7 @@
     },
     {
       "id": 13,
-      "prompt": "把这张普通台灯照片做成桌宠，不是食物也可以吗？",
+      "prompt": "把这张普通台灯照片做成写实卡通桌宠，不是食物也可以吗？",
       "expected_output": "A valid non-food desktop-pet workflow that treats the lamp itself as the body and invents a restrained subject-specific motion.",
       "files": [],
       "expectations": [
@@ -224,15 +224,14 @@
     {
       "id": 17,
       "prompt": "第一次使用桌宠功能，我还没装过任何东西。直接帮我开始做吧。",
-      "expected_output": "A read-only macOS/Windows environment preflight that runs before image generation and requests explicit consent before repairing missing software.",
+      "expected_output": "An identity-first desktop-pet response that resolves the character mode and canonical design before any runner preflight.",
       "files": [],
       "expectations": [
-        "The output runs or instructs scripts/check_desktop_pet_environment.py before analyzing or generating the pet image.",
-        "The output distinguishes an installed runtime from a source-build toolchain and reports only the actual missing components.",
+        "The output does not run or instruct scripts/check_desktop_pet_environment.py before identity generation and approval.",
+        "The output asks for the unspecified source-faithful or flavor-monster character mode before identity generation.",
+        "The output explains that the runner gate occurs only after canonical identity approval and explicit continuation into runnable motion.",
         "The output does not treat the request to make a pet as installation consent.",
-        "Before installation, the output states what will be installed and the per-user destination.",
-        "The output waits for explicit approval before running scripts/install_desktop_pet_runtime.py.",
-        "Launch-at-login remains disabled unless separately requested."
+        "No motion assets are generated before identity approval."
       ]
     },
     {
@@ -250,7 +249,7 @@
     },
     {
       "id": 19,
-      "prompt": "Windows 上第一次做桌宠，运行器和 Node 都没有。需要什么你帮我装。",
+      "prompt": "角色形象已经确认，我选择继续做可运行桌宠。Windows 上运行器和 Node 都没有，需要什么你帮我装。",
       "expected_output": "A Windows-specific preflight and consent-aware repair plan using winget when available and a per-user runtime installation path.",
       "files": [],
       "expectations": [
@@ -259,7 +258,7 @@
         "The runtime destination defaults to %LOCALAPPDATA%\\Programs\\Doodle Desktop Pet.",
         "The installer builds only the Windows target.",
         "The output does not bypass SmartScreen, antivirus, or administrator prompts.",
-        "Preflight is rerun before image generation proceeds."
+        "Preflight is rerun before motion generation proceeds."
       ]
     },
     {
@@ -310,7 +309,7 @@
       "expectations": [
         "The output presents 写实卡通桌宠 and 风味小怪兽桌宠 as two parallel choices.",
         "The source-faithful choice is explained as keeping the photographed subject's silhouette and structure.",
-        "The flavor-monster choice is explained as extracting color, ingredient, material, and motion DNA into an independent creature.",
+        "The flavor-monster choice is explained as extracting color, ingredient, and material into an independent creature identity while reserving motion DNA for later behavior design.",
         "The output does not infer a default from the fact that the subject is a drink.",
         "No candidate art or motion assets are generated before the choice is explicit."
       ]
@@ -323,6 +322,8 @@
       "expectations": [
         "The output records source-faithful mode and does not ask the user to choose a character mode again.",
         "The glass, water, bubbles, outer silhouette, and key internal divisions remain identity locks.",
+        "The source-faithful workflow chooses only the positive study boards needed for the photographed object's construction instead of requiring all four flavor-monster boards.",
+        "The pink-green flavor-monster example is not used as source-faithful identity grammar.",
         "Candidate differences come from face, limb proportions, structural crookedness, and temperament rather than monster body archetypes.",
         "The signature-motion idea uses a real source property such as bubbles or slosh.",
         "The output still waits for explicit character approval before motion generation."
@@ -331,14 +332,18 @@
     {
       "id": 25,
       "prompt": "把这杯粉色果茶做成风味小怪兽桌宠，杯子本身不要保留。",
-      "expected_output": "A flavor-monster candidate workflow that uses source DNA to design an independent creature and does not retain the source container silhouette.",
+      "expected_output": "A single-best-concept flavor-monster identity workflow that semantically remaps source DNA into an independent creature and does not retain the source container silhouette.",
       "files": [],
       "expectations": [
         "The output records flavor-monster mode and does not ask the user to choose a character mode again.",
-        "The identity brief extracts one to three colors, ingredient or material cues, and one motion verb.",
-        "The first impression is a biological creature rather than a cup, lid, straw, or drink cross-section with limbs.",
-        "Ingredients become anatomy, internal features, or markings rather than contents sitting at a vessel bottom.",
-        "Candidate and later behavior rules keep the shared approval gates, runner, and delivery contract while using the schema-v3 6–10 behavior protocol."
+        "The internal identity brief maps source DNA into an independent body topology and dry-media regions, declares exactly two black-line arms and two black-line legs, declares sparse friendly black-line facial marks, applies the cuteness gate, and records motion verbs separately for later behavior design.",
+        "The concept preserves at least two kinds of visual identity DNA chosen from color, ingredient, and material rather than only recoloring a generic monster; motion does not satisfy this static gate.",
+        "The pink-green public example controls only HEYTEA-like cuteness, handmade awkwardness, and the relationship between an unoutlined body and black-line face/limbs; its silhouette, protrusion placement, face layout, and proportions are not copied.",
+        "The first impression is a cute friendly flat doodle creature rather than a cup, lid, straw, drink cross-section, unpleasant organic form, or conventionally completed mascot.",
+        "The body is a soft compact source-derived dry-media color mass without a complete black enclosing outline or literal ingredient anatomy.",
+        "The identity has exactly two open black-line arms and two open black-line legs; every facial mark is a sparse friendly black doodle line, while the face layout itself may vary.",
+        "The default identity output is one complete-color resting master, followed by full-size and 120–140 px review and explicit approval before motion.",
+        "Later behavior rules keep the shared approval gates, runner, and delivery contract while using the schema-v3 6–10 behavior protocol."
       ]
     },
     {
@@ -352,6 +357,240 @@
         "Walk, cursor encounter, held, and drop recovery advance through animation or physical completion events.",
         "The approved strips are split or ping-ponged without unnecessary visual regeneration.",
         "The schema-v3 ZIP passes independent validation and existing schema-v2 packs are not migrated or overwritten."
+      ]
+    },
+    {
+      "id": 27,
+      "prompt": "先按这张饮料图做一版你构思的风味小怪兽，动作以后再定。",
+      "expected_output": "One complete static flavor-monster identity concept built from explicit source and study-board roles, with motion deferred until identity approval.",
+      "files": [
+        "assets/examples/desktop-pet/source-drink.png"
+      ],
+      "expectations": [
+        "The uploaded photo supplies color, ingredient, material, and body-topology DNA while motion verbs are reserved for later behavior design.",
+        "The public pink-green example supplies only HEYTEA-like cuteness and the unoutlined-body/black-line-feature relationship; the dry-media board controls body texture and the thin-stroke board controls every black face and limb mark.",
+        "The generation instruction explicitly forbids copying the public example's body topology, protrusion placement, face layout, or proportions.",
+        "The figure-action board is deferred to motion generation and the smudged-structure board is used only for focused repair rather than as default identity input.",
+        "The mixed-media-object failure board is not passed as a positive generation reference.",
+        "The result is one complete-color concept in a quiet identity-readable resting pose on a white or warm-white review background, not a three-candidate board.",
+        "The output uses a soft compact source-derived dry-media body with no complete black outline, exactly two open black-line arms, exactly two open black-line legs, a sparse friendly variable-layout black-line face, and one stable ground anchor.",
+        "Source ingredient and material cues remain abstract, and the body passes the explicit cuteness gate instead of becoming a literal source object or disturbing organic form.",
+        "The identity is reviewed at full size and 120–140 px, and no actions are generated before explicit approval."
+      ]
+    },
+    {
+      "id": 28,
+      "prompt": "这张小怪兽只是把通用角色换成了饮料颜色，而且还留着杯盖、吸管和分层液体。帮我判断身份阶段哪里失败。",
+      "expected_output": "A focused identity-stage rejection that identifies missing semantic remapping and surviving container anatomy instead of advancing to motion.",
+      "files": [],
+      "expectations": [
+        "The result fails because palette alone is not enough and at least one additional visual identity-DNA category from ingredient or material is missing; motion cannot satisfy the static identity gate.",
+        "The complete lid, straw, container wall, and layered-liquid cross-section are identified as forbidden carryovers.",
+        "The proposed identity repair remaps visual source cues into a crayon body field, crude flat marks, abstract protrusions, or regional media while keeping one independent flat doodle identity; the motion verb stays reserved for later behavior design.",
+        "The repair remains a focused revision of one concept and does not automatically create three alternatives.",
+        "Motion generation remains blocked until the revised identity passes full-size and 120–140 px review and receives explicit approval."
+      ]
+    },
+    {
+      "id": 29,
+      "prompt": "我给了三张同一个小怪兽挥手、走路和睡觉的图，把它们当三个角色候选让我选一个。",
+      "expected_output": "A pose-theater correction that treats the three images as motion ideas and creates one neutral canonical identity instead of a false identity choice.",
+      "files": [],
+      "expectations": [
+        "The output states that action poses are not genuine identity directions.",
+        "The most neutral shared design is consolidated into one front-facing canonical identity master.",
+        "The other poses are retained only as later motion references.",
+        "The canonical identity keeps one declared silhouette, face, appendage inventory, source-DNA mapping, material zoning, and ground anchor.",
+        "Explicit identity approval is required before the pose ideas can become schema-v3 behaviors."
+      ]
+    },
+    {
+      "id": 30,
+      "prompt": "这只风味小怪兽有蜡笔身体，但身体被完整黑框包住，手脚是有体积的彩色肉块，眼睛有阴影，而且整体像一团塌陷的肉。它算通过身份阶段了吗？",
+      "expected_output": "A focused rejection of an identity that violates HEYTEA-like black-line feature grammar and the mandatory cuteness gate.",
+      "files": [],
+      "expectations": [
+        "The identity is rejected even though its crayon body medium is superficially correct.",
+        "The complete black body frame is rejected because the body should remain a mostly unoutlined dry-media color mass.",
+        "The colored volumetric limbs fail the fixed inventory and line grammar; the repair restores exactly two open black-line arms and two open black-line legs.",
+        "The shaded eyes fail because every facial mark must be a sparse friendly black doodle line, although the face layout may vary.",
+        "The collapsed fleshy reading fails the cuteness gate and receives a body-only repair toward a soft compact friendly topology without copying the public example's silhouette.",
+        "The focused repair remains one concept and does not automatically create three alternatives.",
+        "Motion generation remains blocked until the repaired identity passes full-size and 120–140 px review and receives explicit approval."
+      ]
+    },
+    {
+      "id": 31,
+      "prompt": "把这张披萨照片做成一只风味小怪兽，只出身份图，动作以后再做。",
+      "expected_output": "A cute HEYTEA-like pizza-flavor identity whose body is source-derived but no longer a pizza slice or an unpleasant organic mass.",
+      "files": [],
+      "expectations": [
+        "Pizza color, toasted material, cheese stretch, sauce, and topping rhythm are semantically mapped into an independent body topology and abstract dry-media marks.",
+        "The body is soft, compact, friendly, and animatable rather than a pizza slice with limbs, a literal mushroom, a fleshy collapse, slime, horror tendrils, or corpse-like sagging.",
+        "The body remains a dry-media color mass without a complete black enclosing outline.",
+        "The monster has exactly two separate open black-line arms and two separate open black-line legs; no limb is colored, volumetric, missing, or replaced by a tendril.",
+        "Every facial mark is a sparse friendly black doodle line, with flexible eye and mouth layout and no realistic or large chibi eyes.",
+        "The single identity is checked at full size and 120–140 px before motion approval."
+      ]
+    },
+    {
+      "id": 32,
+      "prompt": "这个小怪兽 DNA 很像原图，但身体像湿肉一样塌着，还有黏液、尖刺和恐怖触须。只修失败的地方。",
+      "expected_output": "A body-only focused revision triggered by the mandatory cute-friendly gate.",
+      "files": [],
+      "expectations": [
+        "The identity fails despite accurate DNA because cute friendliness is a mandatory identity criterion.",
+        "Fleshy collapse, exposed or realistic tissue, slime, spikes, horror tendrils, corpse-like sagging, and disturbing organic readings are named as failures.",
+        "The focused revision changes the body into a soft compact friendly source-derived color mass while preserving approved DNA mappings, black-line face, 2+2 black-line limbs, and anchor.",
+        "The repair does not copy the pink-green example's silhouette or expand into three candidates.",
+        "Motion remains blocked until the revised identity passes both size checks and explicit approval."
+      ]
+    },
+    {
+      "id": 33,
+      "prompt": "检查这只怪兽：一只手是彩色肉条、一条腿融进身体、另一条腿有脚掌，眼睛是带高光的大眼睛。",
+      "expected_output": "A line-grammar and inventory rejection with a focused black-line feature repair.",
+      "files": [],
+      "expectations": [
+        "The output requires exactly two separate open black-line arms and two separate open black-line legs.",
+        "Colored, volumetric, merged, missing, paw-like, toe-like, or realistically jointed limbs fail.",
+        "Large highlighted eyes fail; every facial mark must be a sparse friendly black doodle line, while one or two eyes, offset placement, and no conventional mouth remain allowed.",
+        "The body color mass, source DNA, silhouette, and anchor remain unchanged because only the face and limb axes failed.",
+        "The repair remains one identity concept and requires full-size and 120–140 px review."
+      ]
+    },
+    {
+      "id": 34,
+      "prompt": "生成时可以参考粉绿小怪兽，但不要把所有新角色都画成它的换色版。请说明每张参考图的职责。",
+      "expected_output": "A role-separated reference plan that uses the public character for HEYTEA-like style without copying its identity topology.",
+      "files": [],
+      "expectations": [
+        "The source photo controls color, ingredient, material, and body topology; the dry-media board controls body texture; and the thin-stroke board controls black face and limb line quality.",
+        "The pink-green example controls only cuteness, handmade awkwardness, and the relationship between an unoutlined body and sparse black doodle face/limbs.",
+        "The prompt explicitly forbids copying the example's silhouette, protrusion placement, face layout, or proportions.",
+        "The figure-action board is reserved for motion, the smudged-structure board is repair-only, and the mixed-media-object failure board is not a positive input.",
+        "The generated identity still has exactly two black-line arms and two black-line legs, a variable-layout friendly black-line face, and one source-derived body."
+      ]
+    },
+    {
+      "id": 35,
+      "prompt": "我只上传了一张主体清楚、画面里只有一杯饮料的照片，还没说要做什么。",
+      "expected_output": "A three-choice photo entry response with no generation and no environment gate.",
+      "files": [],
+      "expectations": [
+        "The output offers exactly 生成带字版海报, 生成不带字海报, and 生成一张风味小怪兽.",
+        "The output does not add 两套都出, 写实卡通桌宠, or another fourth default option.",
+        "The output does not generate an image, identity, motion asset, or prompt packet yet.",
+        "The output does not run, mention, or request desktop-runner preflight or installation."
+      ]
+    },
+    {
+      "id": 36,
+      "prompt": "把这张照片直接做成带字版海报。",
+      "expected_output": "A direct typography-poster workflow that skips the generic chooser and all runner concerns.",
+      "files": [],
+      "expectations": [
+        "The output does not repeat the three-entry photo chooser.",
+        "The photographed product remains recognizable and photographic.",
+        "The workflow uses a poster base, title construction sheet, and separate title layer.",
+        "No desktop-pet environment preflight or installation information appears."
+      ]
+    },
+    {
+      "id": 37,
+      "prompt": "用这张果茶照片生成一张风味小怪兽。",
+      "expected_output": "One static flavor-monster identity followed by an explicit identity approval gate, without runner preflight.",
+      "files": [],
+      "expectations": [
+        "The output directly enters flavor-monster identity generation without repeating the three-entry chooser.",
+        "Exactly one best complete-color identity concept is generated and checked at full size and 120–140 px.",
+        "No environment preflight, installation plan, motion set, fusion poster, or package is generated.",
+        "The output waits for explicit approval or a focused identity revision."
+      ]
+    },
+    {
+      "id": 38,
+      "prompt": "这个小怪兽我还没确认，你先拿它和原饮品做融合海报，动作也一起出。",
+      "expected_output": "A strict identity gate that blocks both fusion-poster and motion generation until explicit approval.",
+      "files": [],
+      "expectations": [
+        "The output does not infer identity approval from the request.",
+        "Neither fusion poster nor motion assets are generated.",
+        "The output asks the user to approve the canonical identity or request a focused revision first.",
+        "Runner preflight is not performed while identity approval is unresolved."
+      ]
+    },
+    {
+      "id": 39,
+      "prompt": "这个小怪兽形象确认，可以继续。",
+      "expected_output": "A post-approval continuation gate offering fusion poster, runnable desktop pet, or both.",
+      "files": [],
+      "expectations": [
+        "The approved monster is recorded as the canonical identity shared by later branches.",
+        "The output asks whether to 制作融合海报, 继续制作可运行桌宠, or 两者都做.",
+        "The output does not automatically generate either branch.",
+        "Environment preflight is deferred unless the user selects the runnable desktop-pet branch."
+      ]
+    },
+    {
+      "id": 40,
+      "prompt": "小怪兽已经确认，做融合海报，两套都要。",
+      "expected_output": "Two independent approved-monster fusion posters: one typography-led and one fully text-free.",
+      "files": [],
+      "expectations": [
+        "Both posters use the original photographic product and the approved canonical monster.",
+        "The text version uses a dedicated poster base, title construction sheet, and separate title layer.",
+        "The no-text version forbids all text-like marks and tells the story through interaction.",
+        "The two versions use distinct product placement, monster staging, whitespace, or framing instead of toggling text on one base.",
+        "No desktop-runner preflight is required."
+      ]
+    },
+    {
+      "id": 41,
+      "prompt": "做融合海报时可以改小怪兽姿势，但产品和怪兽形象都不要走样。",
+      "expected_output": "A fusion composition that locks the photographic product and canonical monster while adapting pose for one interaction verb.",
+      "files": [],
+      "expectations": [
+        "The product retains photographic texture, silhouette, proportions, structure, and material regions.",
+        "The monster retains body topology, face layout, exactly two arms and two legs, attachment points, palette, material, and flavor marks.",
+        "Only pose changes to express one clear interaction verb such as 投, 扶, 抱, 探, 推, or 尝.",
+        "The poster has one readable product-monster relationship rather than unrelated decorative actions."
+      ]
+    },
+    {
+      "id": 42,
+      "prompt": "小怪兽确认了，融合海报和可运行桌宠都做；但我电脑还没装运行器。",
+      "expected_output": "Independent static and runtime branches where the poster continues and only motion waits on the environment gate.",
+      "files": [],
+      "expectations": [
+        "The fusion-poster branch continues without runner preflight or installation dependency.",
+        "The runnable-pet branch performs schema-v3 preflight before motion generation.",
+        "If installation or upgrade is needed, the output requests explicit consent immediately before that change.",
+        "Declining or deferring installation does not cancel the fusion poster or approved static identity.",
+        "No motion or packaging is promised until preflight reports ready."
+      ]
+    },
+    {
+      "id": 43,
+      "prompt": "把这盏灯做成写实卡通桌宠；角色候选第二款我已经明确确认，现在继续动作。",
+      "expected_output": "Backward-compatible source-faithful routing with environment preflight after identity approval and before motion.",
+      "files": [],
+      "expectations": [
+        "The explicit source-faithful request is supported even though it is absent from the generic three-entry chooser.",
+        "The approved second candidate becomes the canonical source-faithful identity.",
+        "Environment preflight runs now, after identity approval and before the twelve schema-v2 actions.",
+        "Motion generation waits until preflight reports ready."
+      ]
+    },
+    {
+      "id": 44,
+      "prompt": "直接把这张饮料照片做成带字和无字两套普通海报，不要小怪兽。",
+      "expected_output": "A direct two-poster workflow that bypasses the photo chooser and keeps both concepts independent.",
+      "files": [],
+      "expectations": [
+        "The output does not ask the generic three-choice question because both poster outputs are explicit.",
+        "The two ordinary posters preserve the photographed product and use different compositions.",
+        "No monster identity, identity approval, runner preflight, motion, or package workflow appears."
       ]
     }
   ]

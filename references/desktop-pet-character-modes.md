@@ -35,38 +35,61 @@ Record the chosen value as `source-faithful` or `flavor-monster` and keep it fix
 
 ### Source DNA
 
-The photograph supplies flavor DNA rather than a body template. Extract:
+The photograph supplies flavor DNA rather than a body template. Separate what the static identity must prove from what later behavior must express.
+
+Extract visual identity DNA:
 
 - one to three identifying colors;
 - one or two ingredient/material cues, such as fruit cubes, pearls, foam, bubbles, crumbs, glaze, leaves, or transparency;
-- one source-specific motion verb;
-- optional structural memory that can become one small biological feature, such as a leaf-horn, translucent belly patch, spotted skin, tail tip, or head tuft.
+- optional structural memory that can become one crude flat mark, paper gap, local media shift, or abstract irregular protrusion.
+
+Also record one source-specific motion verb as behavior DNA for the later action stage. It does not count toward the static identity minimum.
+
+Before drawing, write a compact internal identity brief. Use no more than three identifying visual source signals and map each one to one creature role:
+
+`source color / ingredient / material → crayon body field / crude flat mark / abstract irregular protrusion / regional medium`
+
+Use at least two kinds of visual identity DNA chosen from color, ingredient, and material. A generic monster whose only connection to the photo is a replaceable palette fails even when a motion verb has been recorded. Extend the brief with:
+
+- a source-derived body silhouette and center of gravity that do not copy the public example or retain the literal source object;
+- exactly two arms and two legs, including their black-line attachment points, lengths, proportions, and quiet resting pose;
+- facial-mark count, placement, line shape, and friendly emotion; the face may be single-eyed, mouthless, offset, or otherwise structurally variable;
+- a cuteness check: the body must read as soft, compact, friendly, and animatable before it reads as strange;
+- hard exclusions for fleshy collapse, exposed or realistic tissue, slime, horror tendrils, corpse-like sagging, sharp grotesque anatomy, and other disturbing organic readings;
+- a stable floor anchor and source-specific motion verbs reserved for later behavior design;
+- a discard list for the complete cup, bottle, bowl, wrapper, rim, lid, straw, container wall, layered-liquid cross-section, pizza slice, mushroom, or other literal source-object silhouette whenever present.
+
+The brief guides generation; do not save the full generation prompt as a project document unless the user explicitly requests it.
 
 ### Character identity
 
-- The first impression must be an independent creature or monster; source recognition comes second through flavor DNA.
-- Use a biological silhouette such as a soft blob, squat hatchling, sprout creature, lopsided nugget, or another simple organism. Do not retain a complete cup, bowl, bottle, wrapper, lid, rim, straw, or container-wall silhouette.
-- Convert ingredients into anatomy or markings rather than leaving them as contents sitting at the bottom of a vessel.
-- Use one intentional oddity—uneven horns, one drooping ear, an off-center tuft, a short tail, or another restrained asymmetry. Avoid stacking many mascot traits.
-- Cuteness comes from awkward proportions, tiny facial marks, short clumsy appendages, and temperament—not large eyes or generic chibi styling.
-- Candidate differences may vary biological silhouette, face system, appendage proportions, the placement of source-DNA features, and stable temperament. All candidates still use the same source DNA, neutral front-facing stance, scale, and ground anchor.
+- The first impression must be a cute, friendly, independent doodle creature; source recognition comes second through flavor DNA. A visually unpleasant or uncanny body fails even when its source mapping is accurate.
+- Use `examples/desktop-pet/pink-green-flavor-monster-v3/preview.png` only as the positive style anchor for HEYTEA-like cuteness, handmade awkwardness, and the relationship between a mostly unoutlined dry-media color body and sparse black doodle face/limbs. Do not copy its body topology, protrusion placement, face layout, or proportions.
+- Derive the body's soft, compact silhouette and center of gravity from the source brief. Do not preserve a literal pizza slice, cup, mushroom, ingredient, container, or photographed food silhouette, and do not turn irregularity into flesh, slime, horror anatomy, or corpse-like collapse.
+- Draw exactly two arms and two legs as separate, open, crooked black doodle strokes. Keep them visibly black, light-to-thin, dry, slightly clumsy, and readable; never replace them with colored strokes, tendrils, trailing body material, volumetric paws, mittens, feet, toes, or realistic joints.
+- Draw every facial mark with the same sparse black doodle-line logic. The face may use one or two eyes, an offset layout, or no conventional mouth, but it must remain friendly and readable; reject colored facial blobs, realistic or shaded eyes, eye sockets, large chibi eyes, and complex facial anatomy.
+- Convert source colors, ingredients, and materials into crude flat marks, paper gaps, local crayon changes, or restrained abstract irregularities. Do not turn a mushroom, fruit, pearl, leaf, or topping into a recognizable realistic organ.
+- Keep the body free of a complete black enclosing outline. Avoid stacked mascot traits, a belly panel, blush, a conventional head/body partition, or shaded volume.
+- Default to one best complete-color identity concept in a quiet identity-readable resting pose rather than a three-candidate board. Lock the source-derived body, two black-line arms, two black-line legs, black-line face system, stable temperament, scale, and ground anchor. Generate multiple directions only when the user explicitly asks for exploration.
+
+Write both sides of the model instruction: a positive cute flat-doodle definition and hard exclusions for container or literal food anatomy, complete enclosing body outlines, colored or volumetric limbs, missing arms or legs, tendril substitution, realistic facial features, large chibi eyes, fleshy collapse, slime, horror anatomy, official marks, text, sticker borders, polished vector geometry, and glossy 3D treatment. Do not merely attach limbs to the photographed object.
 
 ### Action identity
 
-- Use anatomy-led secondary motion: leaf-horns, ears, tuft, tail, belly markings, or ingredient features react before or after the whole body.
-- Define 6–10 complete schema-v3 behaviors around the approved anatomy rather than filling a fixed action-name checklist.
+- Use mark-led secondary motion: a crude flat mark, abstract protrusion, paper gap, or local crayon patch reacts before or after the whole body without becoming a literal organ.
+- Define 6–10 complete schema-v3 behaviors around the approved graphic identity rather than filling a fixed action-name checklist.
 - Include bindings for awake idle, sleep, click, pointer encounter, drag, release, and at least one ambient behavior.
 - Sleep must visibly enter, persist in a loop, and wake through an exit; exploration, cursor encounter, held, and drop recovery may also use explicit phases.
 - Give each behavior enough amplitude and internal progression to read as one story. Prefer fewer substantial behaviors over many tiny interchangeable gestures.
-- Flavor events such as a fruit-cube hiccup, one bubble, color ripple, or leaf-ear shake should arise from anatomy or an internal feature, not a generic prop.
-- Drag, fall, impact, rebound, and settle must preserve the monster silhouette and connect physically; loose ears, horns, tufts, and tails may lag or settle, but limb inventory must remain stable.
+- Flavor events such as a block-mark hiccup, one bubble, color ripple, or abstract-protrusion shake should arise from an approved mark or internal feature, not a generic prop.
+- Drag, fall, impact, rebound, and settle must preserve the monster's graphic identity and connect physically; the approved abstract protrusion or local mark may lag or settle, but the two black-line arms, two black-line legs, and black-line face system must remain stable.
 
 ## Shared production contract
 
 Both character modes use:
 
-- the same environment preflight and installed shared runner;
-- the same black-skeleton then locked-color candidate process when mixed-media construction needs it;
+- the same environment preflight and installed shared runner, loaded only after canonical identity approval when the user chooses runnable motion;
+- the same black-skeleton then locked-color repair process when mixed-media construction needs it; `source-faithful` keeps its existing candidate use, while `flavor-monster` defaults to one-pass complete-color identity generation;
 - the same explicit character-approval and motion-approval gates;
 - the same 120–140 px readability target, transparent runtime strips, version-aware builder and validator, and delivery folder.
 
