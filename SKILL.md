@@ -1,77 +1,89 @@
 ---
 name: heytea-doodle-poster
 description: >-
-  Turn an uploaded photo into either a HEYTEA-inspired object-and-doodle poster
-  or a personalized hand-drawn desktop pet with approved character concepts,
-  schema-v2 source-faithful actions or schema-v3 flavor-monster behaviors, optional physical interactions, and an importable pet pack. Use for 喜茶简笔画海报,
-  歪扭儿童字, 实物加小人涂鸦, 桌宠, 照片变桌面宠物, 食物桌宠, or 饮料桌宠.
+  Turn an uploaded photo into a HEYTEA-inspired text or no-text object-and-doodle
+  poster, a static flavor monster, a poster pairing the unchanged photographed
+  product with an approved monster, or an approved runnable desktop pet. Use for
+  喜茶简笔画海报, 歪扭儿童字, 实物加小人涂鸦, 风味小怪兽, 小怪兽融合海报,
+  桌宠, 照片变桌面宠物, 食物桌宠, or 饮料桌宠.
 ---
 
-# Heytea Doodle Poster and Desktop Pet
+# Heytea Doodle Poster, Flavor Monster, and Desktop Pet
 
 Create unofficial visual work inspired by the playful HEYTEA poster language: rough black marks, awkward handmade shapes, generous white space, and restrained object-led storytelling.
 
 Do not add official HEYTEA logos, mascots, packaging marks, or claims of affiliation unless the user supplies authorized assets and explicitly requests their use.
 
-## Route the request
+## Photo entry and routing
 
-Choose one mode before generating:
+Require and inspect an uploaded image before visual generation. Resolve the subject first:
 
-- **Poster mode**: the user wants a poster, social image, crooked Chinese title, or real-object-with-doodles composition. Read `references/style-guide.md`; for `带字版`, also read `references/lettering-guide.md`.
-- **Desktop-pet mode**: the user wants a 桌宠, desktop companion, animated pet, spritesheet, or importable character pack. Read `references/desktop-pet-environment.md`, `references/desktop-pet-workflow.md`, `references/mixed-media-style-guide.md`, and `references/desktop-pet-pack.md`.
-- If the request genuinely asks for both, complete the two modes independently. Do not turn a poster crop into a pet asset or reuse a pet candidate as the poster without adapting its composition.
+- If no usable subject is visible, stop and ask for one sharp, well-lit, unobstructed subject.
+- If several independent subjects are visible, give short numbered descriptions and ask which one to use. Do not silently choose.
+- Treat a container and its contents as one subject unless the user asks otherwise.
 
-## Shared input boundary
+When the user uploads a usable photo without saying what to make, offer exactly these three choices and do not generate or run environment checks yet:
 
-1. Require an uploaded image before visual generation.
-2. Inspect the image before proposing output.
-3. If no usable subject is visible, stop and ask for a clearer photo. Give concrete capture advice: one subject, adequate light, sharp focus, and an unobstructed outline.
-4. If several independent subjects are visible, identify them with short numbered descriptions and ask the user to choose. Do not silently select one.
-5. For a drink in a cup, food in a bowl, or water in a vessel, treat the container and contents as one subject unless the user asks otherwise.
+1. 生成带字版海报
+2. 生成不带字海报
+3. 生成一张风味小怪兽
 
-## Poster mode
+If the user already asked for a text poster, no-text poster, flavor monster, or both poster versions, enter that workflow directly without repeating the chooser. “两套都出” remains supported but is not a fourth default choice. An explicit 写实卡通桌宠 or `source-faithful` request remains supported but is not shown in the default three choices.
 
-Keep one photographed object recognizable and photographic. Do not cartoonize the full image.
+## Ordinary poster
 
-Before generating:
+Read `references/style-guide.md`; for `带字版`, also read `references/lettering-guide.md`.
 
-1. Inspect `private-assets/reference-cutouts/asset-index.json` when it exists.
-2. Choose `带字版`, `无字版`, or `两套都出（推荐）`; default to two genuinely different concepts when the user wants immediate output and has not chosen.
-3. For `带字版`, use the poster-base, title-construction-sheet, and title-layer workflow. Use `scripts/build_title_reference_sheet.py` and `scripts/composite_title_layer.py` when applicable.
-4. For `无字版`, forbid all text and let one primitive micro-worker action tell the story.
+- Keep the photographed object recognizable and photographic. Do not cartoonize the full image.
+- Inspect `private-assets/reference-cutouts/asset-index.json` when it exists.
+- A text poster uses separate poster-base, title-construction-sheet, and title-layer steps. Use `scripts/build_title_reference_sheet.py` and `scripts/composite_title_layer.py` when applicable.
+- A no-text poster forbids all text and lets one primitive micro-worker action tell the story.
+- When making both versions, create two genuinely different concepts and compositions rather than toggling a title on one base image.
 
 Use `references/evaluation.md` for final review.
 
-## Desktop-pet mode
+## Static flavor-monster identity
 
-Desktop pets have two parallel character modes: `source-faithful`（写实卡通桌宠）and `flavor-monster`（风味小怪兽桌宠）. Read `references/desktop-pet-character-modes.md`. They share one runner and delivery contract but use different identity and public pack protocols: source-faithful remains schema v2; flavor-monster uses schema v3. Do not preserve photographic texture as poster mode does.
+Read `references/desktop-pet-character-modes.md`, the identity stages of `references/desktop-pet-workflow.md`, and `references/mixed-media-style-guide.md`. Do not read or run the environment workflow yet.
 
-Follow the approval gates exactly:
+Generate one best complete-color `flavor-monster` identity on white or warm white. The photo controls flavor DNA and body topology; `examples/desktop-pet/pink-green-flavor-monster-v3/preview.png` controls only HEYTEA-like cuteness and the relationship between an unoutlined color body and sparse black doodle features. Use the dry-media board for body material and the thin-stroke board for the face and exactly two arms plus two legs. Do not copy the example's silhouette, protrusions, face layout, or proportions.
 
-1. Run `scripts/check_desktop_pet_environment.py --json --required-schema 3` before inspecting or generating the photo so a legacy v2-only runner is not mistaken for a compatible installation. If the runner/toolchain is missing or the runner is too old, explain the exact plan and ask for consent: a per-user legacy runner uses a versioned-backup in-place upgrade, while a system-wide legacy runner stays untouched and receives a per-user side-by-side replacement. Run `scripts/install_desktop_pet_runtime.py --yes` for a fresh install or add `--upgrade` only after explicit upgrade approval, then rerun preflight. Do not silently install or replace software, bypass operating-system warnings, or enable launch-at-login.
-2. Resolve the subject using the shared input boundary.
-3. If the user has not already selected `source-faithful` or `flavor-monster`, ask which desktop-pet character mode they want and stop before visual generation. Never choose a default. Keep the selected mode fixed through both approval gates.
-4. Inspect the five desktop-pet boards listed in `references/mixed-media-style-guide.md`: use the dry-media, action, and stroke boards as primary controls; use the smudged-paint board only for crooked structure; treat the mixed-media-object board as an `avoid-default` failure example. Extract either source silhouette and must-preserve details for `source-faithful`, or color/ingredient/material/motion DNA for `flavor-monster`.
-5. Generate one white or warm-white candidate board containing three genuine identity variants in the same neutral front-facing stance and at the same ground anchor. Apply the selected mode's candidate rules from `references/desktop-pet-character-modes.md`. For mixed-media drinks and soft foods, use the two-pass candidate construction in `references/desktop-pet-workflow.md`: first approve a skeleton in which every stroke visibly meanders, then lock every line while assigning different dry media—colored pencil, childlike wax crayon, or sparse pale wash—to different material regions. Do not substitute ruler-straight segments, one uniform fill texture, oil-paint smears, a clean template with surface wobble, or a smooth digital gradient.
-6. Ask the user to select or revise a candidate. If the three images differ only by pose, treat that as a failed candidate board: consolidate their shared identity into one neutral canonical master and reuse the discarded poses only as motion ideas. Do not generate motion assets before the user explicitly approves the identity or consolidation.
-7. Generate the mode-specific motion set described in `references/desktop-pet-workflow.md`: the twelve required v2 actions (plus optional `fall` / `touch`) for source-faithful, or 6–10 schema-v3 behaviors with explicit enter/loop/exit phases for flavor-monster. Use the canonical master as the sole identity reference and apply the small-size stability gate before presenting the dynamic review sheet.
-8. Ask the user to approve motion. Do not package unapproved motion assets.
-9. After approval, export transparent animation strips, build the pack and platform delivery folder with `scripts/build_desktop_pet_pack.py --delivery-dir ...`, and validate the ZIP with `scripts/validate_desktop_pet_pack.py`.
-10. Return the review artifacts, validated ZIP, manifest summary, and delivery folder. For v3, keep cadence, gesture, per-phase grounding (`floor` or `free`), and any explicit display-edge floor policy in the manifest so the runner does not hard-code a character's rhythm or make grounded poses float. The shared Electron runner is installed once; each pet folder contains only its pack, preview, start/quit entrypoints, and short usage note.
+Inspect the identity at full size and 120–140 px, then ask the user to approve it or request a focused revision. Do not generate a poster, motion, runtime assets, or package before explicit identity approval. Approval establishes the canonical identity shared by later fusion-poster and desktop-pet branches.
 
-For a schema-v1 pack, preserve the original pack, copy its eight actions into a new v2 draft, stabilize them, generate `curious`, `stretch`, `tiptoe`, and `play` from the canonical identity, and require a fresh motion approval. Never overwrite or silently activate the v1 pack.
+After approval, ask whether to:
 
-White backgrounds are for candidate and motion review only. Runtime animation files must have real alpha transparency.
+1. 制作融合海报；
+2. 继续制作可运行桌宠；
+3. 两者都做。
+
+## Approved-monster fusion poster
+
+Read `references/monster-poster-workflow.md` plus the ordinary poster references needed for the requested variant. Ask whether the user wants 带字版、无字版或两套都做 unless already stated.
+
+Use the original uploaded photo and the approved canonical monster. Keep the photographed product unchanged and photographic; lock the monster's identity while adapting only its pose for one clear interaction. Text and no-text versions must use independent compositions.
+
+This branch never requires desktop-runner preflight. If the user selected both fusion poster and runnable pet, continue the poster branch even when the runner is missing or installation is declined.
+
+## Runnable desktop pet
+
+Read `references/desktop-pet-workflow.md`, `references/desktop-pet-environment.md`, `references/mixed-media-style-guide.md`, and `references/desktop-pet-pack.md`.
+
+- For an approved `flavor-monster`, run `scripts/check_desktop_pet_environment.py --json --required-schema 3` only now, before motion generation.
+- For an explicit `source-faithful` request, first complete its three-candidate identity workflow and obtain explicit canonical-identity approval; then run the same environment gate before motion generation. Source-faithful remains schema v2 and flavor-monster uses schema v3.
+- If preflight reports missing or outdated components, explain the exact plan and request consent immediately before installation or upgrade. Never silently install or replace software, bypass operating-system warnings, or enable launch-at-login.
+- Continue only after preflight reports `ready`. Then create the mode-specific motion set, request motion approval, and only after approval build and validate the importable pack and delivery folder.
+
+For schema-v1 migration, preserve the original pack, create a new v2 draft, add the four missing states, and require fresh motion approval. Never overwrite or silently activate the v1 pack.
+
+White backgrounds are for identity and motion review only. Runtime animation files require real alpha transparency.
 
 ## Output boundary
 
 - Never describe exploratory image-model output as a finished pet pack.
 - Do not fabricate file paths, validation results, or runnable installers.
-- If visual generation is unavailable, return the staged prompt packet and pack specification, and state which artifacts still need to be generated.
+- If visual generation is unavailable, return the staged prompt packet and state which artifacts remain ungenerated.
 - Do not save generation prompts as standalone project documents unless the user explicitly asks for prompt files.
 - Treat official-looking marks, private-study-only cutouts, and `quality: avoid-default` records as analysis-only.
-- Preserve user files and unrelated working-tree changes when running scripts or packaging output.
+- Preserve user files and unrelated working-tree changes.
 
-## Evaluation
-
-Use `references/evaluation.md` for poster and desktop-pet acceptance checks. Human visual approval is mandatory at both desktop-pet gates; automated validation cannot replace it.
+Human visual approval is mandatory at both desktop-pet gates; automated validation cannot replace it.
