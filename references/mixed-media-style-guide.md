@@ -17,8 +17,8 @@ Do not force every layer into every image. Two or three layers are enough, but t
 
 ## Line grammar
 
-- Mix thin-to-medium pen with a few strategically heavier marker passages. Do not use one uniform outline around everything.
-- Every structural stroke must visibly wander along its full length. Cup walls, rims, bases, arms, legs, and facial dashes should use shallow waves, drifting curvature, pressure wobble, imperfect corners, dry breaks, retracing, or doubled corrections. Breaking ruler-straight lines into fragments does not create the target hand feel.
+- Mix thin-to-medium pen with a few strategically heavier marker passages. Each important face or limb mark must change pressure or thickness within the same stroke; do not use constant-width monoline or one uniform outline around everything.
+- Every structural stroke must visibly wander along its full length. Cup walls, rims, bases, arms, legs, and facial dashes should use shallow waves, drifting curvature, pressure wobble, imperfect corners, dry breaks, retracing, or doubled corrections. Breaking ruler-straight lines into fragments, bending a smooth Bézier path, or adding surface jitter to a clean vector skeleton does not create the target hand feel.
 - Allow open joins, overshooting terminals, and color that misses the outline by a few pixels.
 - Keep secondary marks sparse. One loose curl, broken arc, crooked underline, or short motion dash is more faithful than dense decoration.
 - Make the geometry itself structurally naive: unequal wall slopes, tilted rims, off-center openings, shifted lids, inconsistent perspective, and crooked bases. A clean template with surface wobble is not enough.
@@ -30,7 +30,7 @@ The target is an observed hand making decisions in real time. Smooth Bézier cur
 - Begin with the photographed subject's one to three identifying colors.
 - Favor food-native, low-to-medium-saturation hues: tea green, yellow-green, cream, pale yellow, fruit red, and restrained brown.
 - Assign media by material region instead of applying one texture to the whole character. Light liquid or soft color may use loose colored-pencil scumbling; vivid topping or fruit may use broad childlike wax-crayon loops and chunky marks; clear plastic may remain paper-white with a few faint graphite traces.
-- Colored-pencil marks should be long, loose, lightly layered, and visibly granular. Wax crayon should use a small number of broad wandering arcs, open loops, or separate blocks. Both leave substantial paper visible and may miss or cross boundaries.
+- Colored-pencil marks should be long, loose, lightly layered, and visibly granular. Wax crayon should use a small number of broad wandering arcs, open loops, or separate blocks. Both leave substantial paper visible and may miss, fade before, or cross boundaries. For `flavor-monster`, require significant irregular paper-white inside the colored body; fine paper tooth beneath edge-to-edge color does not count as active paper-white.
 - Broad rubbed pigment or pale wash is an occasional accent, not the dominant default. Oil-paint, oil-pastel smear, gouache mass, wet watercolor bloom, dense repeated tiny strokes, crosshatching, airbrushed gradients, soft plastic shading, glossy highlights, and uniform digital noise are forbidden.
 - Black is structural rather than dominant. White or warm white remains an active material, not merely unused background.
 - Photographic fragments, when used, should be small ingredient accents. Do not turn the entire desktop-pet body back into a photo.
@@ -65,7 +65,7 @@ When a generated identity still has a clean cartoon framework, borrow line anato
 For every `source-faithful` three-candidate board and every `flavor-monster` single identity master:
 
 - use thin-to-medium hesitant pen only where the selected mode calls for line structure; for `flavor-monster`, concentrate black linework in the face, two arms, two legs, and sparse partial marks rather than enclosing the body;
-- zone drinks and soft foods across light colored pencil, broad childlike wax crayon, paper-white clear areas, and only occasional pale smear; never give the full body one uniform texture;
+- zone drinks and soft foods across long loose lightly layered colored-pencil sweeps, a few broad childlike wax-crayon arcs or separated blocks, paper-white clear areas, and only occasional pale smear; never give the full body one equal-density texture;
 - use a warm-white review background with enough separation to inspect edge quality.
 
 For `source-faithful`:
@@ -79,6 +79,7 @@ For `flavor-monster`:
 - preserve at least two kinds of visual identity DNA chosen from color, ingredient, and material instead of the photographed container silhouette, and record motion DNA separately for later behavior design;
 - derive a soft, compact, friendly, animatable body topology and center of gravity from the source DNA without preserving a literal source-object silhouette;
 - keep the body a dry-media color mass without a complete black enclosing outline;
+- require a region-by-region material plan before generation; light zones may be mostly paper-white with faint traces, vivid zones use sparse broad crayon marks, and soft zones use loose pencil sweeps rather than a shared grain filter;
 - draw exactly two arms and two legs as separate, open, crooked black doodle strokes; never use colored or volumetric limbs, paws, toes, realistic joints, tendrils, trailing flesh, or another limb inventory;
 - draw every facial mark as a sparse, friendly black doodle line; allow one or two eyes, offset layouts, or no conventional mouth, but reject colored features, realistic or shaded eyes, large chibi eyes, and complex facial anatomy;
 - translate ingredients into abstract blocks, spots, paper gaps, local media changes, or restrained irregularities rather than a mushroom ear, fruit horn, topping hat, or other realistic organ;
@@ -98,6 +99,8 @@ Reject and regenerate when any of these dominate:
 - smooth vector geometry or sticker border;
 - airbrushed gradient, glossy 3D volume, or plastic shading;
 - dense uniform crayon or pencil fill covering every region with the same mark;
+- paper tooth or digital speckle presented as "white space" while color still fills the body edge to edge;
+- smooth constant-width face or limb curves, including clean Bézier paths with only superficial jitter;
 - oil-paint, oil-pastel, gouache, or wet-smear appearance dominating the character;
 - ruler-straight segments, even when separated by deliberate gaps;
 - structurally clean geometry with a superficial wobble filter;

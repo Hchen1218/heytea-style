@@ -336,13 +336,13 @@
       "files": [],
       "expectations": [
         "The output records flavor-monster mode and does not ask the user to choose a character mode again.",
-        "The internal identity brief maps source DNA into an independent body topology and dry-media regions, declares exactly two black-line arms and two black-line legs, declares sparse friendly black-line facial marks, applies the cuteness gate, and records motion verbs separately for later behavior design.",
+        "The internal identity brief maps source DNA into an independent body topology and declares a region-by-region material plan for loose pencil sweeps, sparse broad crayon marks, significant irregular internal paper-white, and occasional faded edges; it also declares exactly two black-line arms and two black-line legs, friendly black-line facial marks, the cuteness gate, and motion verbs reserved for later.",
         "The concept preserves at least two kinds of visual identity DNA chosen from color, ingredient, and material rather than only recoloring a generic monster; motion does not satisfy this static gate.",
         "The pink-green public example controls only HEYTEA-like cuteness, handmade awkwardness, and the relationship between an unoutlined body and black-line face/limbs; its silhouette, protrusion placement, face layout, and proportions are not copied.",
         "The first impression is a cute friendly flat doodle creature rather than a cup, lid, straw, drink cross-section, unpleasant organic form, or conventionally completed mascot.",
-        "The body is a soft compact source-derived dry-media color mass without a complete black enclosing outline or literal ingredient anatomy.",
-        "The identity has exactly two open black-line arms and two open black-line legs; every facial mark is a sparse friendly black doodle line, while the face layout itself may vary.",
-        "The default identity output is one complete-color resting master, followed by full-size and 120–140 px review and explicit approval before motion.",
+        "The body is a soft compact source-derived dry-media color mass with differentiated regional marks and visible irregular paper-white inside it, without a complete black enclosing outline or literal ingredient anatomy.",
+        "The identity has exactly two open black-line arms and two open black-line legs; every facial and limb mark meanders along its full length and varies pressure or thickness within the stroke, while the face layout itself may vary.",
+        "The default identity output is one complete-color resting master, followed by full-size and 120–140 px review that preserves deliberate internal paper-white, coherent major color zones, face, and all four limbs before explicit approval.",
         "Later behavior rules keep the shared approval gates, runner, and delivery contract while using the schema-v3 6–10 behavior protocol."
       ]
     },
@@ -368,14 +368,14 @@
       ],
       "expectations": [
         "The uploaded photo supplies color, ingredient, material, and body-topology DNA while motion verbs are reserved for later behavior design.",
-        "The public pink-green example supplies only HEYTEA-like cuteness and the unoutlined-body/black-line-feature relationship; the dry-media board controls body texture and the thin-stroke board controls every black face and limb mark.",
+        "The public pink-green example supplies only HEYTEA-like cuteness and the unoutlined-body/black-line-feature relationship; the dry-media board controls region-specific pencil, crayon, and internal paper-white, while the thin-stroke board controls full-length meander and within-stroke pressure or thickness variation in every black face and limb mark.",
         "The generation instruction explicitly forbids copying the public example's body topology, protrusion placement, face layout, or proportions.",
         "The figure-action board is deferred to motion generation and the smudged-structure board is used only for focused repair rather than as default identity input.",
         "The mixed-media-object failure board is not passed as a positive generation reference.",
         "The result is one complete-color concept in a quiet identity-readable resting pose on a white or warm-white review background, not a three-candidate board.",
-        "The output uses a soft compact source-derived dry-media body with no complete black outline, exactly two open black-line arms, exactly two open black-line legs, a sparse friendly variable-layout black-line face, and one stable ground anchor.",
+        "The output uses a soft compact source-derived dry-media body with distinct regional media, significant irregular internal paper-white, no equal-density full fill, no complete black outline, exactly two open black-line arms, exactly two open black-line legs, a sparse friendly variable-layout black-line face, and one stable ground anchor.",
         "Source ingredient and material cues remain abstract, and the body passes the explicit cuteness gate instead of becoming a literal source object or disturbing organic form.",
-        "The identity is reviewed at full size and 120–140 px, and no actions are generated before explicit approval."
+        "At full size and 120–140 px, internal paper-white remains deliberate rather than noise, major color zones remain coherent, and the pressure-varying face plus all four limbs remain legible; no actions are generated before explicit approval."
       ]
     },
     {
@@ -425,12 +425,12 @@
       "expected_output": "A cute HEYTEA-like pizza-flavor identity whose body is source-derived but no longer a pizza slice or an unpleasant organic mass.",
       "files": [],
       "expectations": [
-        "Pizza color, toasted material, cheese stretch, sauce, and topping rhythm are semantically mapped into an independent body topology and abstract dry-media marks.",
+        "Pizza color, toasted material, cheese stretch, sauce, and topping rhythm are semantically mapped into an independent body topology plus a region-by-region plan for loose pencil sweeps, sparse broad crayon marks, significant irregular internal paper-white, and selected faded edges.",
         "The body is soft, compact, friendly, and animatable rather than a pizza slice with limbs, a literal mushroom, a fleshy collapse, slime, horror tendrils, or corpse-like sagging.",
-        "The body remains a dry-media color mass without a complete black enclosing outline.",
+        "The body remains a regionally differentiated dry-media color mass with visible internal paper-white, no equal-density edge-to-edge fill, and no complete black enclosing outline.",
         "The monster has exactly two separate open black-line arms and two separate open black-line legs; no limb is colored, volumetric, missing, or replaced by a tendril.",
-        "Every facial mark is a sparse friendly black doodle line, with flexible eye and mouth layout and no realistic or large chibi eyes.",
-        "The single identity is checked at full size and 120–140 px before motion approval."
+        "Every facial and limb mark is a sparse friendly black doodle line with full-length meander and within-stroke pressure or thickness changes, with flexible eye and mouth layout and no realistic or large chibi eyes.",
+        "The single identity is checked at full size and 120–140 px; internal paper-white, coherent major color zones, face, and all four limbs must survive before motion approval."
       ]
     },
     {
@@ -465,10 +465,10 @@
       "expected_output": "A role-separated reference plan that uses the public character for HEYTEA-like style without copying its identity topology.",
       "files": [],
       "expectations": [
-        "The source photo controls color, ingredient, material, and body topology; the dry-media board controls body texture; and the thin-stroke board controls black face and limb line quality.",
+        "The source photo controls color, ingredient, material, and body topology; the dry-media board controls region-specific pencil, crayon, paper tooth, and internal paper-white; and the thin-stroke board controls full-length meander plus within-stroke variation in every black face and limb mark.",
         "The pink-green example controls only cuteness, handmade awkwardness, and the relationship between an unoutlined body and sparse black doodle face/limbs.",
         "The prompt explicitly forbids copying the example's silhouette, protrusion placement, face layout, or proportions.",
-        "The figure-action board is reserved for motion, the smudged-structure board is repair-only, and the mixed-media-object failure board is not a positive input.",
+        "The figure-action board is reserved for motion, the smudged-structure board enters only a focused repair for full fill, missing paper-white, or overly clean edges, and the mixed-media-object failure board is not a positive input.",
         "The generated identity still has exactly two black-line arms and two black-line legs, a variable-layout friendly black-line face, and one source-derived body."
       ]
     },
@@ -591,6 +591,33 @@
         "The output does not ask the generic three-choice question because both poster outputs are explicit.",
         "The two ordinary posters preserve the photographed product and use different compositions.",
         "No monster identity, identity approval, runner preflight, motion, or package workflow appears."
+      ]
+    },
+    {
+      "id": 45,
+      "prompt": "这只风味小怪兽有蜡笔颗粒和纸张纹理，但身体从边到边全部涂满，每个色区都是同样密度的小短线。只修这个问题。",
+      "expected_output": "A material-axis-only rejection and repair that distinguishes active internal paper-white and regional hand-applied media from a uniformly textured full fill.",
+      "files": [],
+      "expectations": [
+        "The identity fails the material gate even though crayon grain and paper texture are superficially present.",
+        "Paper tooth beneath edge-to-edge color, uniform digital speckle, dense tiny strokes or loops, and crosshatching do not count as significant internal paper-white.",
+        "The repair preserves the approved body topology, source-DNA mapping, face, exactly two arms, exactly two legs, and ground anchor while changing only regional media and internal paper-white.",
+        "The repaired material plan separates long loose lightly layered pencil sweeps, a few broad open crayon arcs or blocks, irregular internal paper-white, and selected missed or faded edges.",
+        "The dry-media board remains a default identity control; the smudged-structure board is added only for this focused repair, while the action and mixed-media-object boards remain excluded from positive identity input.",
+        "The repair stays one identity and must preserve deliberate paper-white plus coherent major color zones at full size and 120–140 px before approval."
+      ]
+    },
+    {
+      "id": 46,
+      "prompt": "这只小怪兽已经是两只手两条腿，位置和表情也对，但四肢和五官都是平滑、等粗、像矢量图标的黑线。只重画线条。",
+      "expected_output": "A face-and-limb-only repair that preserves identity placement and replaces mechanical monoline with readable handmade stroke anatomy.",
+      "files": [],
+      "expectations": [
+        "Correct 2+2 inventory and placement do not pass when face and limb strokes are smooth constant-width curves or clean Bézier paths with superficial jitter.",
+        "The repair preserves body topology, palette, regional media, internal paper-white, source-DNA marks, expression layout, limb attachment points, pose, and ground anchor.",
+        "Only the existing face, two arms, and two legs are redrawn at their locked locations; no candidate alternatives or body redesign are introduced.",
+        "Each repaired mark visibly meanders or bends along its full length and changes pressure or thickness within the same stroke, using restrained dry breaks, retracing, doubled correction, overshoot, or open joins.",
+        "The repaired black system remains sparse, friendly, and legible at full size and 120–140 px without losing any required facial mark or limb."
       ]
     }
   ]

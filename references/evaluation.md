@@ -135,8 +135,8 @@ A desktop-pet request succeeds only when the staged workflow is visible in the r
 Shared desktop-pet visual quality passes when:
 
 - one to three source colors and the mode-appropriate hesitant thin-to-medium pen structure remain consistent; `flavor-monster` concentrates black linework in its sparse face, two arms, two legs, and partial marks rather than a complete body frame;
-- drinks and soft foods use deliberate media zoning—light colored pencil, broad childlike wax crayon, paper-white clear areas, and only optional pale smears—rather than one uniform texture, oil-paint mass, smooth gradient, or flat digital fill;
-- every long structural or limb stroke visibly meanders; no ruler-straight segment survives merely because the overall object is asymmetric;
+- drinks and soft foods use deliberate media zoning—long loose lightly layered colored-pencil sweeps, a few broad open wax-crayon arcs or separated blocks, paper-white clear areas, and only optional pale smears—rather than one equal-density texture, oil-paint mass, smooth gradient, or flat digital fill;
+- every long structural or limb stroke visibly meanders and varies pressure or thickness within the same mark; no ruler-straight segment, smooth constant-width Bézier curve, or clean vector path with superficial jitter passes merely because the overall object is asymmetric;
 - object geometry is structurally asymmetric and hand-redrawn rather than a clean repeated template with a wobble filter;
 - when two-pass construction is used, the color pass preserves every accepted skeleton stroke, gap, face, limb, and position instead of redrawing a cleaner outline;
 - cuteness is carried by proportion, material marks, and readable action rather than a generic large-eyed face;
@@ -156,15 +156,16 @@ Shared desktop-pet visual quality passes when:
 
 - the first impression is a cute, friendly, independent flat doodle creature rather than a literal source object, an unpleasant organic form, or a conventionally completed mascot;
 - an internal identity brief maps no more than three source signals into a source-derived body topology, dry-media fields, abstract marks, restrained irregularities, or regional media and records motion verbs separately for later behavior design;
-- the brief declares body silhouette and center of gravity; exactly two arms and two legs with black-line attachment points, lengths, proportions, and resting pose; facial-mark count, placement, black-line shape, and friendly emotion; a cuteness test; a stable floor anchor; and literal source structures that must disappear;
+- the brief declares body silhouette and center of gravity; a region-by-region plan for pencil, crayon, active internal paper-white, and occasional faded edges; exactly two arms and two legs with black-line attachment points, lengths, proportions, and resting pose; facial-mark count, placement, black-line shape, friendly emotion, full-length meander, and within-stroke pressure or thickness variation; a cuteness test; a stable floor anchor; and literal source structures that must disappear;
 - source recognition in the static identity comes from at least two kinds of visual DNA chosen from color, ingredient, and material rather than a replaceable palette alone; motion DNA is evaluated later;
 - the body is a soft, compact, friendly dry-media color mass without a complete black enclosing outline or a complete pizza slice, mushroom, cup, container, ingredient, or other literal source-object silhouette;
-- every identity has exactly two separate open black-line arms and two separate open black-line legs; no limb is colored, volumetric, missing, merged into the body, or replaced by a tendril or trailing body material;
-- every facial mark is a sparse, friendly, readable black doodle line; one or two eyes, offset layouts, and no conventional mouth are allowed, while colored features, realistic or shaded eyes, large chibi eyes, and complex facial anatomy fail;
+- every identity has exactly two separate open black-line arms and two separate open black-line legs whose strokes meander and change pressure or thickness internally; no limb is colored, volumetric, missing, merged into the body, constant-width, mechanically smooth, or replaced by a tendril or trailing body material;
+- every facial mark is a sparse, friendly, readable black doodle line with visible hand variation; one or two eyes, offset layouts, and no conventional mouth are allowed, while colored features, realistic or shaded eyes, large chibi eyes, complex facial anatomy, smooth Bézier curves, and constant-width monoline fail;
 - `examples/desktop-pet/pink-green-flavor-monster-v3/preview.png` controls only HEYTEA-like cuteness, handmade awkwardness, and the relationship between an unoutlined body and black doodle face/limbs; the photo controls body topology, and copying the example's silhouette, protrusion placement, face layout, or proportions fails;
 - the dry-media and thin-stroke boards have separate material and black-line roles, while the action board is deferred to motion, smudged structure is repair-only, and the mixed-media-object failure board is never a positive input;
 - fleshy collapse, exposed or realistic tissue, slime, horror tendrils, corpse-like sagging, sharp grotesque anatomy, or any disturbing organic reading fails the cuteness gate even when source DNA is recognizable;
-- the full-resolution identity and a 120–140 px reduction both preserve the source-derived body, friendly black-line face, two black-line arms, two black-line legs, at least two visual-DNA kinds, and stable ground anchor;
+- the full-resolution identity visibly contains irregular paper-white inside the body, distinct mark behavior between major color zones, and incomplete or faded selected edges; fine paper grain beneath edge-to-edge saturated color does not qualify;
+- the 120–140 px reduction preserves deliberate internal paper-white rather than compression noise, keeps major color zones coherent rather than speckled, and retains the source-derived body, friendly black-line face, two black-line arms, two black-line legs, at least two visual-DNA kinds, and stable ground anchor;
 - the approved body, black-line face, fixed 2+2 black-line limbs, flavor-DNA marks, and anchor remain stable across actions;
 - behavior interpretation uses the monster's approved graphic features, larger episode arcs, and explicit enter/loop/exit phases rather than preserving the v2 state names.
 
@@ -193,6 +194,8 @@ Desktop-pet pack quality passes when both build and independent validation succe
 - **Grotesque monster substitution**: fleshy collapse, exposed tissue, slime, horror tendrils, corpse-like sagging, sharp anatomy, or another disturbing organic reading replaces cute friendliness.
 - **Reference-role leakage**: the public pink-green example supplies the new silhouette, protrusion placement, face layout, or proportions instead of only cuteness and the unoutlined-body/black-line-feature relationship.
 - **Material flattening**: every region receives the same crayon/pencil texture instead of distinct dry media selected by material.
+- **Pseudo-handmade full fill**: paper grain, uniform digital speckle, dense tiny strokes or loops, or crosshatching is visible, but color still packs the body edge to edge and no significant irregular internal paper-white survives.
+- **Mechanical black-line system**: the face and 2+2 limbs have the correct inventory and placement but use smooth constant-width curves, clean Bézier paths, mechanically repeated bends, or superficial jitter without full-length meander and within-stroke pressure variation.
 - **Oil-paint overcorrection**: broad wet-looking smears, gouache masses, or oil-pastel rubbing replace the original colored-pencil and childlike crayon vocabulary.
 - **Straight-segment collage**: the object is assembled from broken lines, but each individual wall, rim, limb, or facial mark remains ruler-straight.
 - **Surface-only wobble**: the outline wiggles, but the rim, walls, lid, base, and perspective remain mechanically clean and symmetrical.
