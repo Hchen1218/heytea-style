@@ -1,18 +1,12 @@
 # Desktop Pet Workflow
 
-Read this reference only for desktop-pet requests.
+Read the identity stages of this reference for static character requests. Read the environment, motion, approval, and packaging stages only when the user chooses a runnable desktop pet.
 
 ## Outcome
 
-Turn one photographed subject into a quiet desktop companion in the user-selected character mode, recognizable at small size, alive without interrupting work, and importable into the bundled runner.
+Turn one photographed subject into an approved canonical character and, only when requested, a quiet runnable desktop companion recognizable at small size and importable into the bundled runner.
 
 This mode is a full illustration conversion. Unlike poster mode, it does not preserve photographic texture.
-
-## Stage 0: Environment gate
-
-Before analyzing the photo, follow `desktop-pet-environment.md` and run the read-only preflight. Continue only when the runner is installed or the user has explicitly chosen a static-concept-only path.
-
-If anything is missing, show one concrete repair plan and ask for installation consent. After approval, automatically fill only the missing components, rerun preflight, and stop if it still does not report `ready`. This system gate is separate from the later character and motion approval gates.
 
 ## Stage 1: Subject gate
 
@@ -31,7 +25,7 @@ Record a compact identity brief:
 - parts that may be simplified or translated;
 - a subject-specific motion idea.
 
-## Stage 1.5: Character-mode gate
+## Stage 2: Character-mode and identity-brief gate
 
 Read `desktop-pet-character-modes.md`. If the user has not already chosen a mode, ask whether they want:
 
@@ -43,29 +37,40 @@ Stop before candidate generation until the mode is explicit. Do not recommend, d
 Extend the identity brief according to the selected mode:
 
 - `source-faithful`: record outer silhouette, major internal divisions, and must-preserve object/container details.
-- `flavor-monster`: record color DNA, one or two ingredient/material cues, one motion verb, and the biological feature each cue may become. Do not lock the source container silhouette.
+- `flavor-monster`: select no more than three identifying visual signals, require at least two kinds of identity DNA chosen from color, ingredient, and material, and map them into a source-derived body topology, crayon field, crude flat marks, restrained irregularities, or regional medium. Record the body silhouette and center of gravity; a regional material plan assigning every major zone to long loose lightly layered colored-pencil sweeps, a few broad open wax-crayon arcs or separated blocks, significant irregular internal paper-white, or an occasional faded edge; exactly two arms and two legs with black-line attachment points, lengths, proportions, and resting pose; facial-mark count, placement, black-line shape, and friendly emotion; the planned full-length meander plus within-stroke pressure or thickness variation of every face and limb mark; a cuteness check with explicit grotesque-organic exclusions; one stable floor anchor; and source-specific motion verbs reserved for later behavior design. Also record every literal source structure that must be discarded. Do not lock the source silhouette or save the full generation prompt unless the user explicitly requests a prompt file.
 
-## Stage 2: Candidate board
+## Stage 3: Identity design
 
-Before prompt writing, inspect all three model-facing boards listed in `mixed-media-style-guide.md`. Use them together: object/material construction, action anatomy, and thin-stroke anatomy are separate controls.
+Before prompt writing, inspect the five boards listed in `mixed-media-style-guide.md` and distinguish positive controls from the failure reference.
 
-### Two-pass candidate construction
+For a `flavor-monster` identity generation, provide exactly these model-facing roles:
 
-For mixed-media drinks, soft foods, or any retry where the material reference is correct but the generated outline remains clean, separate line and color:
+1. the uploaded photo supplies visual identity DNA from color, ingredient, and material, plus a separately recorded motion verb for later behavior design;
+2. `examples/desktop-pet/pink-green-flavor-monster-v3/preview.png` controls HEYTEA-like cuteness, handmade awkwardness, and the relationship between a mostly unoutlined color body and sparse black doodle face/limbs; explicitly forbid copying its body topology, protrusion placement, face layout, or proportions;
+3. `contact_sheet_dry_media_wavy_line_v4.png` controls region-specific colored-pencil scumbling, sparse wax-crayon marks, significant internal paper-white, paper tooth, and continuously wandering strokes; it must not become a uniform texture layer over the whole body;
+4. `contact_sheet_thin_stroke_anatomy_v2.png` controls full-length meander, within-stroke pressure and thickness changes, black dry breaks, open joins, overshoots, and retracing in exactly two arms, two legs, and every facial mark.
 
-1. **Line skeleton**: generate the three candidates in black on warm white with no color or shading. Borrow only line anatomy from poster-mode `figures/full-poses/*` and `lettering/strokes/*`. Every stroke—not merely the overall contour—must visibly meander with shallow waves, drifting curvature, and pressure wobble. Use gaps, overshoots, retracing, and bad joins as secondary traits. Require structural asymmetry in rim, opening, walls, lid, base, and perspective. Reject ruler-straight walls, rims, limbs, and facial dashes even when they are broken into fragments.
-2. **Locked color pass**: use the accepted skeleton as the edit target. Preserve every black stroke, gap, face, limb, and position exactly. Add color behind the line only. Use the dry-media/wavy-line board to assign colored pencil, childlike wax crayon, graphite, and optional pale wash to different material regions. Do not redraw, complete, smooth, or repair the line while coloring, and do not apply one uniform color texture across the full body.
+State these roles in the generation instruction and forbid copying people, lettering, objects, layouts, logos, or packaging from the study boards. Use `contact_sheet_figure_actions_v2.png` only after identity approval during motion generation. Use `contact_sheet_smudged_paint_structure_v3.png` only for a focused repair that needs fading edges or paper intrusion. Do not pass `contact_sheet_mixed_media_objects_v2.png` as a positive generation reference; inspect it only after generation when diagnosing over-hatching or object-heavy material treatment.
 
-Keep both review artifacts. The colored board is not allowed to bypass a failed line skeleton.
+### Two-pass construction or repair
 
-Generate one review board with three full-body candidates on white or warm white. All three must use the same source or source DNA at the same scale, in the same neutral front-facing stance, with arms relaxed and feet on one shared ground anchor. A candidate board compares identity design, not animation poses.
+For `source-faithful` mixed-media drinks and soft foods, retain the existing two-pass construction. For `flavor-monster`, default to one complete-color generation in which the crayon body mass and sparse line marks are resolved together. Enter this two-pass repair only when the first result has flattened media, mechanical geometry, or coloring that completes, smooths, or replaces the intended sparse line system:
+
+1. **Line skeleton**: generate the three `source-faithful` candidates, or the one `flavor-monster` repair target, in black on warm white with no color or shading. Borrow only line behavior from poster-mode `figures/full-poses/*` and `lettering/strokes/*`. Every stroke must visibly meander with shallow waves, drifting curvature, and pressure wobble. Use gaps, overshoots, retracing, and bad joins as secondary traits. For `source-faithful`, require structural asymmetry in the source rim, opening, walls, lid, base, and perspective when present. For `flavor-monster`, the repair skeleton contains the approved black-line face, exactly two open black-line arms, exactly two open black-line legs, and only necessary partial body guides; it must not add a complete enclosing body contour or conventional mascot anatomy. Reject ruler-straight or colored limbs and facial marks even when they are broken into fragments.
+2. **Locked color pass**: use the accepted skeleton as the edit target. Preserve every black stroke, gap, face, limb, and position exactly. Add color behind the line only. Use the dry-media/wavy-line board to assign colored pencil, childlike wax crayon, graphite, active paper-white, and optional pale wash to different material regions. For `flavor-monster`, require visible irregular paper gaps inside the body, allow selected misses, faded ends, or slight boundary crossings, and let light regions remain mostly paper-white with faint traces. Do not redraw, complete, smooth, or repair the line while coloring; do not apply one equal-density texture across the full body; and do not substitute uniform noise, dense tiny strokes or loops, or crosshatching for hand-applied media.
+
+Keep both repair artifacts. The colored result is not allowed to bypass a failed line skeleton.
+
+For `source-faithful`, generate one review board with three full-body candidates on white or warm white. All three must use the same source at the same scale, in the same neutral front-facing stance, with arms relaxed and feet on one shared ground anchor. A candidate board compares identity design, not animation poses.
+
+For `flavor-monster`, generate exactly one best complete-color identity on white or warm white unless the user explicitly asks for multiple directions. Use a quiet identity-readable resting pose, generous negative space, and one shared ground anchor. The first impression must be a cute, friendly, independent flat doodle creature; source recognition comes second through the identity brief. The public example supplies style and cuteness only, while the photo-derived brief supplies the new body topology.
 
 Keep constant in both modes:
 
 - source palette;
-- thin-to-medium hesitant black line structure with occasional retracing, open joins, and overshoot;
+- thin-to-medium hesitant black line structure whose important strokes meander along their full length and vary pressure or thickness within the same mark, with occasional dry breaks, retracing, open joins, and overshoot; for `flavor-monster`, apply this primarily to the face, two arms, two legs, and sparse partial marks rather than a complete body contour;
 - structurally crooked geometry rather than a clean template with a wobble filter;
-- source-appropriate material zoning; for drinks and soft foods, combine light colored-pencil scumbling, broad childlike wax-crayon marks, paper-white clear areas, and only optional pale smears rather than one uniform treatment.
+- source-appropriate material zoning; for drinks and soft foods, combine long loose lightly layered colored-pencil sweeps, a small number of broad open wax-crayon arcs or separated blocks, paper-white clear areas, and only optional pale smears rather than one uniform treatment. For `flavor-monster`, the paper-white must form significant irregular gaps inside the body; paper grain showing through a fully packed fill does not satisfy this requirement.
 
 For `source-faithful`, also keep the source outer silhouette, major internal divisions, and recognizable container, topping, label-free package, or ingredient details. Vary only:
 
@@ -73,35 +78,84 @@ For `source-faithful`, also keep the source outer silhouette, major internal div
 - short arm and leg proportions;
 - structural crookedness and stable temperament: quiet, curious, or gently clumsy, expressed without changing pose.
 
-For `flavor-monster`, keep the color, ingredient/material, and motion DNA rather than the photographed container silhouette. Vary only:
+For `flavor-monster`, lock:
 
-- a simple biological body archetype and its restrained asymmetry;
-- minimal face system and short appendage proportions;
-- where source-DNA cues become horns, ears, tuft, tail, belly patch, skin marking, or another approved biological feature;
-- stable temperament: quiet, curious, or gently clumsy, expressed without changing pose.
+- one soft, compact, friendly, source-derived dry-media color-mass body with no complete black enclosing outline and no literal source-object silhouette;
+- one declared region-by-region material plan with visible internal paper-white, differentiated pencil/crayon density, and selected incomplete or faded edges;
+- exactly two separate open black-line arms and two separate open black-line legs, including attachment points, lengths, proportions, and resting pose;
+- a sparse, friendly black-line face whose structure may vary through one or two eyes, offset placement, or no conventional mouth;
+- at least two kinds of visual identity DNA chosen from color, ingredient, and material and transformed into the body topology, color field, crude flat marks, paper gaps, restrained irregularities, or regional medium—not literal ingredient anatomy;
+- one separately recorded motion verb reserved for later behavior design and motion approval;
+- a stable quiet, curious, or gently clumsy temperament expressed without an action pose;
+- a cuteness pass that rejects fleshy collapse, realistic tissue, slime, horror tendrils, corpse-like sagging, sharp grotesque anatomy, or any disturbing organic reading;
+- a discard list covering every literal source structure and brand-like mark that must not survive.
 
 Do not use waving, walking, leaning, jumping, sleeping, or other action differences to create the illusion of three concepts. If removing the pose would make the candidates indistinguishable, the board has failed.
 
-In `source-faithful`, the subject is the body; do not put it in an animal costume or replace it with a monster. In `flavor-monster`, the creature is the body; do not retain a complete cup, bowl, bottle, wrapper, lid, rim, straw, or container-wall silhouette. In both modes avoid detailed clothing, uniform heavy outlines, smooth digital gradients, solid textureless fills, polished vector outlines, sticker borders, kawaii rendering, glossy 3D shading, realistic faces, text, watermarks, or official brand marks. Cuteness should come from awkward proportion, material marks, and a readable action rather than large eyes.
+In `source-faithful`, the subject is the body; do not put it in an animal costume or replace it with a monster. In `flavor-monster`, the creature is the body; do not retain a complete cup, bowl, bottle, wrapper, pizza slice, mushroom, ingredient, or other literal source silhouette. In both modes avoid detailed clothing, uniform heavy outlines, smooth digital gradients, solid textureless fills, polished vector outlines, sticker borders, kawaii rendering, glossy 3D shading, realistic faces, text, watermarks, or official brand marks. For `flavor-monster`, also reject colored, volumetric, missing, or tendril-replaced limbs and any fleshy, slimy, corpse-like, sharp, or horrific body reading. Cuteness should come from soft compact proportions, material marks, sparse black doodle features, and friendly temperament rather than large eyes.
 
-Ask the user to choose candidate 1, 2, or 3, or request a focused revision. Do not infer approval from silence.
+For `source-faithful`, ask the user to choose candidate 1, 2, or 3, or request a focused revision. For `flavor-monster`, ask the user to approve the single concept or request a focused revision of it. Repair only the failed axis: revise the body when it is literal, unpleasant, or insufficiently cute; when it is fully packed or every region shares one texture, preserve topology, DNA, face, limbs, and anchor, add the smudged-structure board for that repair only, and rebuild only the regional media and internal paper-white; when the face or limbs are smooth or constant-width, preserve the body and color regions and redraw only those marks at their existing locations with full-length meander and within-stroke variation; and repair only the inventory when an arm or leg is missing. Do not infer approval from silence, and do not turn a rejected monster concept into a three-candidate board unless the user requests broader exploration.
 
-Before presenting the board, perform a limb inventory on every candidate. Unless the approved concept explicitly calls for another anatomy, each candidate must show exactly two arms and two clearly visible legs. Broken-line style may create gaps inside a limb, but it must not erase the limb or merge it into the body/color mass. Fix only the affected candidate before asking for approval.
+Before presenting the identity, perform an appendage inventory. `source-faithful` candidates default to exactly two arms and two clearly visible legs. Every `flavor-monster` must have exactly two separate open black-line arms and two separate open black-line legs. Broken-line style may create gaps, but it must not change the 2+2 count, merge a limb into the body, replace a limb with a tendril or colored stroke, or turn it into a volumetric paw, mitten, foot, toe cluster, or realistic joint.
+
+### Identity-scale gate
+
+Inspect the generated identity at full resolution, then render or view it at 120–140 px before requesting approval. Reject or focus-revise it when:
+
+- a complete cup, bottle, bowl, wrapper, rim, lid, straw, container wall, layered-liquid cross-section, logo-like mark, text, prop, or background scene survives;
+- the small version no longer reads as one soft, compact, friendly source-derived color body with a sparse black-line face, two black-line arms, and two black-line legs;
+- fewer than two kinds of visual identity DNA chosen from color, ingredient, and material remain recognizable after reduction;
+- the friendly black-line face or quiet resting posture becomes unreadable;
+- the feet or approved body-bottom substitute do not share one stable ground anchor.
+- significant irregular paper-white is absent from inside the body, reads only as fine paper grain under saturated color, or disappears into compression noise after reduction;
+- major color regions collapse into undifferentiated speckle, or every region uses the same density and mark type;
+- a face or limb stroke is a smooth Bézier-like curve, constant-width monoline, or clean vector path with superficial jitter, or its pressure variation makes a required feature disappear at small size;
+- a complete enclosing black body outline, colored or volumetric limb, missing arm or leg, tendril substitution, realistic or shaded facial feature, large chibi eye, literal ingredient organ, fleshy collapse, slime, horror anatomy, corpse-like sagging, or shaded mascot volume becomes the dominant reading.
+
+White or warm-white paper is review-only. Approval locks the identity but does not authorize a paper background in runtime assets, which must use real alpha transparency.
 
 ### Pose-only consolidation
 
-If a presented board already has one shared identity and differs only through pose:
+If a `source-faithful` board, or a user-requested multi-direction monster board, already has one shared identity and differs only through pose:
 
 1. State that these are motion sketches, not valid identity variants; do not force a meaningless three-way choice.
-2. Use the most neutral standing pose to create one canonical master with fixed cup geometry, face placement, limb count and proportions, line behavior, media zoning, and foot anchor.
+2. Use the most neutral standing pose to create one canonical master with fixed source geometry or monster graphic grammar, face placement, appendage count and proportions, line behavior, media zoning, and ground anchor.
 3. Treat the other poses only as motion references. A raised arm may inform `wave`; a tilt may inform `happy` or `land`.
 4. Obtain explicit approval of the consolidated identity before motion generation. Keep the canonical master as the sole identity reference for every action.
 
-## Stage 3: Motion design
+## Stage 4: Identity approval and continuation gate
+
+Do not infer approval from silence or from a request that originally mentioned a desktop pet. Explicit identity approval locks one canonical master; it does not authorize motion generation, environment installation, or poster generation.
+
+For an approved `flavor-monster`, ask the user to choose:
+
+1. 制作融合海报；
+2. 继续制作可运行桌宠；
+3. 两者都做。
+
+If the user chooses a fusion poster, route that branch to `monster-poster-workflow.md` and ask for 带字版、无字版或两套都做 unless already specified. The poster branch does not use the runner environment gate.
+
+If the user chooses a runnable pet, or explicitly requested a `source-faithful` runnable pet and has now approved its canonical identity, continue to Stage 5. If both branches were selected, they proceed independently: a blocked runtime branch must not block the static fusion poster.
+
+## Stage 5: Runnable-branch environment gate
+
+Only after canonical identity approval and explicit selection of a runnable desktop pet, read `desktop-pet-environment.md` and run the read-only preflight:
+
+```bash
+python3 scripts/check_desktop_pet_environment.py --json --required-schema 3
+```
+
+If anything is missing, show one concrete repair plan and ask for installation or upgrade consent immediately before making that change. After approval, fill only the missing components, rerun preflight, and stop the motion branch if it still does not report `ready`. If the user declines, keep the approved static identity and any fusion-poster branch available without promising runnable output.
+
+This system gate is separate from both human visual approval gates. It must pass before motion generation, but it must never run merely to create a static monster or fusion poster.
+
+## Stage 6: Motion design
 
 After character approval, make a consistent action model sheet. Use the approved candidate as the only identity reference.
 
-Before drawing actions, record a compact canonical lock from the master: selected character mode, face coordinates, appendage inventory and lengths, outer silhouette proportions, defining object geometry or monster anatomy, color/material zones, foot anchor, and the characteristic amplitude of line waviness. Pose references may change gesture but never override this lock.
+For `flavor-monster`, this is the first stage where `contact_sheet_figure_actions_v2.png` may be passed as a positive reference. It controls gesture economy and primitive limb movement only; the approved canonical master remains the sole identity source and the action board must not redesign the color mass, face, marks, or appendage inventory.
+
+Before drawing actions, record a compact canonical lock from the master: selected character mode, black-line facial marks and coordinates, exactly two black-line arms and two black-line legs with their attachment points and lengths, outer silhouette or color-mass proportions, defining object geometry or monster graphic features, color/material zones, foot anchor, and the characteristic amplitude of line waviness. Pose references may change gesture but never override this lock.
 
 For `source-faithful`, keep the public schema-v2 action set:
 
@@ -152,7 +206,7 @@ When replacing earlier actions, the newest explicitly approved action family is 
 
 Use handcrafted/model-generated frames for silhouette-changing poses. Let the runtime supply mirroring, translation, subtle breathing, light sway, heart/Zzz particles, and squash/stretch.
 
-## Stage 4: Motion approval
+## Stage 7: Motion approval
 
 Provide both for either mode:
 
@@ -174,6 +228,12 @@ If one state fails, regenerate that state only. Do not rerun the full set unless
 
 Ask for explicit motion approval. Package only after approval.
 
+## Stage 8: Package and validate
+
+After motion approval, export transparent animation strips, build the pack and platform delivery folder with `scripts/build_desktop_pet_pack.py --delivery-dir ...`, and validate the ZIP with `scripts/validate_desktop_pet_pack.py`.
+
+Return the review artifacts, validated ZIP, manifest summary, and delivery folder. For v3, keep cadence, gesture, per-phase grounding (`floor` or `free`), and any explicit display-edge floor policy in the manifest. The shared Electron runner is installed once; each pet delivery contains only its pack, preview, start/quit entrypoints, and short usage note.
+
 ## Generation prompt frame
 
 Use the uploaded photo and approved candidate as references. Adapt details to the subject rather than copying this wording mechanically:
@@ -186,7 +246,9 @@ and source-appropriate hand color. For drinks and soft foods preserve the approv
 zoning: light colored pencil, broad childlike wax crayon, paper-white clear areas, and
 only optional pale smears in every frame.
 [source-faithful: the photographed subject remains the body and keeps its object structure.]
-[flavor-monster: the approved creature remains the body and keeps its biological anatomy;
+[flavor-monster: the approved creature remains the body and keeps its source-derived unoutlined
+dry-media color mass, sparse friendly black-line face, exactly two open black-line arms,
+exactly two open black-line legs, and abstract flavor marks;
 do not reintroduce a complete source container silhouette.]
 Transparent background, no white rectangle, no text, no logo, no watermark, no costume,
 no new accessories, no polished vector line.

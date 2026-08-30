@@ -8,6 +8,9 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 INDEX_PATH = ROOT / "private-assets/reference-cutouts/asset-index.json"
+FLAVOR_MONSTER_STYLE_ANCHOR = (
+    "examples/desktop-pet/pink-green-flavor-monster-v3/preview.png"
+)
 
 CORE_DESKTOP_BOARDS = {
     "contact_sheet_dry_media_wavy_line_v4": "primary",
@@ -20,6 +23,10 @@ CORE_DESKTOP_BOARDS = {
 PUBLIC_TEXT_FILES = (
     ROOT / "README.md",
     ROOT / "SKILL.md",
+    ROOT / "references/desktop-pet-environment.md",
+    ROOT / "references/desktop-pet-workflow.md",
+    ROOT / "references/evaluation.md",
+    ROOT / "references/monster-poster-workflow.md",
     ROOT / "references/mixed-media-style-guide.md",
 )
 
@@ -81,6 +88,45 @@ class ReferenceAssetTests(unittest.TestCase):
         ):
             self.assertIn(public_path, readme_text)
             self.assertTrue((ROOT / public_path).is_file(), public_path)
+
+    def test_flavor_monster_style_anchor_is_readable_and_referenced(self):
+        anchor_path = ROOT / FLAVOR_MONSTER_STYLE_ANCHOR
+        self.assertTrue(anchor_path.is_file(), FLAVOR_MONSTER_STYLE_ANCHOR)
+        with Image.open(anchor_path) as image:
+            image.verify()
+
+        for text_path in (
+            ROOT / "SKILL.md",
+            ROOT / "references/desktop-pet-character-modes.md",
+            ROOT / "references/desktop-pet-workflow.md",
+            ROOT / "references/mixed-media-style-guide.md",
+            ROOT / "references/evaluation.md",
+        ):
+            with self.subTest(file=text_path.name):
+                self.assertIn(
+                    FLAVOR_MONSTER_STYLE_ANCHOR,
+                    text_path.read_text(encoding="utf-8"),
+                )
+
+    def test_photo_entry_and_runtime_gate_references_stay_connected(self):
+        skill_text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        workflow_text = (ROOT / "references/desktop-pet-workflow.md").read_text(
+            encoding="utf-8"
+        )
+        environment_text = (
+            ROOT / "references/desktop-pet-environment.md"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("references/monster-poster-workflow.md", skill_text)
+        self.assertIn("monster-poster-workflow.md", workflow_text)
+        for choice in (
+            "生成带字版海报",
+            "生成不带字海报",
+            "生成一张风味小怪兽",
+        ):
+            self.assertIn(choice, skill_text)
+        self.assertIn("after the user has explicitly approved", environment_text)
+        self.assertIn("Do not begin motion generation", environment_text)
 
     def test_public_docs_have_no_local_machine_paths(self):
         forbidden = ("/Users/", "/var/folders/", "/private/tmp/")

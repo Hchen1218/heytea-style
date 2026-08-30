@@ -1,10 +1,10 @@
 # Desktop Pet Environment and Installation
 
-Read this reference at the beginning of every desktop-pet request, before inspecting or generating the user's photo.
+Read this reference only after the user has explicitly approved a canonical identity and chosen to continue into runnable desktop-pet motion. Static monster identities and fusion posters do not require this environment.
 
-## Required entry gate
+## Required motion-branch gate
 
-Run the read-only preflight first:
+Before generating any motion assets, run the read-only preflight:
 
 ```bash
 python scripts/check_desktop_pet_environment.py --json --required-schema 3
@@ -19,7 +19,7 @@ Interpret the result:
 - `missing-source`: the skill package does not contain the runner source. Stop and report that the runtime cannot be installed from this package.
 - `unsupported`: stop. v1 supports only macOS and Windows.
 
-Do not begin image generation until the preflight is resolved. A user may decline installation and still request static concept art, but do not promise a runnable desktop pet or proceed to animation packaging in that case.
+Do not begin motion generation until the preflight is resolved. Identity generation and approved-monster fusion posters may proceed without the runner. If the user selected both poster and runnable-pet outputs, a missing runner blocks only the motion and packaging branch. A user may decline installation and keep the approved static identity or continue the fusion poster, but do not promise a runnable desktop pet in that case.
 
 ## Consent boundary
 

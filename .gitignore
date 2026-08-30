@@ -16,5 +16,6 @@ assets/desktop-pet-runtime/node_modules/
 assets/desktop-pet-runtime/dist/
 assets/desktop-pet-runtime/.cache/
 generated-pets/
+output/
 outputs/
 素材/
