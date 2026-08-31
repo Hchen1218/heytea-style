@@ -80,6 +80,7 @@ class ReferenceAssetTests(unittest.TestCase):
             "assets/examples/poster/source-food.jpg",
             "assets/examples/poster/typography-poster.png",
             "assets/examples/poster/doodle-poster.png",
+            "assets/examples/monster-poster/pink-green-monster-product-interaction.png",
             "assets/examples/desktop-pet/source-drink.png",
             "assets/examples/desktop-pet/canonical-pet.png",
             "assets/examples/desktop-pet/motion-preview.gif",

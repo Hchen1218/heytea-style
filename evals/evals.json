@@ -338,7 +338,9 @@
         "The output records flavor-monster mode and does not ask the user to choose a character mode again.",
         "The internal identity brief maps source DNA into an independent body topology and declares a region-by-region material plan for loose pencil sweeps, sparse broad crayon marks, significant irregular internal paper-white, and occasional faded edges; it also declares exactly two black-line arms and two black-line legs, friendly black-line facial marks, the cuteness gate, and motion verbs reserved for later.",
         "The concept preserves at least two kinds of visual identity DNA chosen from color, ingredient, and material rather than only recoloring a generic monster; motion does not satisfy this static gate.",
-        "The pink-green public example controls only HEYTEA-like cuteness, handmade awkwardness, and the relationship between an unoutlined body and black-line face/limbs; its silhouette, protrusion placement, face layout, and proportions are not copied.",
+        "The internal brief includes a DNA-to-monster-structure map in which at least one non-color source signal becomes a contour-changing abstract feature that remains readable at 120–140 px; color, texture, spots, or internal marks alone do not pass.",
+        "The internal brief includes an example difference lock that declares a facial-mark system and limb geometry different from the public example, including face type/count/layout plus limb attachment points, lengths, proportions, and resting pose.",
+        "The pink-green public example controls only HEYTEA-like cuteness, handmade awkwardness, and the relationship between an unoutlined body and black-line face/limbs; its silhouette, protrusion placement, facial anatomy, limb skeleton, and proportions are not copied.",
         "The first impression is a cute friendly flat doodle creature rather than a cup, lid, straw, drink cross-section, unpleasant organic form, or conventionally completed mascot.",
         "The body is a soft compact source-derived dry-media color mass with differentiated regional marks and visible irregular paper-white inside it, without a complete black enclosing outline or literal ingredient anatomy.",
         "The identity has exactly two open black-line arms and two open black-line legs; every facial and limb mark meanders along its full length and varies pressure or thickness within the stroke, while the face layout itself may vary.",
@@ -368,8 +370,9 @@
       ],
       "expectations": [
         "The uploaded photo supplies color, ingredient, material, and body-topology DNA while motion verbs are reserved for later behavior design.",
+        "Before generation, the output declares both an example difference lock and a DNA-to-monster-structure map with at least one source-derived contour feature.",
         "The public pink-green example supplies only HEYTEA-like cuteness and the unoutlined-body/black-line-feature relationship; the dry-media board controls region-specific pencil, crayon, and internal paper-white, while the thin-stroke board controls full-length meander and within-stroke pressure or thickness variation in every black face and limb mark.",
-        "The generation instruction explicitly forbids copying the public example's body topology, protrusion placement, face layout, or proportions.",
+        "The generation instruction lists the public example's face system and limb skeleton as discard-only anatomy and specifies replacement facial marks, limb attachments, lengths, proportions, and resting geometry.",
         "The figure-action board is deferred to motion generation and the smudged-structure board is used only for focused repair rather than as default identity input.",
         "The mixed-media-object failure board is not passed as a positive generation reference.",
         "The result is one complete-color concept in a quiet identity-readable resting pose on a white or warm-white review background, not a three-candidate board.",
@@ -467,7 +470,8 @@
       "expectations": [
         "The source photo controls color, ingredient, material, and body topology; the dry-media board controls region-specific pencil, crayon, paper tooth, and internal paper-white; and the thin-stroke board controls full-length meander plus within-stroke variation in every black face and limb mark.",
         "The pink-green example controls only cuteness, handmade awkwardness, and the relationship between an unoutlined body and sparse black doodle face/limbs.",
-        "The prompt explicitly forbids copying the example's silhouette, protrusion placement, face layout, or proportions.",
+        "The prompt explicitly treats the example's silhouette, protrusion placement, facial-mark system, limb attachment points, lengths, proportions, resting pose, and feature coordinates as discard-only anatomy.",
+        "The prompt declares a replacement face-and-limb system and a DNA-to-monster-structure map with at least one non-color source cue becoming a readable contour feature.",
         "The figure-action board is reserved for motion, the smudged-structure board enters only a focused repair for full fill, missing paper-white, or overly clean edges, and the mixed-media-object failure board is not a positive input.",
         "The generated identity still has exactly two black-line arms and two black-line legs, a variable-layout friendly black-line face, and one source-derived body."
       ]
@@ -618,6 +622,32 @@
         "Only the existing face, two arms, and two legs are redrawn at their locked locations; no candidate alternatives or body redesign are introduced.",
         "Each repaired mark visibly meanders or bends along its full length and changes pressure or thickness within the same stroke, using restrained dry breaks, retracing, doubled correction, overshoot, or open joins.",
         "The repaired black system remains sparse, friendly, and legible at full size and 120–140 px without losing any required facial mark or limb."
+      ]
+    },
+    {
+      "id": 47,
+      "prompt": "新生成的小怪兽换了身体颜色和轮廓，但五官、手脚连接位置和站姿仍然跟粉绿 example 一模一样。它可以通过身份阶段吗？",
+      "expected_output": "A focused public-example anatomy rejection that preserves independent source-derived body work while replacing the copied face system and limb skeleton.",
+      "files": [],
+      "expectations": [
+        "The identity is rejected even though its palette and outer silhouette differ from the public example.",
+        "The output identifies copied facial-mark type/count/layout and copied limb attachment points, lengths, proportions, or resting geometry as identity failures rather than acceptable style borrowing.",
+        "The repair preserves independently valid source-DNA topology, regional media, internal paper-white, palette, and ground anchor while redesigning both the face system and limb geometry.",
+        "The revised prompt contains an explicit example difference lock and lists the example anatomy that must be discarded instead of relying on a generic do-not-copy sentence.",
+        "The replacement still has exactly two open black-line arms and two open black-line legs and remains readable at full size and 120–140 px before approval."
+      ]
+    },
+    {
+      "id": 48,
+      "prompt": "这张餐盘里有牛排、芦笋、南瓜和番茄。生成的小怪兽只是酒红色圆盘，里面加了红绿橙色纹理，没有耳朵、尾巴或任何怪物结构。请修正身份设计。",
+      "expected_output": "A topology-axis rejection that maps non-color meal DNA into at least one abstract contour-changing monster feature instead of merely recoloring a generic disk.",
+      "files": [],
+      "expectations": [
+        "The recolored circular disk fails because palette, texture, spots, and internal marks do not satisfy the monster-structure gate.",
+        "The repair records a DNA-to-monster-structure map using a non-color cue such as steak sear, asparagus segmentation, squash char edge, or tomato-vine structure.",
+        "At least one mapped cue becomes an abstract ear-like fin, horn, crest, spine, tail bud, antenna, or comparable feature that changes the outer contour and remains readable at 120–140 px.",
+        "The feature is integrated into the unoutlined colored body topology, is not a literal vegetable, fruit, realistic organ, unmotivated decoration, extra limb, or horror tendril, and does not alter the exact two-arm plus two-leg inventory.",
+        "The repair preserves any valid palette and regional dry-media treatment, rebuilds only the failed topology and any dependent face or limb attachments, and still waits for explicit identity approval."
       ]
     }
   ]
