@@ -28,8 +28,8 @@
 
 | 原始照片 | A. 写实卡通桌宠（明确请求时） | B. 风味小怪兽 |
 |---|---|---|
-| ![粉绿饮料原图](assets/examples/desktop-pet/source-drink.png) | ![保留杯子轮廓与饮料分层的写实卡通桌宠](assets/examples/desktop-pet/canonical-pet.png) | ![提取颜色、果粒和材质重新设计的风味小怪兽](examples/desktop-pet/pink-green-flavor-monster-v3/preview.png) |
-| 输入提供主体、色彩和材料信息 | 原主体直接成为角色，保留轮廓与关键结构 | 原图提供色彩、配料、材质和动作 DNA，容器不再充当身体 |
+| ![粉绿饮料原图](assets/examples/desktop-pet/source-drink.png) | ![保留杯子轮廓与饮料分层的写实卡通桌宠](assets/examples/desktop-pet/canonical-pet.png) | ![提取颜色、果粒、材质及其关系重新设计的风味小怪兽](examples/desktop-pet/pink-green-flavor-monster-v3/preview.png) |
+| 输入提供主体、色彩和材料信息 | 原主体直接成为角色，保留轮廓与关键结构 | 原图提供色彩、配料、材质及包含、沉积和覆盖关系，容器不再充当身体 |
 
 确认后的 canonical monster 会同时锁定融合海报和桌宠动作中的身体、脸、2+2 肢体、颜色、材质与风味标记。
 

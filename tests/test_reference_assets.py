@@ -20,10 +20,22 @@ CORE_DESKTOP_BOARDS = {
     "contact_sheet_mixed_media_objects_v2": "avoid-default",
 }
 
+FLAVOR_MONSTER_STAGE_BOARDS = {
+    "contact_sheet_single_pass_rough_line_v1": {
+        "role": "single-pass-rough-line-reference",
+        "template_use": "flavor-monster-line-master",
+    },
+    "contact_sheet_crayon_layer_v1": {
+        "role": "crayon-layer-color-stage-reference",
+        "template_use": "flavor-monster-line-locked-color",
+    },
+}
+
 PUBLIC_TEXT_FILES = (
     ROOT / "README.md",
     ROOT / "SKILL.md",
     ROOT / "references/desktop-pet-environment.md",
+    ROOT / "references/desktop-pet-character-modes.md",
     ROOT / "references/desktop-pet-workflow.md",
     ROOT / "references/evaluation.md",
     ROOT / "references/monster-poster-workflow.md",
@@ -65,6 +77,15 @@ class ReferenceAssetTests(unittest.TestCase):
                 if expected_quality == "primary":
                     self.assertNotEqual(record["quality"], "avoid-default")
 
+        for name, expected in FLAVOR_MONSTER_STAGE_BOARDS.items():
+            with self.subTest(name=name):
+                self.assertIn(name, self.by_name)
+                record = self.by_name[name]
+                self.assertEqual(record["role"], expected["role"])
+                self.assertEqual(record["template_use"], expected["template_use"])
+                self.assertEqual(record["copyright_scope"], "private-reference-only")
+                self.assertIn("anatomy-free", record["glyph_traits"])
+
     def test_skill_reference_and_readme_paths_stay_consistent(self):
         skill_text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
         style_text = (ROOT / "references/mixed-media-style-guide.md").read_text(
@@ -90,18 +111,15 @@ class ReferenceAssetTests(unittest.TestCase):
             self.assertIn(public_path, readme_text)
             self.assertTrue((ROOT / public_path).is_file(), public_path)
 
-    def test_flavor_monster_style_anchor_is_readable_and_referenced(self):
+    def test_flavor_monster_style_anchor_is_readable_and_owned_by_identity_docs(self):
         anchor_path = ROOT / FLAVOR_MONSTER_STYLE_ANCHOR
         self.assertTrue(anchor_path.is_file(), FLAVOR_MONSTER_STYLE_ANCHOR)
         with Image.open(anchor_path) as image:
             image.verify()
 
         for text_path in (
-            ROOT / "SKILL.md",
             ROOT / "references/desktop-pet-character-modes.md",
-            ROOT / "references/desktop-pet-workflow.md",
             ROOT / "references/mixed-media-style-guide.md",
-            ROOT / "references/evaluation.md",
         ):
             with self.subTest(file=text_path.name):
                 self.assertIn(
@@ -128,6 +146,63 @@ class ReferenceAssetTests(unittest.TestCase):
             self.assertIn(choice, skill_text)
         self.assertIn("after the user has explicitly approved", environment_text)
         self.assertIn("Do not begin motion generation", environment_text)
+
+    def test_flavor_monster_relation_and_face_contract_stays_consistent(self):
+        canonical_path = ROOT / "references/desktop-pet-character-modes.md"
+        canonical_text = canonical_path.read_text(encoding="utf-8")
+
+        for required in (
+            "source relation map",
+            "primary-matrix",
+            "embedded-inclusion",
+            "surface-layer",
+            "deposit",
+            "accent",
+            "embedded-in",
+            "sits-on-top-of",
+            "accumulates-at",
+            "overlaps-with",
+            "material layer map",
+            "readability > friendliness > identity distinctiveness > handmade irregularity",
+        ):
+            with self.subTest(required=required):
+                self.assertIn(required, canonical_text)
+
+        public_contract_text = "\n".join(
+            path.read_text(encoding="utf-8") for path in PUBLIC_TEXT_FILES
+        )
+        for obsolete_gate in (
+            "two to four body-scale paper-white channels",
+            "two to four paper-white channels",
+            "crayon-gap map",
+            "surface/top-layer",
+            "deposited-at",
+            "Reject standard dot eyes",
+            "perfect U mouths",
+            "centered equal spacing",
+            "contact_sheet_outline_crayon_gap_v1",
+        ):
+            with self.subTest(obsolete_gate=obsolete_gate):
+                self.assertNotIn(obsolete_gate, public_contract_text)
+
+        color_board = self.by_name["contact_sheet_crayon_layer_v1"]
+        self.assertIn("optional-breathing-space", color_board["glyph_traits"])
+        self.assertNotIn(
+            "body-scale-paper-white-channels", color_board["glyph_traits"]
+        )
+
+    def test_flavor_monster_relation_regression_evals_are_present(self):
+        evals = json.loads((ROOT / "evals/evals.json").read_text(encoding="utf-8"))
+        cases = evals["evals"]
+        ids = [case["id"] for case in cases]
+        self.assertEqual(len(ids), len(set(ids)))
+        by_id = {case["id"]: case for case in cases}
+
+        for case_id in (58, 59, 60):
+            with self.subTest(case_id=case_id):
+                self.assertIn(case_id, by_id)
+                self.assertTrue(by_id[case_id]["prompt"].strip())
+                self.assertGreaterEqual(len(by_id[case_id]["expectations"]), 3)
 
     def test_public_docs_have_no_local_machine_paths(self):
         forbidden = ("/Users/", "/var/folders/", "/private/tmp/")

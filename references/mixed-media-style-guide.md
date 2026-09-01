@@ -6,7 +6,7 @@ This guide describes a visual study of user-supplied references. It captures tra
 
 ## Core visual system
 
-The reference language is not a uniform cartoon outline or a fully colored crayon drawing. It is a loose collage assembled from four unequal layers:
+The reference language is not a uniform cartoon outline or a fully packed crayon drawing. It is a loose collage assembled from four unequal layers:
 
 1. thin black or muted-green pen lines establish structure;
 2. heterogeneous dry media—light colored-pencil scumbling, childlike wax-crayon loops or blocks, and occasional dry pastel—supply most color;
@@ -17,20 +17,20 @@ Do not force every layer into every image. Two or three layers are enough, but t
 
 ## Line grammar
 
-- Mix thin-to-medium pen with a few strategically heavier marker passages. Each important face or limb mark must change pressure or thickness within the same stroke; do not use constant-width monoline or one uniform outline around everything.
-- Every structural stroke must visibly wander along its full length. Cup walls, rims, bases, arms, legs, and facial dashes should use shallow waves, drifting curvature, pressure wobble, imperfect corners, dry breaks, retracing, or doubled corrections. Breaking ruler-straight lines into fragments, bending a smooth Bézier path, or adding surface jitter to a clean vector skeleton does not create the target hand feel.
+- Mix thin-to-medium pen with strategically heavier marker passages. For `flavor-monster`, the body and source-derived protrusions require one semantically complete heavy black structural stroke system, while the face and 2+2 limbs remain thinner. At any cross-section the boundary reads as one mark, never a parallel band, braid, rope, or outline-of-an-outline. Every important stroke must change pressure or thickness within itself; a complete boundary is not permission for constant-width monoline.
+- Every structural stroke must visibly wander along its full length. Cup walls, rims, bases, arms, legs, and facial dashes should use short flat spots, shallow dents, drifting curvature, pressure jumps, imperfect corners, dry breaks, overshoots, or mismatched joins. For a flavor-monster boundary, allow only one or two short local retraces and keep continuous parallel travel below roughly ten percent of the complete path. Breaking ruler-straight lines into fragments, bending a smooth Bézier path, or adding surface jitter to a clean vector skeleton does not create the target hand feel.
 - Allow open joins, overshooting terminals, and color that misses the outline by a few pixels.
 - Keep secondary marks sparse. One loose curl, broken arc, crooked underline, or short motion dash is more faithful than dense decoration.
 - Make the geometry itself structurally naive: unequal wall slopes, tilted rims, off-center openings, shifted lids, inconsistent perspective, and crooked bases. A clean template with surface wobble is not enough.
 
-The target is an observed hand making decisions in real time. Smooth Bézier curves, mechanically rounded corners, sticker borders, and identical line weight fail this style.
+The target is an observed hand making decisions in real time. Smooth Bézier curves, mechanically rounded corners, sticker borders, identical line weight, whole-loop mechanical doubling, braided or rope-like tracks, repeated beaded stamps, and clean vector paths with a wobble filter fail this style.
 
 ## Color and material grammar
 
 - Begin with the photographed subject's one to three identifying colors.
 - Favor food-native, low-to-medium-saturation hues: tea green, yellow-green, cream, pale yellow, fruit red, and restrained brown.
-- Assign media by material region instead of applying one texture to the whole character. Light liquid or soft color may use loose colored-pencil scumbling; vivid topping or fruit may use broad childlike wax-crayon loops and chunky marks; clear plastic may remain paper-white with a few faint graphite traces.
-- Colored-pencil marks should be long, loose, lightly layered, and visibly granular. Wax crayon should use a small number of broad wandering arcs, open loops, or separate blocks. Both leave substantial paper visible and may miss, fade before, or cross boundaries. For `flavor-monster`, require significant irregular paper-white inside the colored body; fine paper tooth beneath edge-to-edge color does not count as active paper-white.
+- Assign media by material region instead of applying one texture to the whole character. `source-faithful` may keep loose colored pencil, wax crayon, graphite, or occasional pale wash according to source material. `flavor-monster` uses dry wax crayon as the dominant color tool.
+- For `flavor-monster`, wax crayon uses a small number of broad blunt side-of-crayon sweeps with matte granular deposits, broken pressure, ragged ends, and visible paper tooth. Follow the approved material layer map: establish a continuous primary matrix, embed inclusions or deposits within it, keep surface layers spatially distinct, and overlap broad dry-wax passes to create intermediate hues and depth. Paper-white breathing space is optional and must not sever the mapped hierarchy. Slight misses or crossings at the black boundary are allowed when the boundary remains readable.
 - Broad rubbed pigment or pale wash is an occasional accent, not the dominant default. Oil-paint, oil-pastel smear, gouache mass, wet watercolor bloom, dense repeated tiny strokes, crosshatching, airbrushed gradients, soft plastic shading, glossy highlights, and uniform digital noise are forbidden.
 - Black is structural rather than dominant. White or warm white remains an active material, not merely unused background.
 - Photographic fragments, when used, should be small ingredient accents. Do not turn the entire desktop-pet body back into a photo.
@@ -47,25 +47,27 @@ The target is an observed hand making decisions in real time. Smooth Bézier cur
 
 Inspect these boards before writing an identity or action prompt:
 
-- `examples/desktop-pet/pink-green-flavor-monster-v3/preview.png`: public, repo-created positive style anchor for HEYTEA-like cuteness, handmade awkwardness, and the relationship between a mostly unoutlined color body and sparse black doodle face/limbs. It is not an anatomy template: never copy its body topology, protrusion placement, facial-mark type/count/layout, limb attachment points, lengths, proportions, resting pose, or feature coordinates into a new identity.
+- `examples/desktop-pet/pink-green-flavor-monster-v3/preview.png`: public, repo-created positive style anchor for HEYTEA-like cuteness and handmade looseness. It is not an anatomy or outline template: never copy its body topology, protrusion placement, facial-mark type/count/layout, limb attachment points, lengths, proportions, resting pose, feature coordinates, or outline treatment into a new identity.
+- `private-assets/reference-cutouts/desktop-pet-style/contact_sheet_single_pass_rough_line_v1.png`: primary anatomy-free `flavor-monster` black-line board, assembled only from non-lettering HEYTEA source cutouts. Its isolated heavy contour curves and lighter arm/leg curves control one-pass path construction, pressure jumps, blunt terminals, crooked travel, dry breaks, bad joins, and restrained local retracing. It supplies no silhouette, face, limb skeleton, object, text, or character anatomy.
+- `private-assets/reference-cutouts/desktop-pet-style/contact_sheet_crayon_layer_v1.png`: color-stage-only board for broad blunt dry wax-crayon, paper tooth, and optional breathing space. It supplies no color-zone structure or required gap count. Do not pass it to flavor-monster black-line-master generation, and do not copy its line fragments.
 - `private-assets/reference-cutouts/desktop-pet-style/contact_sheet_dry_media_wavy_line_v4.png`: primary line-and-color reference for continuously meandering strokes, light colored-pencil scumbling, childlike wax-crayon loops, chunky crayon marks, and paper tooth.
 - `private-assets/reference-cutouts/desktop-pet-style/contact_sheet_smudged_paint_structure_v3.png`: secondary reference for fading edges, paper intrusion, crooked rims, unequal walls, and shifted lids; do not let its broad smears dominate the whole character.
 - `private-assets/reference-cutouts/desktop-pet-style/contact_sheet_figure_actions_v2.png`: faceless action figures, primitive props, gesture economy, and object-to-figure scale.
 - `private-assets/reference-cutouts/desktop-pet-style/contact_sheet_thin_stroke_anatomy_v2.png`: thin black/green line weight, awkward glyph structure, open joins, overshoots, retracing, and dry breaks.
 - `private-assets/reference-cutouts/desktop-pet-style/contact_sheet_mixed_media_objects_v2.png`: analysis-only example of an over-hatched failure. Never pass it as a positive identity-generation reference.
 
-For `flavor-monster` identity generation, pass the uploaded photo, the public pink-green example, the dry-media/wavy-line board, and the thin-stroke board, with a separate declared role for each. The photo supplies color, ingredient, material, and body-topology DNA while its motion verb is reserved for later behavior design; the public example controls only cuteness, handmade awkwardness, and the relationship between an unoutlined color body and black doodle face/limbs; the dry-media board controls crayon and paper texture; and the stroke board controls the black line quality of exactly two arms, two legs, and every facial mark. State explicitly that the public example must not supply silhouette, protrusion placement, facial-mark type/count/layout, limb attachment points, lengths, proportions, resting pose, or anatomical coordinates. List those example traits as discard-only anatomy and declare a replacement face system plus limb geometry. Use the figure-action board only during motion generation after identity approval. Use the smudged-paint board only for focused repair of a failed body axis. Do not copy any depicted object, person, lettering, layout, logo, or packaging. Keep the mixed-media-object board outside every positive generation input and consult it only when diagnosing over-hatched output.
+For `flavor-monster` black-line generation, pass the uploaded photo, public pink-green example, and the single-pass rough-line board with a separate declared role for each. Construct the face from the approved written face brief only. After the line master passes, use only the locked master, crayon-layer board, and dry-media board for color. Exclude the lettering-derived thin-stroke board from flavor-monster identity generation, use the figure-action board only during motion generation, use the smudged-paint board only for focused material repair, and keep the mixed-media-object failure board outside every positive input. No reference board may supply silhouette, face, limb skeleton, object, text, layout, logo, packaging, or anatomical coordinates.
 
 For `source-faithful`, continue choosing the same positive controls according to the photographed object's construction needs. When these study boards ship with the open-source Skill, identify them as non-official reference assets and keep them outside the CC BY grant for original examples.
 
-When a generated identity still has a clean cartoon framework, borrow line anatomy—not figure identity—from primary poster-mode `figures/full-poses/*` and `lettering/strokes/*` cutouts. Use a black-only skeleton and locked-color repair only then for `flavor-monster`; its default identity pass is complete color with regional media already assigned. Poster assets control segment construction, blunt ends, line-weight jumps, and bad joins; they must not introduce workers, lettering, props, or logos into the pet.
+When a generated identity still has a clean cartoon framework, borrow line anatomy—not figure identity—from primary poster-mode `figures/full-poses/*` and `lettering/strokes/*` cutouts. `flavor-monster` always uses a black-line master followed by a line-locked crayon pass. Poster assets control segment construction, blunt ends, line-weight jumps, and bad joins; they must not introduce workers, lettering, props, or logos into the pet.
 
 ## Desktop-pet translation
 
 For every `source-faithful` three-candidate board and every `flavor-monster` single identity master:
 
-- use thin-to-medium hesitant pen only where the selected mode calls for line structure; for `flavor-monster`, concentrate black linework in the face, two arms, two legs, and sparse partial marks rather than enclosing the body;
-- zone drinks and soft foods across long loose lightly layered colored-pencil sweeps, a few broad childlike wax-crayon arcs or separated blocks, paper-white clear areas, and only occasional pale smear; never give the full body one equal-density texture;
+- use mode-specific hesitant pen; for `flavor-monster`, enclose the body and source-derived protrusions with a heavy irregular black boundary and keep the face plus 2+2 limbs thinner but pressure-varying;
+- preserve mode-specific material layering; for `flavor-monster`, use broad blunt dry wax-crayon to preserve the primary matrix, embedded inclusions or deposits, surface layers, overlaps, optional breathing space, and selected missed edges rather than transparent wash, peer color blocks, or one equal-density texture;
 - use a warm-white review background with enough separation to inspect edge quality.
 
 For `source-faithful`:
@@ -74,22 +76,7 @@ For `source-faithful`:
 - vary face placement, limb proportions, structural crookedness, and temperament only;
 - reject animal costumes, monster substitution, or loss of object recognition.
 
-For `flavor-monster`:
-
-- preserve at least two kinds of visual identity DNA chosen from color, ingredient, and material instead of the photographed container silhouette, and record motion DNA separately for later behavior design;
-- derive a soft, compact, friendly, animatable body topology and center of gravity from the source DNA without preserving a literal source-object silhouette;
-- map at least one non-color source cue into a contour-changing monster feature such as an abstract ear-like fin, horn, crest, spine, tail bud, antenna, or comparable protrusion. Normally use one or two; keep them integrated into the colored body mass, readable at 120–140 px, and traceable to the source rather than decorative;
-- treat those ears, fins, horns, crests, spines, tail buds, or antennae as body topology, not as extra arms or legs. Reject literal fruit or vegetable organs, realistic anatomy, unmotivated mascot accessories, extra black-line limbs, or slime-like tendrils;
-- keep the body a dry-media color mass without a complete black enclosing outline;
-- require a region-by-region material plan before generation; light zones may be mostly paper-white with faint traces, vivid zones use sparse broad crayon marks, and soft zones use loose pencil sweeps rather than a shared grain filter;
-- draw exactly two arms and two legs as separate, open, crooked black doodle strokes; never use colored or volumetric limbs, paws, toes, realistic joints, tendrils, trailing flesh, or another limb inventory;
-- draw every facial mark as a sparse, friendly black doodle line; allow one or two eyes, offset layouts, or no conventional mouth, but reject colored features, realistic or shaded eyes, large chibi eyes, and complex facial anatomy;
-- translate ingredients into abstract blocks, spots, paper gaps, local media changes, or restrained irregularities rather than a mushroom ear, fruit horn, topping hat, or other realistic organ;
-- default to one best complete-color concept with a source-driven body, black-line face, fixed 2+2 black-line limbs, stable temperament, quiet resting pose, scale, and ground anchor;
-- require a cuteness pass: reject fleshy collapse, exposed or realistic tissue, slime, horror tendrils, corpse-like sagging, sharp grotesque anatomy, or any disturbing organic reading;
-- generate multiple identity directions only when the user explicitly requests exploration;
-- reject complete cup, bowl, bottle, wrapper, pizza slice, mushroom, ingredient, or other literal source-object silhouettes;
-- reject generic unrelated monsters whose palette could be changed without losing all connection to the source.
+For `flavor-monster`, obtain all identity decisions from `desktop-pet-character-modes.md`. This guide controls only their visual execution: heavy irregular boundary, thinner line features, broad blunt dry wax-crayon, paper tooth, optional breathing space, and the assigned reference-board stages.
 
 For animation frames, preserve the same stroke logic even when poses change. Runtime interpolation may move or squash the complete drawing, but it must not replace hand-drawn silhouette-changing key poses.
 
@@ -97,12 +84,13 @@ For animation frames, preserve the same stroke logic even when poses change. Run
 
 Reject and regenerate when any of these dominate:
 
-- uniform thick black outline;
+- smooth, equal-width, sticker-like, whole-loop mechanically doubled, braided, rope-like, outlined-band, or repeated-stamp black outline;
 - smooth vector geometry or sticker border;
 - airbrushed gradient, glossy 3D volume, or plastic shading;
-- dense uniform crayon or pencil fill covering every region with the same mark;
+- transparent marker, watercolor, pastel or oil-pastel smear, smooth digital fill, or dense uniform crayon covering every region with the same mark;
 - paper tooth or digital speckle presented as "white space" while color still fills the body edge to edge;
 - smooth constant-width face or limb curves, including clean Bézier paths with only superficial jitter;
+- more than one or two local retraces, or continuous parallel travel covering roughly ten percent or more of the complete flavor-monster boundary;
 - oil-paint, oil-pastel, gouache, or wet-smear appearance dominating the character;
 - ruler-straight segments, even when separated by deliberate gaps;
 - structurally clean geometry with a superficial wobble filter;
@@ -110,13 +98,4 @@ Reject and regenerate when any of these dominate:
 - excessive props, decorations, text, logos, or campaign layout;
 - photographic desktop-pet body with doodles merely pasted on top.
 - `source-faithful` output that replaces the source object with a generic creature.
-- `flavor-monster` output that is still a cup, bowl, bottle, wrapper, or food package with limbs.
-- `flavor-monster` identity output that copies source colors but omits both ingredient and material DNA, or later behavior output that ignores the separately recorded motion DNA.
-- `flavor-monster` identity that changes the palette or body silhouette but keeps the public example's facial-mark system and limb skeleton.
-- `flavor-monster` body that remains an unjustified disk, dome, or generic blob with only colors, texture, spots, or internal marks and no source-derived contour-changing monster feature.
-- `flavor-monster` body with a complete enclosing black outline instead of an unoutlined dry-media color mass.
-- colored, volumetric, missing, merged, or tendril-replaced limbs instead of exactly two open black-line arms and two open black-line legs.
-- colored facial blobs, realistic or shaded eyes, large chibi eyes, complex facial anatomy, or facial marks that are not sparse black doodle lines.
-- literal ingredient anatomy or a complete pizza slice, mushroom, cup, or other source-object silhouette.
-- fleshy collapse, exposed tissue, slime, horror tendrils, corpse-like sagging, sharp grotesque anatomy, or another disturbing organic reading.
-- correct crayon or pencil medium applied without the public example's cuteness and black-line face/limb relationship, or with its silhouette and face layout copied as a template.
+- `flavor-monster` body missing its heavy irregular structural boundary, or using a smooth equal-width/sticker-like boundary instead.
