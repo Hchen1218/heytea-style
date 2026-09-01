@@ -573,6 +573,32 @@
     "notes": "primary model-facing board for continuously meandering line travel and region-specific colored-pencil/crayon treatment"
   },
   {
+    "name": "contact_sheet_single_pass_rough_line_v1",
+    "category": "desktop-pet-style/contact-sheets",
+    "path": "private-assets/reference-cutouts/desktop-pet-style/contact_sheet_single_pass_rough_line_v1.png",
+    "role": "single-pass-rough-line-reference",
+    "template_use": "flavor-monster-line-master",
+    "stroke_weight": "heavy-to-thin-single-pass-variable",
+    "glyph_traits": ["non-lettering-heytea-source", "heavy-outline-curves", "light-limb-curves", "single-pass-path", "pressure-jumps", "blunt-terminals", "dry-breaks", "bad-joins", "local-retrace", "anatomy-free"],
+    "action_verb": "construct-one-pass-line",
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "sole positive flavor-monster black-line image board, assembled only from isolated curves in non-lettering HEYTEA source cutouts; controls heavy outline and lighter arm/leg path behavior without supplying objects, text, silhouette, face layout, limbs, or character anatomy"
+  },
+  {
+    "name": "contact_sheet_crayon_layer_v1",
+    "category": "desktop-pet-style/contact-sheets",
+    "path": "private-assets/reference-cutouts/desktop-pet-style/contact_sheet_crayon_layer_v1.png",
+    "role": "crayon-layer-color-stage-reference",
+    "template_use": "flavor-monster-line-locked-color",
+    "stroke_weight": "not-a-line-stage-control",
+    "glyph_traits": ["broad-dry-crayon", "paper-tooth", "optional-breathing-space", "anatomy-free", "color-stage-only"],
+    "action_verb": "color-behind-locked-line",
+    "quality": "primary",
+    "copyright_scope": "private-reference-only",
+    "notes": "anatomy-free color-stage board derived from an approved construction result; controls only broad dry wax-crayon scale, paper tooth, and optional breathing space, supplies no color-zone structure or required gap count, and must not be passed to black-line-master generation"
+  },
+  {
     "name": "contact_sheet_figure_actions_v2",
     "category": "desktop-pet-style/contact-sheets",
     "path": "private-assets/reference-cutouts/desktop-pet-style/contact_sheet_figure_actions_v2.png",
@@ -590,12 +616,12 @@
     "category": "desktop-pet-style/contact-sheets",
     "path": "private-assets/reference-cutouts/desktop-pet-style/contact_sheet_thin_stroke_anatomy_v2.png",
     "role": "stroke-anatomy-reference",
-    "template_use": "desktop-pet-candidate",
+    "template_use": "source-faithful-analysis-only",
     "stroke_weight": "thin-to-medium-variable",
     "glyph_traits": ["open-joins", "overshoot", "retracing", "dry-breaks"],
     "action_verb": "mark",
     "quality": "primary",
     "copyright_scope": "private-reference-only",
-    "notes": "model-facing study board for black and muted-green pen rhythm; isolated glyphs do not form campaign copy"
+    "notes": "lettering-derived study board retained only for source-faithful analysis; never pass it to flavor-monster identity generation or use it to control a monster face, limbs, or outline"
   }
 ]

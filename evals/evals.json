@@ -336,15 +336,15 @@
       "files": [],
       "expectations": [
         "The output records flavor-monster mode and does not ask the user to choose a character mode again.",
-        "The internal identity brief maps source DNA into an independent body topology and declares a region-by-region material plan for loose pencil sweeps, sparse broad crayon marks, significant irregular internal paper-white, and occasional faded edges; it also declares exactly two black-line arms and two black-line legs, friendly black-line facial marks, the cuteness gate, and motion verbs reserved for later.",
+        "The internal identity brief preserves primary-matrix, embedded-inclusion, surface-layer, deposit, and accent roles plus their containment, position, accumulation, and overlap relations before abstraction.",
         "The concept preserves at least two kinds of visual identity DNA chosen from color, ingredient, and material rather than only recoloring a generic monster; motion does not satisfy this static gate.",
         "The internal brief includes a DNA-to-monster-structure map in which at least one non-color source signal becomes a contour-changing abstract feature that remains readable at 120–140 px; color, texture, spots, or internal marks alone do not pass.",
         "The internal brief includes an example difference lock that declares a facial-mark system and limb geometry different from the public example, including face type/count/layout plus limb attachment points, lengths, proportions, and resting pose.",
-        "The pink-green public example controls only HEYTEA-like cuteness, handmade awkwardness, and the relationship between an unoutlined body and black-line face/limbs; its silhouette, protrusion placement, facial anatomy, limb skeleton, and proportions are not copied.",
+        "The pink-green public example controls only HEYTEA-like cuteness and looseness; its silhouette, protrusion placement, facial anatomy, limb skeleton, proportions, and outline treatment are not copied.",
         "The first impression is a cute friendly flat doodle creature rather than a cup, lid, straw, drink cross-section, unpleasant organic form, or conventionally completed mascot.",
-        "The body is a soft compact source-derived dry-media color mass with differentiated regional marks and visible irregular paper-white inside it, without a complete black enclosing outline or literal ingredient anatomy.",
-        "The identity has exactly two open black-line arms and two open black-line legs; every facial and limb mark meanders along its full length and varies pressure or thickness within the stroke, while the face layout itself may vary.",
-        "The default identity output is one complete-color resting master, followed by full-size and 120–140 px review that preserves deliberate internal paper-white, coherent major color zones, face, and all four limbs before explicit approval.",
+        "The body is soft, compact, and source-derived, with a semantically complete heavy irregular black boundary, relation-preserving broad blunt dry wax-crayon layers, optional breathing space, and no literal ingredient anatomy.",
+        "The identity has exactly two open black-line arms and two open black-line legs whose strokes meander and vary pressure; the default face uses two clear eyes and one clear mouth with only mild handmade variation.",
+        "The default identity output is one fresh black-line resting master followed by a line-locked crayon pass; the line master receives full-size, representative 300%, and 120–140 px review before color or explicit approval.",
         "Later behavior rules keep the shared approval gates, runner, and delivery contract while using the schema-v3 6–10 behavior protocol."
       ]
     },
@@ -370,15 +370,15 @@
       ],
       "expectations": [
         "The uploaded photo supplies color, ingredient, material, and body-topology DNA while motion verbs are reserved for later behavior design.",
-        "Before generation, the output declares both an example difference lock and a DNA-to-monster-structure map with at least one source-derived contour feature.",
-        "The public pink-green example supplies only HEYTEA-like cuteness and the unoutlined-body/black-line-feature relationship; the dry-media board controls region-specific pencil, crayon, and internal paper-white, while the thin-stroke board controls full-length meander and within-stroke pressure or thickness variation in every black face and limb mark.",
+        "Before generation, the output declares a source relation map, example difference lock, DNA-to-monster-structure map, outline construction brief, legibility-first face construction brief, and material layer map.",
+        "The public pink-green example supplies only HEYTEA-like cuteness and looseness; the single non-lettering HEYTEA curve board controls both heavy outline and lighter arm/leg curves; facial marks come from the written face brief only; and the crayon-layer plus dry-media boards enter only the line-locked color stage.",
         "The generation instruction lists the public example's face system and limb skeleton as discard-only anatomy and specifies replacement facial marks, limb attachments, lengths, proportions, and resting geometry.",
         "The figure-action board is deferred to motion generation and the smudged-structure board is used only for focused repair rather than as default identity input.",
         "The mixed-media-object failure board is not passed as a positive generation reference.",
-        "The result is one complete-color concept in a quiet identity-readable resting pose on a white or warm-white review background, not a three-candidate board.",
-        "The output uses a soft compact source-derived dry-media body with distinct regional media, significant irregular internal paper-white, no equal-density full fill, no complete black outline, exactly two open black-line arms, exactly two open black-line legs, a sparse friendly variable-layout black-line face, and one stable ground anchor.",
+        "The result is one two-stage concept in a quiet identity-readable resting pose on a white or warm-white review background, not a three-candidate board.",
+        "The output uses a soft compact source-derived body with a heavy irregular black structural boundary, a continuous primary matrix with embedded inclusions/deposits and spatially distinct surface layers rendered in broad dry wax-crayon, optional breathing space, exactly two open black-line arms, exactly two open black-line legs, a clear friendly two-eye-and-mouth black-line face, and one stable ground anchor.",
         "Source ingredient and material cues remain abstract, and the body passes the explicit cuteness gate instead of becoming a literal source object or disturbing organic form.",
-        "At full size and 120–140 px, internal paper-white remains deliberate rather than noise, major color zones remain coherent, and the pressure-varying face plus all four limbs remain legible; no actions are generated before explicit approval."
+        "At full size, a representative 300% crop, and 120–140 px, the one-pass boundary remains free of long parallel tracks or surface-only noise, source relations and layered crayon remain coherent, optional breathing space does not sever the hierarchy, and both eyes, the mouth, and all four limbs remain legible; no actions are generated before explicit approval."
       ]
     },
     {
@@ -389,7 +389,7 @@
       "expectations": [
         "The result fails because palette alone is not enough and at least one additional visual identity-DNA category from ingredient or material is missing; motion cannot satisfy the static identity gate.",
         "The complete lid, straw, container wall, and layered-liquid cross-section are identified as forbidden carryovers.",
-        "The proposed identity repair remaps visual source cues into a crayon body field, crude flat marks, abstract protrusions, or regional media while keeping one independent flat doodle identity; the motion verb stays reserved for later behavior design.",
+        "The proposed identity repair first records a source relation map, then remaps primary matrix, embedded inclusions, deposits, surface layers, overlaps, and structural cues into material layers, abstract marks, or protrusions while keeping one independent flat doodle identity; the motion verb stays reserved for later behavior design.",
         "The repair remains a focused revision of one concept and does not automatically create three alternatives.",
         "Motion generation remains blocked until the revised identity passes full-size and 120–140 px review and receives explicit approval."
       ]
@@ -409,14 +409,14 @@
     },
     {
       "id": 30,
-      "prompt": "这只风味小怪兽有蜡笔身体，但身体被完整黑框包住，手脚是有体积的彩色肉块，眼睛有阴影，而且整体像一团塌陷的肉。它算通过身份阶段了吗？",
+      "prompt": "这只风味小怪兽有蜡笔身体，但身体被平滑、等粗的完整黑框包住，手脚是有体积的彩色肉块，眼睛有阴影，而且整体像一团塌陷的肉。它算通过身份阶段了吗？",
       "expected_output": "A focused rejection of an identity that violates HEYTEA-like black-line feature grammar and the mandatory cuteness gate.",
       "files": [],
       "expectations": [
         "The identity is rejected even though its crayon body medium is superficially correct.",
-        "The complete black body frame is rejected because the body should remain a mostly unoutlined dry-media color mass.",
+        "The black body frame is required in principle but fails if it is smooth, equal-width, sticker-like, mechanically doubled, or made from repeated stamps; a heavy irregular structural boundary is retained or restored.",
         "The colored volumetric limbs fail the fixed inventory and line grammar; the repair restores exactly two open black-line arms and two open black-line legs.",
-        "The shaded eyes fail because every facial mark must be a sparse friendly black doodle line, although the face layout may vary.",
+        "The shaded eyes fail; the default repair uses two clear black eyes and one clear friendly black mouth with only mild handmade variation.",
         "The collapsed fleshy reading fails the cuteness gate and receives a body-only repair toward a soft compact friendly topology without copying the public example's silhouette.",
         "The focused repair remains one concept and does not automatically create three alternatives.",
         "Motion generation remains blocked until the repaired identity passes full-size and 120–140 px review and receives explicit approval."
@@ -428,12 +428,12 @@
       "expected_output": "A cute HEYTEA-like pizza-flavor identity whose body is source-derived but no longer a pizza slice or an unpleasant organic mass.",
       "files": [],
       "expectations": [
-        "Pizza color, toasted material, cheese stretch, sauce, and topping rhythm are semantically mapped into an independent body topology plus a region-by-region plan for loose pencil sweeps, sparse broad crayon marks, significant irregular internal paper-white, and selected faded edges.",
+        "Pizza color, toasted material, cheese stretch, sauce, and topping rhythm are classified in a source relation map and semantically mapped into an independent body topology plus an outline construction brief and material layer map.",
         "The body is soft, compact, friendly, and animatable rather than a pizza slice with limbs, a literal mushroom, a fleshy collapse, slime, horror tendrils, or corpse-like sagging.",
-        "The body remains a regionally differentiated dry-media color mass with visible internal paper-white, no equal-density edge-to-edge fill, and no complete black enclosing outline.",
+        "The body keeps a heavy irregular structural boundary and broad blunt dry wax-crayon layers that preserve matrix, topping, embedded, deposited, and overlap relations without equal-density flattening or forced white channels.",
         "The monster has exactly two separate open black-line arms and two separate open black-line legs; no limb is colored, volumetric, missing, or replaced by a tendril.",
         "Every facial and limb mark is a sparse friendly black doodle line with full-length meander and within-stroke pressure or thickness changes, with flexible eye and mouth layout and no realistic or large chibi eyes.",
-        "The single identity is checked at full size and 120–140 px; internal paper-white, coherent major color zones, face, and all four limbs must survive before motion approval."
+        "The single identity is checked at full size and 120–140 px; source-relation hierarchy, coherent material layers, both eyes, the mouth, and all four limbs must survive before motion approval."
       ]
     },
     {
@@ -457,7 +457,7 @@
       "expectations": [
         "The output requires exactly two separate open black-line arms and two separate open black-line legs.",
         "Colored, volumetric, merged, missing, paw-like, toe-like, or realistically jointed limbs fail.",
-        "Large highlighted eyes fail; every facial mark must be a sparse friendly black doodle line, while one or two eyes, offset placement, and no conventional mouth remain allowed.",
+        "Large highlighted eyes fail; the default repair restores two clear black eyes and one clear friendly black mouth, while experimental single-eyed, mouthless, or offset systems require an explicit user request.",
         "The body color mass, source DNA, silhouette, and anchor remain unchanged because only the face and limb axes failed.",
         "The repair remains one identity concept and requires full-size and 120–140 px review."
       ]
@@ -468,11 +468,11 @@
       "expected_output": "A role-separated reference plan that uses the public character for HEYTEA-like style without copying its identity topology.",
       "files": [],
       "expectations": [
-        "The source photo controls color, ingredient, material, and body topology; the dry-media board controls region-specific pencil, crayon, paper tooth, and internal paper-white; and the thin-stroke board controls full-length meander plus within-stroke variation in every black face and limb mark.",
-        "The pink-green example controls only cuteness, handmade awkwardness, and the relationship between an unoutlined body and sparse black doodle face/limbs.",
+        "The source photo controls the relation map across color, ingredient, material, and body topology; the single non-lettering HEYTEA curve board controls one-pass boundary and arm/leg behavior; the clear default face is constructed from written constraints only; and the crayon-layer plus dry-media boards enter only the locked color stage.",
+        "The pink-green example controls only cuteness and handmade looseness, not outline treatment or anatomy.",
         "The prompt explicitly treats the example's silhouette, protrusion placement, facial-mark system, limb attachment points, lengths, proportions, resting pose, and feature coordinates as discard-only anatomy.",
         "The prompt declares a replacement face-and-limb system and a DNA-to-monster-structure map with at least one non-color source cue becoming a readable contour feature.",
-        "The figure-action board is reserved for motion, the smudged-structure board enters only a focused repair for full fill, missing paper-white, or overly clean edges, and the mixed-media-object failure board is not a positive input.",
+        "The figure-action board is reserved for motion, the smudged-structure board enters only a focused repair for lost paper intrusion, overly clean edges, or flattened layer transitions, and the mixed-media-object failure board is not a positive input.",
         "The generated identity still has exactly two black-line arms and two black-line legs, a variable-layout friendly black-line face, and one source-derived body."
       ]
     },
@@ -507,7 +507,7 @@
       "files": [],
       "expectations": [
         "The output directly enters flavor-monster identity generation without repeating the three-entry chooser.",
-        "Exactly one best complete-color identity concept is generated and checked at full size and 120–140 px.",
+        "Exactly one best identity is built as a fresh black-line master checked at full size, a 300% detail crop, and 120–140 px, followed only after passage by one line-locked complete-color result.",
         "No environment preflight, installation plan, motion set, fusion poster, or package is generated.",
         "The output waits for explicit approval or a focused identity revision."
       ]
@@ -600,15 +600,15 @@
     {
       "id": 45,
       "prompt": "这只风味小怪兽有蜡笔颗粒和纸张纹理，但身体从边到边全部涂满，每个色区都是同样密度的小短线。只修这个问题。",
-      "expected_output": "A material-axis-only rejection and repair that distinguishes active internal paper-white and regional hand-applied media from a uniformly textured full fill.",
+      "expected_output": "A material-axis-only rejection and repair that replaces uniform microtexture with relation-preserving broad dry-wax layers.",
       "files": [],
       "expectations": [
         "The identity fails the material gate even though crayon grain and paper texture are superficially present.",
-        "Paper tooth beneath edge-to-edge color, uniform digital speckle, dense tiny strokes or loops, and crosshatching do not count as significant internal paper-white.",
-        "The repair preserves the approved body topology, source-DNA mapping, face, exactly two arms, exactly two legs, and ground anchor while changing only regional media and internal paper-white.",
-        "The repaired material plan separates long loose lightly layered pencil sweeps, a few broad open crayon arcs or blocks, irregular internal paper-white, and selected missed or faded edges.",
-        "The dry-media board remains a default identity control; the smudged-structure board is added only for this focused repair, while the action and mixed-media-object boards remain excluded from positive identity input.",
-        "The repair stays one identity and must preserve deliberate paper-white plus coherent major color zones at full size and 120–140 px before approval."
+        "Uniform digital speckle, dense tiny strokes or loops, and crosshatching do not become valid material merely because paper tooth is visible.",
+        "The repair preserves the approved body topology, source relation map, face, exactly two arms, exactly two legs, and ground anchor while changing only the pigment treatment.",
+        "The repaired material plan uses broad blunt matte dry wax-crayon to preserve the continuous primary matrix, embedded inclusions or deposits, surface layers, overlaps, optional breathing space, and selected missed or faded edges.",
+        "The line master remains locked; the crayon-layer board controls only broad wax scale, paper tooth, and optional breathing space, while the dry-media board provides secondary wax evidence and line/action/failure boards stay outside this pigment-only repair.",
+        "The repair stays one identity and must preserve source hierarchy plus coherent material layers at full size and 120–140 px before approval."
       ]
     },
     {
@@ -617,10 +617,11 @@
       "expected_output": "A face-and-limb-only repair that preserves identity placement and replaces mechanical monoline with readable handmade stroke anatomy.",
       "files": [],
       "expectations": [
-        "Correct 2+2 inventory and placement do not pass when face and limb strokes are smooth constant-width curves or clean Bézier paths with superficial jitter.",
-        "The repair preserves body topology, palette, regional media, internal paper-white, source-DNA marks, expression layout, limb attachment points, pose, and ground anchor.",
+        "Correct 2+2 inventory and placement do not pass when limb strokes are smooth constant-width curves or clean Bézier paths with superficial jitter; face marks need only mild handmade variation when they remain clear.",
+        "The repair preserves body topology, source relation map, palette, material layers, optional breathing space, source-DNA marks, expression layout, limb attachment points, pose, and ground anchor.",
         "Only the existing face, two arms, and two legs are redrawn at their locked locations; no candidate alternatives or body redesign are introduced.",
-        "Each repaired mark visibly meanders or bends along its full length and changes pressure or thickness within the same stroke, using restrained dry breaks, retracing, doubled correction, overshoot, or open joins.",
+        "Each repaired limb is one pass, visibly meanders or bends along its full length, and changes pressure or thickness within the same stroke; the face retains two clear eyes and one clear mouth with only mild size, tilt, weight, or terminal variation.",
+        "The single non-lettering HEYTEA curve board controls limb stroke behavior only and cannot supply a new expression layout or limb skeleton; no face-mark or lettering board is used.",
         "The repaired black system remains sparse, friendly, and legible at full size and 120–140 px without losing any required facial mark or limb."
       ]
     },
@@ -632,8 +633,9 @@
       "expectations": [
         "The identity is rejected even though its palette and outer silhouette differ from the public example.",
         "The output identifies copied facial-mark type/count/layout and copied limb attachment points, lengths, proportions, or resting geometry as identity failures rather than acceptable style borrowing.",
-        "The repair preserves independently valid source-DNA topology, regional media, internal paper-white, palette, and ground anchor while redesigning both the face system and limb geometry.",
+        "The repair preserves independently valid source-DNA topology, source relation map, material layers, optional breathing space, palette, and ground anchor while redesigning both the face system and limb geometry.",
         "The revised prompt contains an explicit example difference lock and lists the example anatomy that must be discarded instead of relying on a generic do-not-copy sentence.",
+        "Construction boards may transfer line or material behavior but cannot supply protrusions, facial anatomy, limb geometry, resting pose, or character coordinates.",
         "The replacement still has exactly two open black-line arms and two open black-line legs and remains readable at full size and 120–140 px before approval."
       ]
     },
@@ -646,8 +648,137 @@
         "The recolored circular disk fails because palette, texture, spots, and internal marks do not satisfy the monster-structure gate.",
         "The repair records a DNA-to-monster-structure map using a non-color cue such as steak sear, asparagus segmentation, squash char edge, or tomato-vine structure.",
         "At least one mapped cue becomes an abstract ear-like fin, horn, crest, spine, tail bud, antenna, or comparable feature that changes the outer contour and remains readable at 120–140 px.",
-        "The feature is integrated into the unoutlined colored body topology, is not a literal vegetable, fruit, realistic organ, unmotivated decoration, extra limb, or horror tendril, and does not alter the exact two-arm plus two-leg inventory.",
+        "The feature is integrated into the heavy outlined body topology, is not a literal vegetable, fruit, realistic organ, unmotivated decoration, extra limb, or horror tendril, and does not alter the exact two-arm plus two-leg inventory.",
         "The repair preserves any valid palette and regional dry-media treatment, rebuilds only the failed topology and any dependent face or limb attachments, and still waits for explicit identity approval."
+      ]
+    },
+    {
+      "id": 49,
+      "prompt": "这只小怪兽的 DNA、蜡笔和留白都对，但身体黑边像矢量贴纸一样平滑等粗，整圈还有机械双线。只修黑边。",
+      "expected_output": "A black-line-axis-only repair that keeps all approved identity and material information while replacing the mechanical boundary.",
+      "files": [],
+      "expectations": [
+        "The smooth equal-width sticker edge and whole-loop mechanical doubling fail even though a black boundary is required.",
+        "The repair locks topology, source relation map, DNA protrusions, palette, broad dry wax-crayon material layers, optional breathing space, face layout, 2+2 limb inventory, pose, and anchor.",
+        "Only the existing black boundary is redrawn at its locked location as one stroke system, heavier than face and limbs, with underlying flat spots, shallow dents, blunt corners, hesitant bends, and within-stroke pressure variation.",
+        "The repaired boundary allows one or two short local retraces only, keeps continuous parallel travel below roughly ten percent, and rejects repeated beaded stamps or a clean vector skeleton with surface noise.",
+        "The boundary is inspected at full size, a representative 300% crop, and 120–140 px before approval."
+      ]
+    },
+    {
+      "id": 50,
+      "prompt": "黑边、结构和留白都已经通过，但颜色像透明马克笔，而且局部变成密集小圈。只把填色工具改回蜡笔。",
+      "expected_output": "A pigment-axis-only repair that replaces marker and micro-pattern texture with broad dry wax-crayon while preserving every approved lock.",
+      "files": [],
+      "expectations": [
+        "Transparent marker and dense tiny loops fail the flavor-monster material gate.",
+        "The repair locks every black stroke, topology, source relation, DNA feature, palette, face, limbs, pose, anchor, and any valid optional breathing space.",
+        "Only colored pigment is replaced with a small number of broad blunt matte wax-crayon sweeps showing granular drag, broken pressure, paper tooth, and ragged ends.",
+        "No watercolor, pastel or oil-pastel smear, paint, smooth fill, short hatching, crosshatching, or uniform noise is introduced.",
+        "The repaired crayon zones remain coherent rather than speckled at 120–140 px."
+      ]
+    },
+    {
+      "id": 51,
+      "prompt": "这只小怪兽的黑边、蜡笔层次和源图关系都合格，身体没有明显白色通道，只有自然纸纹。它是否必须重画出两三条留白？",
+      "expected_output": "An acceptance response that treats paper-white breathing space as optional rather than a quota.",
+      "files": [],
+      "expectations": [
+        "The identity does not fail merely because it has zero body-scale white channels.",
+        "Paper-white is optional and has no minimum count when the continuous primary matrix, embedded inclusions or deposits, surface layers, and overlap transitions remain coherent.",
+        "No arbitrary white channel is opened because doing so could sever the approved source relations.",
+        "Broad dry wax-crayon, paper tooth, selected faded edges, the complete black-line system, face, 2+2 limbs, pose, and anchor remain locked.",
+        "The output proceeds to explicit identity approval instead of performing a purposeless gap repair."
+      ]
+    },
+    {
+      "id": 53,
+      "prompt": "这只风味小怪兽已经有源图驱动的耳鳍和尾芽，黑边粗细不均，宽幅干蜡笔和三条白色通道都清楚，五官与两手两脚在 140px 也能读出来。还需要继续重画吗？",
+      "expected_output": "A stop-and-approve response that recognizes all identity axes as passing and avoids purposeless regeneration.",
+      "files": [],
+      "expectations": [
+        "The output recognizes that topology, source relations, example difference, one-pass irregular boundary, clear two-eye-and-mouth face, dry wax-crayon layers, optional breathing space, and 2+2 limbs all pass at full size, 300%, and 140 px.",
+        "No speculative body, line, color, gap, face, or limb redesign is proposed.",
+        "The output asks for explicit identity approval rather than generating more variants or beginning motion.",
+        "Poster, runner preflight, animation, and packaging remain blocked until the user chooses the next branch after approval."
+      ]
+    },
+    {
+      "id": 54,
+      "prompt": "这只怪兽的黑边看起来很粗糙，但放大后是三四条平行细线绕完整个身体，像绳子或编织边。它能通过吗？",
+      "expected_output": "A rejection of multi-track pseudo-roughness that requires a true one-pass boundary rather than accepting visible texture as handmade construction.",
+      "files": [],
+      "expectations": [
+        "The identity fails even though the parallel tracks look rough at normal size.",
+        "A flavor-monster boundary must read as one black mark at every cross-section rather than a band, braid, rope, or outline-of-an-outline.",
+        "The repair locks topology, DNA protrusions, palette, crayon, gaps, face, 2+2 limbs, pose, and anchor while rebuilding only the black boundary.",
+        "One or two short local retraces are allowed only when continuous parallel travel remains below roughly ten percent of the complete path.",
+        "The result must pass full-size, representative 300% crop, and 120–140 px review."
+      ]
+    },
+    {
+      "id": 55,
+      "prompt": "轮廓边缘有颗粒和抖动，但把噪点忽略后，中心路径仍然是一条非常平滑的圆形贝塞尔曲线。只修线条。",
+      "expected_output": "A path-geometry rejection that distinguishes structural hand decisions from texture placed on a smooth vector skeleton.",
+      "files": [],
+      "expectations": [
+        "Surface grain, jitter, or absorbent edges do not rescue a smooth underlying centerline.",
+        "The replacement path introduces real flat spots, shallow dents, blunt corners, hesitant bends, pressure jumps, dry breaks, or mismatched joins.",
+        "The repair preserves every valid non-line identity and material lock.",
+        "The single-pass rough-line board is the positive line-stage control; the crayon-layer board is not passed to this repair.",
+        "The new boundary remains one readable mark rather than becoming a repeated stamp or parallel track."
+      ]
+    },
+    {
+      "id": 57,
+      "prompt": "第一次只修黑边以后，旧图的整圈双线和光滑圆弧还是保留下来了。下一步继续在这张图上描一遍吗？",
+      "expected_output": "A restart decision that stops stacked line edits and rebuilds a fresh black-line master from locked topology.",
+      "files": [],
+      "expectations": [
+        "The workflow must not apply another stacked edit to the inherited multi-track or smooth line skeleton.",
+        "Valid topology, source relation map, DNA features, legibility-first face brief, limb geometry, palette, material layer map, pose, scale, and anchor are preserved as locks rather than copied pixels.",
+        "A fresh black-only master is generated from the locked topology using only the single non-lettering HEYTEA curve board as a positive line image control, while the face comes from written constraints.",
+        "The new master must pass full-size, 300%, and 120–140 px review before any color is reapplied.",
+        "Color is restored only in a separate line-locked pass using the crayon-layer and dry-media boards while preserving source relations."
+      ]
+    },
+    {
+      "id": 58,
+      "prompt": "把这杯饮料做成风味小怪兽：中间主体是粉色饮品，黄色果粒混在粉色里并沉到底部，顶部是一层独立的绿色抹茶。只做身份图。",
+      "expected_output": "A relation-first drink identity plan that preserves matrix, embedded particles, and top-layer hierarchy before abstraction.",
+      "files": [],
+      "expectations": [
+        "The brief classifies pink as the continuous primary matrix, yellow particles as embedded inclusions that accumulate at the bottom, and green matcha as a spatially distinct surface layer.",
+        "The source relation map records embedded-in, accumulates-at, sits-on-top-of, and any visible overlap before assigning monster roles.",
+        "Yellow particles remain embedded in the pink material rather than becoming a peer orange body zone or detached square stickers.",
+        "The green layer remains independently readable near the top while broad dry-wax overlap may create a restrained transition into the pink matrix.",
+        "Optional paper-white never cuts the three source relationships into separate blocks, and the default face remains two clear eyes plus one clear friendly mouth at 120–140 px."
+      ]
+    },
+    {
+      "id": 59,
+      "prompt": "我想要正常、清楚的脸：两只小豆眼和一张微笑嘴，只保留一点手绘感，不要断钩眼或看不懂的符号。",
+      "expected_output": "A legibility-first face brief that honors the requested conventional two-eye-and-mouth face.",
+      "files": [],
+      "expectations": [
+        "The default face is two unmistakable black bean eyes and one unmistakable friendly smile below them.",
+        "Readability at 120–140 px is checked before handmade irregularity or identity distinctiveness.",
+        "Handmade character is limited to mild size, tilt, weight, or terminal variation; no mark is forced to break, hook, or jump pressure.",
+        "Near-centered spacing and a simple U-like smile are accepted rather than rejected as generic emoji geometry.",
+        "No single-eyed, mouthless, broken-hook, or other experimental face is introduced against the user's request."
+      ]
+    },
+    {
+      "id": 60,
+      "prompt": "检查这只饮料风味怪兽：粉色、绿色和黄色被画成三个同等级硬色块，中间又用三条粗白缝完全隔开；黄色果粒也不再混在粉色里。只修颜色关系。",
+      "expected_output": "A focused relation-and-material-layer repair that removes peer blocking and hierarchy-breaking white gaps.",
+      "files": [],
+      "expectations": [
+        "The identity fails because peer color blocking destroys the source's primary-matrix, embedded-inclusion, and surface-layer roles.",
+        "The repair locks accepted topology, black-line master, clear face, 2+2 limbs, pose, scale, and anchor while changing only the failed relation-dependent material layers.",
+        "Pink is restored as the continuous matrix, yellow returns as bottom-concentrated inclusions embedded within pink, and green returns as a spatially distinct surface layer.",
+        "Broad dry-wax overlap supplies intermediate color and depth without a smooth digital gradient or wet smear.",
+        "The three dividing white gaps are removed; any remaining breathing space is optional, subordinate, and cannot sever the mapped relationships."
       ]
     }
   ]
