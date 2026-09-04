@@ -15,7 +15,7 @@ Interpret the result:
 - `ready`: the installed runner meets the requested schema's minimum version.
 - `upgradeable`: a runner exists but is too old for the requested schema; show the exact in-place or side-by-side plan and request upgrade consent.
 - `installable`: the runner is missing, but the bundled source and local Node/npm toolchain can build it.
-- `needs-toolchain`: the runner is missing and Node.js 20+ or npm must be installed first.
+- `needs-toolchain`: the runner is missing and Node.js 22.12.0+ or npm must be installed first.
 - `missing-source`: the skill package does not contain the runner source. Stop and report that the runtime cannot be installed from this package.
 - `unsupported`: stop. v1 supports only macOS and Windows.
 
@@ -64,7 +64,9 @@ python scripts/install_desktop_pet_runtime.py --yes --upgrade
 
 The JSON report identifies the installed runner as `runtimeScope: "user"` or `"system"`. The install plan exposes the matching `installMode`: `in-place-upgrade` for a per-user legacy runner and `user-side-by-side` for a system-wide legacy runner.
 
-For `in-place-upgrade`, the upgrader first asks the running app to quit, preserves it as a versioned backup beside the application, copies the new build atomically with rollback on copy failure, and leaves imported pets/settings in Application Support untouched. For `user-side-by-side`, it asks the system-wide runner to quit, leaves that installation unchanged, and installs the new runner in the per-user location without requesting administrator privileges or claiming to create a system-level backup.
+The report also exposes `minimumNodeVersion`, `dependencyStatus`, `electronVersion`, and `electronBuilderVersion`. `dependencyStatus` is `missing`, `ready`, or `drifted`; the backward-compatible `dependenciesInstalled` field is true only when the installed Electron and builder exactly match the bundled lockfile contract.
+
+For `in-place-upgrade`, the upgrader verifies the new build, then asks the running app to quit, preserves it as a versioned backup beside the application, copies the new build atomically with rollback on copy failure, and leaves imported pets/settings in Application Support untouched. For `user-side-by-side`, it verifies the new build, then asks the system-wide runner to quit, leaves that installation unchanged, and installs the new runner in the per-user location without requesting administrator privileges or claiming to create a system-level backup.
 
 The script uses no shell interpolation. It refuses to replace a per-user installed application unless both `--yes` and `--upgrade` are supplied, never overwrites an existing backup (repeated refreshes receive a numbered backup), and installs new or side-by-side builds to:
 
@@ -78,10 +80,14 @@ On macOS it can use Homebrew to install Node.js. On Windows it can use winget to
 The approved installer may perform only the missing steps:
 
 1. install Node.js/npm through the detected trusted package manager when explicitly allowed;
-2. run `npm install` inside the bundled runner source when dependencies are absent;
+2. run `npm ci` inside the bundled runner source when dependencies are absent or drifted;
 3. build only the current operating-system target;
 4. copy the unsigned local MVP into the per-user application directory;
 5. launch the runner once for verification.
+
+Before an old runner is stopped or any application is copied, the build must pass both layers of verification: the packaging hook parses `app.asar` and confirms `package.json` plus the declared main entry, then the built executable runs `--self-test` without creating a window, tray, or user-data state. `default_app.asar` is Electron's template fallback and is deliberately absent from a finished build; its absence is not a packaging failure.
+
+If the standard build fails with an archive-stream, `unzipper`, or `Invalid package` signature, the installer may retry exactly once. The retry runs Electron's bundled `install-electron` helper, then points electron-builder at the checksum-verified unpacked `node_modules/electron/dist` directory. It never deletes or mutates the user's global Electron cache. A second failure stops installation and returns structured stage, version, log-tail, fallback, and artifact-check diagnostics.
 
 It does not:
 
