@@ -99,6 +99,20 @@ def build_frame_audit(root: Path, manifest: dict, out_path: Path) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True); sheet.save(out_path)
 
 
+def write_review_artifacts(root: Path, manifest: dict, review_dir: Path) -> dict[str, str]:
+    paths = {
+        "contactSheet": review_dir / "contact-sheet.png",
+        "behaviorTimelines": review_dir / "behavior-timelines.png",
+        "motionPreview": review_dir / "motion-preview.gif",
+        "frameAudit": review_dir / "frame-audit.png",
+    }
+    build_contact_sheet(root, manifest, paths["contactSheet"])
+    build_behavior_timelines(root, manifest, paths["behaviorTimelines"])
+    build_motion_preview(root, manifest, paths["motionPreview"])
+    build_frame_audit(root, manifest, paths["frameAudit"])
+    return {key: str(path.resolve()) for key, path in paths.items()}
+
+
 def write_deterministic_zip(root: Path, out_path: Path, pack_id: str) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(prefix="desktop-pet-pack-", suffix=".zip", delete=False, dir=out_path.parent) as handle: temp_path = Path(handle.name)
@@ -117,7 +131,7 @@ def main() -> None:
         if not args.out and not args.review_only: parser.error("--out is required unless --review-only is used")
         if args.review_only and not args.review_dir: parser.error("--review-dir is required with --review-only")
         review_dir = args.review_dir or args.out.with_suffix("").with_name(f"{args.out.stem}-review")
-        build_contact_sheet(result.root, result.manifest, review_dir / "contact-sheet.png"); build_behavior_timelines(result.root, result.manifest, review_dir / "behavior-timelines.png"); build_motion_preview(result.root, result.manifest, review_dir / "motion-preview.gif"); build_frame_audit(result.root, result.manifest, review_dir / "frame-audit.png")
+        write_review_artifacts(result.root, result.manifest, review_dir)
         delivery = None
         if not args.review_only:
             write_deterministic_zip(result.root, args.out, result.pack_id)

@@ -86,17 +86,17 @@ python3 -m pip install -r requirements.txt
 在角色身份已确认、并选择继续制作可运行桌宠后，进行只读环境预检：
 
 ```bash
-python3 scripts/check_desktop_pet_environment.py --json --required-schema 3
-python3 scripts/install_desktop_pet_runtime.py --json-plan
+python3 scripts/desktop_pet.py doctor --json --required-schema 3
+python3 scripts/desktop_pet.py install --json-plan
 ```
 
 检查安装计划并明确同意后，再执行：
 
 ```bash
-python3 scripts/install_desktop_pet_runtime.py --yes
+python3 scripts/desktop_pet.py install --yes
 ```
 
-升级已有运行器需要额外添加 `--upgrade`。工具会保留用户目录中的旧版本备份，不会静默替换系统目录应用、绕过系统安全提示或开启登录自启。
+升级已有运行器需要额外添加 `--upgrade`。若 npm/Electron 下载因网络失败，加上 `--mirror` 走 npmmirror。源码未变时会复用本地 `dist/` 已打包产物，跳过 `npm ci` 和 electron-builder。`check_desktop_pet_environment.py` / `install_desktop_pet_runtime.py` 是统一 CLI 的 shim。工具会保留用户目录中的旧版本备份，不会静默替换系统目录应用、绕过系统安全提示或开启登录自启。
 
 不要直接打开 `assets/desktop-pet-runtime/src/renderer/index.html`；透明置顶、托盘、角色导入和桌面物理依赖 Electron 主进程。
 
@@ -120,28 +120,16 @@ python3 scripts/install_desktop_pet_runtime.py --yes
 写实卡通桌宠：
 
 ```bash
-python3 scripts/build_desktop_pet_pack.py \
-  examples/desktop-pet/pink-green-drink \
-  --out generated-pets/pink-green-drink-v2.zip \
-  --review-dir generated-pets/pink-green-drink-v2-review
-
-python3 scripts/validate_desktop_pet_pack.py \
-  generated-pets/pink-green-drink-v2.zip
+python3 scripts/desktop_pet.py pack examples/desktop-pet/pink-green-drink
 ```
 
 风味小怪兽桌宠：
 
 ```bash
-python3 scripts/build_desktop_pet_pack.py \
-  examples/desktop-pet/pink-green-flavor-monster-v3 \
-  --out generated-pets/pink-green-flavor-monster-v3.zip \
-  --review-dir generated-pets/pink-green-flavor-monster-v3-review
-
-python3 scripts/validate_desktop_pet_pack.py \
-  generated-pets/pink-green-flavor-monster-v3.zip
+python3 scripts/desktop_pet.py pack examples/desktop-pet/pink-green-flavor-monster-v3
 ```
 
-需要启动/关闭入口时，为构建命令添加 `--delivery-dir <目录>`。
+默认把 ZIP、审核图和启动/关闭入口写到 `generated-pets/`。需要只生成审核图时用 `python3 scripts/desktop_pet.py review <pet-dir>`。旧的 `build_desktop_pet_pack.py` / `validate_desktop_pet_pack.py` 命令仍然可用。
 
 </details>
 

@@ -120,7 +120,7 @@ If the user chooses a runnable pet, or explicitly requested a `source-faithful` 
 Only after canonical identity approval and explicit selection of a runnable desktop pet, read `desktop-pet-environment.md` and run the read-only preflight:
 
 ```bash
-python3 scripts/check_desktop_pet_environment.py --json --required-schema 3
+python3 scripts/desktop_pet.py doctor --json --required-schema 3
 ```
 
 If anything is missing, show one concrete repair plan and ask for installation or upgrade consent immediately before making that change. After approval, fill only the missing components, rerun preflight, and stop the motion branch if it still does not report `ready`. If the user declines, keep the approved static identity and any fusion-poster branch available without promising runnable output.
@@ -208,7 +208,13 @@ Ask for explicit motion approval. Package only after approval.
 
 ## Stage 8: Package and validate
 
-After motion approval, export transparent animation strips, build the pack and platform delivery folder with `scripts/build_desktop_pet_pack.py --delivery-dir ...`, and validate the ZIP with `scripts/validate_desktop_pet_pack.py`.
+After motion approval, export transparent animation strips, then build, validate, and write the delivery folder in one step:
+
+```bash
+python3 scripts/desktop_pet.py pack <pet-dir>
+```
+
+`prepare` and `review` are available when strips still need normalization or when you only need contact-sheet / timeline / GIF / frame-audit artifacts. The older `build_desktop_pet_pack.py` and `validate_desktop_pet_pack.py` scripts remain callable.
 
 Return the review artifacts, validated ZIP, manifest summary, and delivery folder. For v3, keep cadence, gesture, per-phase grounding (`floor` or `free`), and any explicit display-edge floor policy in the manifest. The shared Electron runner is installed once; each pet delivery contains only its pack, preview, start/quit entrypoints, and short usage note.
 

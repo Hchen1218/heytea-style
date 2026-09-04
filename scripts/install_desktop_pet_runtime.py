@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import argparse
 import json
 import os
 import plistlib
@@ -11,15 +10,18 @@ import shutil
 import subprocess
 import sys
 import time
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
 
 from check_desktop_pet_environment import (
     MIN_NODE_VERSION,
     PRODUCT_NAME,
     EnvironmentReport,
+    bundle_hash_path,
     detect_environment,
-    normalize_platform,
+    select_mac_app,
+    select_windows_unpacked,
+    write_source_hash,
 )
 
 
@@ -42,6 +44,25 @@ class RuntimeBuildError(InstallError):
 
 
 SELF_TEST_PREFIX = "SELF_TEST_RESULT:"
+NPM_MIRROR_ENV = {
+    "npm_config_registry": "https://registry.npmmirror.com",
+    "ELECTRON_MIRROR": "https://npmmirror.com/mirrors/electron/",
+    "ELECTRON_BUILDER_BINARIES_MIRROR": "https://npmmirror.com/mirrors/electron-builder-binaries/",
+}
+NETWORK_FAILURE_SIGNATURES = (
+    "etimedout",
+    "econnreset",
+    "enotfound",
+    "eai_again",
+    "getaddrinfo",
+    "socket hang up",
+    "network is unreachable",
+    "unable to resolve",
+    "registry.npmjs.org",
+    "fetch failed",
+    "err_socket",
+    "request to https://registry",
+)
 
 
 @dataclass(frozen=True)
@@ -60,6 +81,9 @@ class InstallPlan:
     buildFallback: list[list[str]] | None
     installDirectory: str | None
     launchAfterInstall: bool
+    reuseCachedBuild: bool
+    sourceHash: str | None
+    useMirror: bool
 
 
 def toolchain_commands(report: EnvironmentReport) -> list[list[str]]:
@@ -80,14 +104,71 @@ def toolchain_commands(report: EnvironmentReport) -> list[list[str]]:
     return []
 
 
-def make_plan(report: EnvironmentReport, *, launch: bool = True) -> InstallPlan:
+def runtime_is_current(report: EnvironmentReport) -> bool:
+    return report.runtimeCompatible and report.installedSourceMatches
+
+
+def should_reuse_cached_build(report: EnvironmentReport, *, allow_upgrade: bool = False) -> bool:
+    if not report.sourceCompatible or not report.cachedBuildReady:
+        return False
+    if runtime_is_current(report):
+        return False
+    if report.runtimeCompatible and not allow_upgrade:
+        return False
+    return True
+
+
+def mirror_environment(use_mirror: bool) -> dict[str, str] | None:
+    if not use_mirror:
+        return None
+    env = os.environ.copy()
+    env.update(NPM_MIRROR_ENV)
+    return env
+
+
+def is_network_failure(output: str) -> bool:
+    lowered = output.lower()
+    return any(signature in lowered for signature in NETWORK_FAILURE_SIGNATURES)
+
+
+def diagnostic_advice(stage: str, output: str, *, fallback_used: bool, use_mirror: bool) -> tuple[str, list[str]]:
+    summaries = {
+        "dependencies": "安装运行器依赖失败（npm ci）。",
+        "build": "打包桌宠运行器失败。",
+        "validate": "打包产物自检未通过，没有写入用户目录。",
+        "install": "将运行器复制到用户目录失败。",
+    }
+    steps: list[str] = []
+    if is_network_failure(output):
+        if use_mirror:
+            steps.append("已使用 --mirror 仍失败：检查本机网络、代理，或稍后重试。")
+        else:
+            steps.append("网络或 npm registry 不可达：加上 --mirror 后重试（使用 npmmirror）。")
+    if is_archive_build_failure(output) and not fallback_used:
+        steps.append("这是 Electron 压缩包解压失败，安装器会自动用本地 electron/dist 重试一次。")
+    if stage == "validate":
+        steps.append("检查 assets/desktop-pet-runtime/dist 是否产出完整应用，以及 --self-test 输出。")
+    if not steps:
+        steps.append("查看 diagnostic.stderrTail 定位失败命令后重试。")
+    return summaries.get(stage, "安装桌宠运行器失败。"), steps
+
+
+def make_plan(
+    report: EnvironmentReport,
+    *,
+    launch: bool = True,
+    use_mirror: bool = False,
+    allow_upgrade: bool = False,
+) -> InstallPlan:
     npm = "npm.cmd" if report.platform == "windows" else "npm"
     build_script = "pack:win" if report.platform == "windows" else "pack:mac"
     root = Path(report.runtimeRoot)
     replacement_needed = report.runtimeInstalled and not report.runtimeCompatible
-    upgrade = replacement_needed and report.runtimeScope == "user"
-    side_by_side = replacement_needed and report.runtimeScope == "system"
-    if report.runtimeCompatible:
+    source_refresh = report.runtimeCompatible and allow_upgrade and not report.installedSourceMatches
+    refreshing = replacement_needed or source_refresh
+    upgrade = refreshing and report.runtimeScope == "user"
+    side_by_side = refreshing and report.runtimeScope == "system"
+    if report.runtimeCompatible and not source_refresh:
         install_mode = "launch-existing"
     elif upgrade:
         install_mode = "in-place-upgrade"
@@ -97,6 +178,8 @@ def make_plan(report: EnvironmentReport, *, launch: bool = True) -> InstallPlan:
         install_mode = "fresh-install"
     else:
         install_mode = "unavailable"
+    reuse = should_reuse_cached_build(report, allow_upgrade=allow_upgrade)
+    skip_build = (report.runtimeCompatible and not source_refresh) or reuse or not report.sourceCompatible
     backup = None
     if upgrade and report.runtimePath:
         installed = Path(report.runtimePath)
@@ -111,31 +194,34 @@ def make_plan(report: EnvironmentReport, *, launch: bool = True) -> InstallPlan:
         installedVersion=report.runtimeVersion,
         minimumVersion=report.minimumRuntimeVersion,
         upgradeExisting=upgrade,
-        stopExisting=replacement_needed,
+        stopExisting=refreshing,
         backupPath=backup,
-        installToolchain=toolchain_commands(report),
-        installDependencies=None if report.dependenciesInstalled or not report.sourceCompatible else [npm, "ci"],
-        buildRuntime=None if report.runtimeCompatible or not report.sourceCompatible else [npm, "run", build_script],
-        buildFallback=None if report.runtimeCompatible or not report.sourceCompatible else [
+        installToolchain=[] if reuse else toolchain_commands(report),
+        installDependencies=None if skip_build or report.dependenciesInstalled else [npm, "ci"],
+        buildRuntime=None if skip_build else [npm, "run", build_script],
+        buildFallback=None if skip_build else [
             ["node", str(root / "node_modules" / "electron" / "install.js")],
             [npm, "run", build_script, "--", f"--config.electronDist={root / 'node_modules' / 'electron' / 'dist'}"],
         ],
         installDirectory=report.installDirectory,
         launchAfterInstall=launch,
+        reuseCachedBuild=reuse,
+        sourceHash=report.sourceHash,
+        useMirror=use_mirror,
     )
 
 
-def run(command: list[str], *, cwd: Path | None = None, dry_run: bool = False) -> None:
+def run(command: list[str], *, cwd: Path | None = None, dry_run: bool = False, env: dict[str, str] | None = None) -> None:
     print("+", " ".join(command))
     if not dry_run:
-        subprocess.run(command, cwd=cwd, check=True)
+        subprocess.run(command, cwd=cwd, check=True, env=env)
 
 
-def run_captured(command: list[str], *, cwd: Path, dry_run: bool = False) -> str:
+def run_captured(command: list[str], *, cwd: Path, dry_run: bool = False, env: dict[str, str] | None = None) -> str:
     print("+", " ".join(command))
     if dry_run:
         return ""
-    completed = subprocess.run(command, cwd=cwd, capture_output=True, text=True)
+    completed = subprocess.run(command, cwd=cwd, capture_output=True, text=True, env=env)
     output = "\n".join(part.strip() for part in (completed.stdout, completed.stderr) if part.strip())
     if output:
         print(output)
@@ -172,11 +258,16 @@ def build_diagnostic(
     fallback_used: bool,
     error: CapturedCommandError | Exception,
     artifact_checks: dict | None = None,
+    use_mirror: bool = False,
 ) -> dict:
     output = error.output if isinstance(error, CapturedCommandError) else str(error)
+    summary, next_steps = diagnostic_advice(stage, output, fallback_used=fallback_used, use_mirror=use_mirror)
     return {
         "stage": stage,
         "attempt": attempt,
+        "summary": summary,
+        "nextSteps": next_steps,
+        "networkFailure": is_network_failure(output),
         "versions": {
             "node": report.nodeVersion,
             "npm": report.npmVersion,
@@ -202,46 +293,85 @@ def build_runtime(
     node: str,
     root: Path,
     dry_run: bool = False,
+    env: dict[str, str] | None = None,
 ) -> bool:
     build_script = "pack:win" if report.platform == "windows" else "pack:mac"
     try:
-        run_captured([npm, "run", build_script], cwd=root, dry_run=dry_run)
+        run_captured([npm, "run", build_script], cwd=root, dry_run=dry_run, env=env)
         return False
     except CapturedCommandError as first_error:
         if not is_archive_build_failure(first_error.output):
             raise RuntimeBuildError(build_diagnostic(
                 report, stage="build", attempt="standard", fallback_used=False, error=first_error,
+                use_mirror=bool(env and env.get("npm_config_registry") == NPM_MIRROR_ENV["npm_config_registry"]),
             )) from first_error
 
         electron_installer = root / "node_modules" / "electron" / "install.js"
         electron_dist = root / "node_modules" / "electron" / "dist"
         try:
-            run_captured([node, str(electron_installer)], cwd=root, dry_run=dry_run)
+            run_captured([node, str(electron_installer)], cwd=root, dry_run=dry_run, env=env)
             run_captured(
                 [npm, "run", build_script, "--", f"--config.electronDist={electron_dist}"],
                 cwd=root,
                 dry_run=dry_run,
+                env=env,
             )
             return True
         except CapturedCommandError as fallback_error:
             raise RuntimeBuildError(build_diagnostic(
                 report, stage="build", attempt="fallback", fallback_used=True, error=fallback_error,
+                use_mirror=bool(env and env.get("npm_config_registry") == NPM_MIRROR_ENV["npm_config_registry"]),
             )) from fallback_error
 
 
 def find_mac_app(dist: Path) -> Path:
-    matches = sorted(dist.glob(f"mac*/{PRODUCT_NAME}.app"))
-    if not matches:
+    found = select_mac_app(dist)
+    if found is None:
         raise InstallError(f"macOS build did not produce {PRODUCT_NAME}.app")
-    return matches[0]
+    return found
 
 
 def find_windows_directory(dist: Path) -> Path:
-    candidates = [dist / "win-unpacked", dist / "win-ia32-unpacked", dist / "win-arm64-unpacked"]
-    for candidate in candidates:
-        if (candidate / f"{PRODUCT_NAME}.exe").is_file():
-            return candidate
-    raise InstallError("Windows build did not produce a runnable unpacked directory")
+    found = select_windows_unpacked(dist)
+    if found is None:
+        raise InstallError("Windows build did not produce a runnable unpacked directory")
+    return found
+
+
+def stamp_built_source_hash(report: EnvironmentReport, source_hash: str | None, *, dry_run: bool = False) -> None:
+    if not source_hash:
+        return
+    root = Path(report.runtimeRoot)
+    bundle = find_mac_app(root / "dist") if report.platform == "macos" else find_windows_directory(root / "dist")
+    marker = bundle_hash_path(report.platform, bundle)
+    print(f"+ stamp {marker}")
+    if not dry_run:
+        write_source_hash(marker, source_hash)
+
+
+def macos_bundle_has_executable(application: Path) -> bool:
+    macos_dir = application / "Contents" / "MacOS"
+    if not macos_dir.is_dir():
+        return False
+    return any(path.is_file() for path in macos_dir.iterdir())
+
+
+def prepare_macos_application(application: Path, *, dry_run: bool = False) -> None:
+    if sys.platform != "darwin" or not macos_bundle_has_executable(application):
+        return
+    print(f"+ xattr -dr com.apple.quarantine {application}")
+    print(f"+ codesign --force --deep --sign - {application}")
+    if dry_run:
+        return
+    subprocess.run(["xattr", "-dr", "com.apple.quarantine", str(application)], check=False, capture_output=True)
+    completed = subprocess.run(
+        ["codesign", "--force", "--deep", "--sign", "-", str(application)],
+        capture_output=True,
+        text=True,
+    )
+    if completed.returncode != 0:
+        detail = (completed.stderr or completed.stdout or "").strip() or f"exit {completed.returncode}"
+        raise InstallError(f"ad-hoc codesign failed: {detail}")
 
 
 def validate_built_runtime(report: EnvironmentReport, *, fallback_used: bool = False) -> dict:
@@ -342,6 +472,7 @@ def install_built_runtime(report: EnvironmentReport, *, upgrade: bool = False, d
                     raise
             else:
                 shutil.copytree(source, destination, symlinks=True)
+            prepare_macos_application(destination, dry_run=dry_run)
         return destination
 
     source = find_windows_directory(dist)
@@ -400,8 +531,10 @@ def install(
     allow_upgrade: bool,
     launch: bool,
     dry_run: bool,
+    use_mirror: bool = False,
 ) -> Path | None:
-    if report.runtimeCompatible and not allow_upgrade:
+    source_refresh = allow_upgrade and not report.installedSourceMatches
+    if report.runtimeCompatible and not source_refresh:
         application = Path(report.runtimePath or "")
         if launch:
             launch_runtime(report.platform, application, dry_run=dry_run)
@@ -417,8 +550,11 @@ def install(
     if not report.sourceCompatible:
         raise InstallError(f"bundled runtime source {report.sourceVersion or 'unknown'} is older than required {report.minimumRuntimeVersion}")
 
+    reuse = should_reuse_cached_build(report, allow_upgrade=allow_upgrade)
+    if reuse:
+        print("+ reuse cached runtime build")
     commands = toolchain_commands(report)
-    if not report.nodeSupported or not report.npmAvailable:
+    if not reuse and (not report.nodeSupported or not report.npmAvailable):
         if not allow_toolchain:
             raise InstallError(
                 f"Node.js {MIN_NODE_VERSION}+ and npm are required; rerun with --install-toolchain after confirmation"
@@ -435,29 +571,33 @@ def install(
             raise InstallError("Node.js installation finished but the current process cannot find node/npm; reopen the terminal and retry")
 
     root = Path(report.runtimeRoot)
-    npm = shutil.which("npm.cmd" if report.platform == "windows" else "npm")
-    node = shutil.which("node")
-    if not npm:
-        raise InstallError("npm is unavailable")
-    if not node:
-        raise InstallError("node is unavailable")
-    if not report.dependenciesInstalled:
-        try:
-            run_captured([npm, "ci"], cwd=root, dry_run=dry_run)
-        except CapturedCommandError as error:
-            raise RuntimeBuildError(build_diagnostic(
-                report, stage="dependencies", attempt="npm-ci", fallback_used=False, error=error,
-            )) from error
-        if not dry_run:
-            report = detect_environment(platform_name=report.platform, runtime_root=root)
-            if not report.dependenciesInstalled:
-                error = InstallError(f"npm ci completed but runtime dependencies are {report.dependencyStatus}")
+    env = mirror_environment(use_mirror)
+    fallback_used = False
+    if not reuse:
+        npm = shutil.which("npm.cmd" if report.platform == "windows" else "npm")
+        node = shutil.which("node")
+        if not npm:
+            raise InstallError("npm is unavailable")
+        if not node:
+            raise InstallError("node is unavailable")
+        if not report.dependenciesInstalled:
+            try:
+                run_captured([npm, "ci"], cwd=root, dry_run=dry_run, env=env)
+            except CapturedCommandError as error:
                 raise RuntimeBuildError(build_diagnostic(
-                    report, stage="dependencies", attempt="post-install-check", fallback_used=False, error=error,
+                    report, stage="dependencies", attempt="npm-ci", fallback_used=False, error=error, use_mirror=use_mirror,
                 )) from error
-    fallback_used = build_runtime(report, npm=npm, node=node, root=root, dry_run=dry_run)
+            if not dry_run:
+                report = detect_environment(platform_name=report.platform, runtime_root=root)
+                if not report.dependenciesInstalled:
+                    error = InstallError(f"npm ci completed but runtime dependencies are {report.dependencyStatus}")
+                    raise RuntimeBuildError(build_diagnostic(
+                        report, stage="dependencies", attempt="post-install-check", fallback_used=False, error=error, use_mirror=use_mirror,
+                    )) from error
+        fallback_used = build_runtime(report, npm=npm, node=node, root=root, dry_run=dry_run, env=env)
     if not dry_run:
         validate_built_runtime(report, fallback_used=fallback_used)
+        stamp_built_source_hash(report, report.sourceHash)
     if report.runtimeInstalled:
         request_runtime_quit(report.platform, Path(report.runtimePath or ""), dry_run=dry_run)
     application = install_built_runtime(
@@ -470,47 +610,11 @@ def install(
     return application
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--yes", action="store_true", help="Confirm installation was explicitly approved by the user")
-    parser.add_argument("--install-toolchain", action="store_true", help="Allow installing Node.js through brew or winget")
-    parser.add_argument("--upgrade", action="store_true", help="Allow replacing or refreshing an installed runtime while preserving a versioned backup")
-    parser.add_argument("--no-launch", action="store_true", help="Do not launch after installation")
-    parser.add_argument("--dry-run", action="store_true", help="Print actions without changing the system")
-    parser.add_argument("--json-plan", action="store_true", help="Print the planned actions and exit")
-    parser.add_argument("--platform", choices=("macos", "windows"), help="Override platform for diagnostics/tests")
-    parser.add_argument("--runtime-root", type=Path, help="Override the bundled runtime source directory")
-    args = parser.parse_args()
+def main(argv: list[str] | None = None) -> int:
+    from desktop_pet import main as cli_main
 
-    current_platform = normalize_platform(args.platform)
-    report = detect_environment(platform_name=current_platform, runtime_root=args.runtime_root)
-    plan = make_plan(report, launch=not args.no_launch)
-    if args.json_plan:
-        print(json.dumps(asdict(plan), ensure_ascii=False, indent=2))
-        return
-    if not args.yes:
-        raise SystemExit("INSTALLATION NOT STARTED: explicit confirmation is required; rerun with --yes")
-    try:
-        application = install(
-            report,
-            allow_toolchain=args.install_toolchain,
-            allow_upgrade=args.upgrade,
-            launch=not args.no_launch,
-            dry_run=args.dry_run,
-        )
-    except RuntimeBuildError as exc:
-        raise SystemExit(f"INSTALL FAILED: {json.dumps(exc.diagnostic, ensure_ascii=False)}") from exc
-    except (InstallError, OSError, subprocess.SubprocessError) as exc:
-        diagnostic = build_diagnostic(
-            report,
-            stage="install",
-            attempt="installer",
-            fallback_used=False,
-            error=exc,
-        )
-        raise SystemExit(f"INSTALL FAILED: {json.dumps(diagnostic, ensure_ascii=False)}") from exc
-    print(json.dumps({"installed": str(application) if application else None, "platform": current_platform}, ensure_ascii=False))
+    return cli_main(["install", *(sys.argv[1:] if argv is None else argv)])
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

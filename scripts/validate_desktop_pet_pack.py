@@ -36,9 +36,57 @@ class ValidationResult:
 class PackValidationError(ValueError):
     """Raised when a pack violates the public contract."""
 
+    def __init__(self, message: str, *, path: str | None = None, frame: int | None = None, hint: str | None = None):
+        self.message = message
+        self.path = path
+        self.frame = frame
+        self.hint = hint if hint is not None else suggest_fix(message)
+        parts = [message]
+        if path:
+            parts.append(f"file: {path}")
+        if frame is not None:
+            parts.append(f"frame: {frame}")
+        if self.hint:
+            parts.append(f"fix: {self.hint}")
+        super().__init__("; ".join(parts))
 
-def fail(message: str) -> None:
-    raise PackValidationError(message)
+    def to_dict(self) -> dict:
+        return {
+            "ok": False,
+            "error": self.message,
+            "path": self.path,
+            "frame": self.frame,
+            "hint": self.hint,
+        }
+
+
+def suggest_fix(message: str) -> str | None:
+    rules = (
+        ("non-transparent strip corners", "检查条带四角是否残留白底或棋盘格；运行资源必须真透明。"),
+        ("fully opaque", "导出时去掉白底，保留 alpha 通道。"),
+        ("no alpha channel", "另存为 PNG/WebP 并启用透明度。"),
+        ("is empty", "该帧没有可见像素，重新导出这一帧。"),
+        ("no visible body core", "主体偏离画布中心或被裁切，检查单元格边界。"),
+        ("drifts more than 1 px", "固定脚锚点后重导出，idle/walk 不要左右或上下漂移。"),
+        ("loop seam", "循环首尾帧应对齐同一姿势，或改为非 loop。"),
+        ("changes more than 1.5%", "idle 高度抖动超过 1.5%，减小呼吸动画幅度。"),
+        ("visible height", "调整 defaultScale 或角色高度，使默认桌面高度落在 120–140px。"),
+        ("escapes the pack", "file 必须是包内相对路径，禁止 .. 与绝对路径。"),
+        ("schemaVersion must be 2 or 3", "v1 包不能直接运行，请补画动作后升级为 v2。"),
+        ("missing required actions", "补齐 12 个必选动作后再校验。"),
+        ("must declare exactly one of fps or durationsMs", "每个 phase 只保留 fps 或 durationsMs 之一。"),
+        ("ZIP must contain exactly one top-level", "压缩包必须只有一个与角色 id 同名的顶层目录。"),
+        ("missing pet.json", "角色目录里需要 pet.json。"),
+        ("missing regular preview.png", "补一张 preview.png 作为给人看的预览图。"),
+    )
+    for needle, hint in rules:
+        if needle in message:
+            return hint
+    return "对照 references/desktop-pet-pack.md 修复后重新校验。"
+
+
+def fail(message: str, *, path: str | None = None, frame: int | None = None, hint: str | None = None) -> None:
+    raise PackValidationError(message, path=path, frame=frame, hint=hint)
 
 
 def require_int(value: object, label: str, minimum: int, maximum: int) -> int:
@@ -231,43 +279,43 @@ def validate_strip(root: Path, label: str, spec: dict, width: int, height: int, 
     image_path = root / relative
     try:
         resolved = image_path.resolve(strict=True); resolved.relative_to(root.resolve(strict=True))
-    except (OSError, ValueError): fail(f"{label}.file escapes the pack or does not exist")
-    if not resolved.is_file() or resolved.is_symlink(): fail(f"{label}.file must be a regular file")
-    if resolved.stat().st_size > MAX_FILE_BYTES: fail(f"{label}.file exceeds 24 MB")
+    except (OSError, ValueError): fail(f"{label}.file escapes the pack or does not exist", path=str(relative))
+    if not resolved.is_file() or resolved.is_symlink(): fail(f"{label}.file must be a regular file", path=str(relative))
+    if resolved.stat().st_size > MAX_FILE_BYTES: fail(f"{label}.file exceeds 24 MB", path=str(relative))
     try:
         with Image.open(resolved) as source:
             has_alpha = "A" in source.getbands() or "transparency" in source.info
             source.load(); image = source.convert("RGBA")
-    except (OSError, ValueError) as exc: fail(f"{label}.file is not a readable image: {exc}")
+    except (OSError, ValueError) as exc: fail(f"{label}.file is not a readable image: {exc}", path=str(relative))
     frames = spec["frames"]
-    if image.size != (width * frames, height): fail(f"{label} has size {image.size}; expected {(width * frames, height)}")
-    if not has_alpha: fail(f"{label} has no alpha channel")
+    if image.size != (width * frames, height): fail(f"{label} has size {image.size}; expected {(width * frames, height)}", path=str(relative), hint="条带宽度必须等于 canvas.width × frames，高度等于 canvas.height。")
+    if not has_alpha: fail(f"{label} has no alpha channel", path=str(relative))
     alpha = image.getchannel("A")
-    if alpha.getextrema() == (255, 255): fail(f"{label} is fully opaque; runtime assets need transparency")
+    if alpha.getextrema() == (255, 255): fail(f"{label} is fully opaque; runtime assets need transparency", path=str(relative))
     corners = ((0, 0), (image.width - 1, 0), (0, image.height - 1), (image.width - 1, image.height - 1))
-    if any(alpha.getpixel(point) != 0 for point in corners): fail(f"{label} has non-transparent strip corners")
+    if any(alpha.getpixel(point) != 0 for point in corners): fail(f"{label} has non-transparent strip corners", path=str(relative))
     boxes = []
     for index in range(frames):
         frame_alpha = alpha.crop((index * width, 0, (index + 1) * width, height)); box = frame_alpha.getbbox()
-        if box is None: fail(f"{label} frame {index + 1} is empty")
-        if frame_alpha.crop((width // 4, 0, width * 3 // 4, height)).getbbox() is None: fail(f"{label} frame {index + 1} has no visible body core")
+        if box is None: fail(f"{label} frame {index + 1} is empty", path=str(relative), frame=index + 1)
+        if frame_alpha.crop((width // 4, 0, width * 3 // 4, height)).getbbox() is None: fail(f"{label} frame {index + 1} has no visible body core", path=str(relative), frame=index + 1)
         boxes.append(box)
     if v2_action in {"idle", "walk"}:
         centers = [(box[0] + box[2]) / 2 for box in boxes]; bottoms = [box[3] for box in boxes]
-        if max(centers) - min(centers) > 1: fail(f"{label} body center drifts more than 1 px")
-        if max(bottoms) - min(bottoms) > 1: fail(f"{label} foot baseline drifts more than 1 px")
+        if max(centers) - min(centers) > 1: fail(f"{label} body center drifts more than 1 px", path=str(relative))
+        if max(bottoms) - min(bottoms) > 1: fail(f"{label} foot baseline drifts more than 1 px", path=str(relative))
     if v2_action == "idle":
         heights = [box[3] - box[1] for box in boxes]
-        if max(heights) - min(heights) > max(1, round(sum(heights) / len(heights) * .015)): fail("actions.idle visible height changes more than 1.5%")
+        if max(heights) - min(heights) > max(1, round(sum(heights) / len(heights) * .015)): fail("actions.idle visible height changes more than 1.5%", path=str(relative))
         displayed = heights[0] * default_scale
-        if height >= 200 and not 120 <= displayed <= 140: fail(f"default desktop visible height is {displayed:.1f}px; expected 120-140px")
+        if height >= 200 and not 120 <= displayed <= 140: fail(f"default desktop visible height is {displayed:.1f}px; expected 120-140px", path=str(relative))
     is_loop = spec.get("loop") if v2_action else spec.get("playback") == "loop"
     if is_loop and frames > 1:
         first = alpha.crop((0, 0, width, height)); last = alpha.crop(((frames - 1) * width, 0, frames * width, height))
         changed = ImageChops.difference(first, last).point(lambda value: 255 if value > 24 else 0)
         changed_ratio = sum(changed.histogram()[1:]) / (width * height)
         limit = .18 if v2_action else .35
-        if changed_ratio > limit: fail(f"{label} loop seam changes too much ({changed_ratio:.1%})")
+        if changed_ratio > limit: fail(f"{label} loop seam changes too much ({changed_ratio:.1%})", path=str(relative))
 
 
 def validate_pack_directory(root: Path, *, require_root_name: bool = True) -> ValidationResult:
@@ -314,10 +362,26 @@ def validate_pack(path: Path) -> ValidationResult:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__); parser.add_argument("pack", type=Path); args = parser.parse_args()
-    try: result = validate_pack(args.pack)
-    except (OSError, PackValidationError) as exc: raise SystemExit(f"INVALID: {exc}") from exc
-    print(f"VALID: {result.pack_id} (schema v{result.manifest['schemaVersion']})")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("pack", type=Path)
+    parser.add_argument("--json", action="store_true", help="Print a machine-readable result")
+    args = parser.parse_args()
+    try:
+        result = validate_pack(args.pack)
+    except (OSError, PackValidationError) as exc:
+        if args.json:
+            payload = exc.to_dict() if isinstance(exc, PackValidationError) else {"ok": False, "error": str(exc), "path": None, "frame": None, "hint": None}
+            print(json.dumps(payload, ensure_ascii=False, indent=2))
+        else:
+            print(f"INVALID: {exc}")
+        raise SystemExit(1) from exc
+    payload = {
+        "ok": True,
+        "packId": result.pack_id,
+        "schemaVersion": result.manifest["schemaVersion"],
+        "root": str(result.root),
+    }
+    print(json.dumps(payload, ensure_ascii=False, indent=2) if args.json else f"VALID: {result.pack_id} (schema v{result.manifest['schemaVersion']})")
 
 
 if __name__ == "__main__": main()

@@ -1,6 +1,6 @@
 {
   "name": "heytea-doodle-desktop-pet-runtime",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "A quiet cross-platform runtime for schema-v2 action packs and schema-v3 behavior packs.",
   "author": "Doodle Desktop Pet contributors",
   "main": "src/main.js",

@@ -44,6 +44,9 @@ class DesktopPetDeliveryTest(unittest.TestCase):
             self.assertIn("--quit", stop.read_text(encoding="utf-8"))
             self.assertTrue((delivery / "tea-cup-v2.zip").is_file())
             self.assertTrue((delivery / "preview.png").is_file())
+            notes = (delivery / "使用说明.txt").read_text(encoding="utf-8")
+            self.assertIn("xattr -dr com.apple.quarantine", notes)
+            self.assertIn("Gatekeeper", notes)
 
     def test_windows_delivery_uses_shared_runtime(self) -> None:
         with tempfile.TemporaryDirectory() as temp:

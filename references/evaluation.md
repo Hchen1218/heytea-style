@@ -236,7 +236,7 @@ Before committing or packaging this skill:
 - `private-assets/reference-cutouts/` may be included when reference images are intended to ship;
 - raw source caches and extraction scripts are not present in the repository or `.skill` archive;
 - `scripts/build_title_reference_sheet.py` and `scripts/composite_title_layer.py` are present in the package if the docs mention them;
-- `scripts/build_desktop_pet_pack.py` and `scripts/validate_desktop_pet_pack.py` are present when desktop-pet packaging is documented;
+- `scripts/desktop_pet.py`, `scripts/build_desktop_pet_pack.py`, and `scripts/validate_desktop_pet_pack.py` are present when desktop-pet packaging is documented;
 - the Electron runtime contains source and tests but no `node_modules`, `dist`, imported user packs, or app-data state;
 - Electron, electron-builder, and the ASAR verifier are exact-version dependencies with a committed lockfile, and installation uses `npm ci`;
 - macOS and Windows builds parse a valid `app.asar`, contain the declared main entry, omit the template `default_app.asar`, and pass the packaged `--self-test` before installation;

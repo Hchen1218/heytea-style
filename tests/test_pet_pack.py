@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from build_desktop_pet_pack import build_contact_sheet, build_frame_audit, build_motion_preview, write_deterministic_zip
-from validate_desktop_pet_pack import PackValidationError, REQUIRED_ACTIONS, validate_pack
+from validate_desktop_pet_pack import PackValidationError, REQUIRED_ACTIONS, suggest_fix, validate_pack
 
 
 class PetPackTest(unittest.TestCase):
@@ -122,8 +122,29 @@ class PetPackTest(unittest.TestCase):
             manifest = json.loads((root / "pet.json").read_text(encoding="utf-8"))
             idle = manifest["actions"]["idle"]
             Image.new("RGBA", (64 * idle["frames"], 64), (255, 255, 255, 255)).save(root / idle["file"])
-            with self.assertRaises(PackValidationError):
+            with self.assertRaises(PackValidationError) as raised:
                 validate_pack(root)
+            self.assertEqual(raised.exception.path, "animations/idle.png")
+            self.assertIn("白底", raised.exception.hint or "")
+
+    def test_empty_frame_includes_frame_number(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = self.make_pack(Path(temp))
+            manifest = json.loads((root / "pet.json").read_text(encoding="utf-8"))
+            idle = manifest["actions"]["idle"]
+            Image.new("RGBA", (64 * idle["frames"], 64), (0, 0, 0, 0)).save(root / idle["file"])
+            with self.assertRaises(PackValidationError) as raised:
+                validate_pack(root)
+            self.assertEqual(raised.exception.frame, 1)
+            self.assertEqual(raised.exception.path, "animations/idle.png")
+            self.assertIn("可见像素", raised.exception.hint or "")
+
+    def test_idle_height_jitter_hint_does_not_talk_about_default_scale(self) -> None:
+        jitter = suggest_fix("actions.idle visible height changes more than 1.5%")
+        scale = suggest_fix("default desktop visible height is 90.0px; expected 120-140px")
+        self.assertIsNotNone(jitter)
+        self.assertNotIn("defaultScale", jitter or "")
+        self.assertIn("defaultScale", scale or "")
 
     def test_rejects_path_traversal(self) -> None:
         with tempfile.TemporaryDirectory() as temp:

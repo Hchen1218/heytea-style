@@ -157,6 +157,10 @@ def build_delivery(pack: Path, out: Path, platform_name: str, *, force: bool = F
         "4. 双击“关闭桌宠”会保存设置并正常退出，不会强制杀进程。\n"
         "5. 桌宠隐藏后仍可通过系统托盘菜单重新显示。\n"
         f"6. 本角色包需要 Doodle Desktop Pet {minimum_runtime_version(result.manifest['schemaVersion'])} 或更高版本。\n"
+        "7. 若 macOS 提示“已损坏，无法打开”或“无法验证开发者”，这是未公证的本地构建。"
+        "可在终端执行：xattr -dr com.apple.quarantine ~/Applications/Doodle\\ Desktop\\ Pet.app"
+        " 然后再次双击启动。不要关闭系统完整性保护或 Gatekeeper。\n"
+        "8. 若 Windows SmartScreen 提示未知应用，选择“仍要运行”。运行器未做代码签名。\n"
     )
     (out / "使用说明.txt").write_text(instructions, encoding="utf-8")
     return {

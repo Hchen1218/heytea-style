@@ -137,6 +137,15 @@ test('completed episodes enforce a quiet interval', () => {
   assert.equal(controller.quietUntil, 4000);
 });
 
+test('cancelCurrent clears the active episode without pausing', () => {
+  const controller = new TriggerController(model(), { random: () => 0 });
+  controller.interact('drag');
+  controller.cancelCurrent();
+  assert.equal(controller.current, null);
+  assert.equal(controller.paused, false);
+  assert.equal(controller.interact('click').behavior, 'click');
+});
+
 test('paused controller clears activity and ignores triggers', () => {
   const controller = new TriggerController(model(), { random: () => 0 });
   controller.interact('drag');
