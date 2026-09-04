@@ -6,7 +6,7 @@ const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 const asar = require('@electron/asar');
-const { validatePackagedApp } = require('../scripts/after-pack');
+const { listedAsarPath, validatePackagedApp } = require('../scripts/after-pack');
 const expectedMetadata = require('../package.json');
 
 async function fixture({ includeMain = true, packagedVersion = expectedMetadata.version, corrupt = false } = {}) {
@@ -50,6 +50,24 @@ test('rejects a corrupt app.asar without removing the fallback archive', async (
   t.after(() => fs.rmSync(path.dirname(context.packager.projectDir), { recursive: true, force: true }));
   assert.throws(() => validatePackagedApp(context), /RUNTIME_BUILD_VALIDATION_FAILED/);
   assert.equal(fs.existsSync(path.join(resources, 'default_app.asar')), true);
+});
+
+test('normalizes asar listing paths to posix with a leading slash', () => {
+  assert.equal(listedAsarPath('package.json'), '/package.json');
+  assert.equal(listedAsarPath('\\package.json'), '/package.json');
+  assert.equal(listedAsarPath('/package.json'), '/package.json');
+  assert.equal(listedAsarPath('src\\main.js'), '/src/main.js');
+});
+
+test('accepts Windows-style asar listings that omit the leading slash', async (t) => {
+  const { context } = await fixture();
+  t.after(() => fs.rmSync(path.dirname(context.packager.projectDir), { recursive: true, force: true }));
+  const asarApi = {
+    listPackage: () => ['package.json', 'src\\main.js'],
+    extractFile: (archive, file) => asar.extractFile(archive, file),
+  };
+  const result = validatePackagedApp(context, asarApi);
+  assert.equal(result.version, expectedMetadata.version);
 });
 
 test('rejects a missing entry or mismatched version', async (t) => {

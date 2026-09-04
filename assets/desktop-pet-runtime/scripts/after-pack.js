@@ -8,6 +8,10 @@ function fail(message) {
   throw new Error(`RUNTIME_BUILD_VALIDATION_FAILED: ${message}`);
 }
 
+function listedAsarPath(file) {
+  return `/${String(file).replaceAll('\\', '/').replace(/^\/+/, '')}`;
+}
+
 function resourcesDirectory(context) {
   if (context.electronPlatformName === 'darwin') {
     return path.join(
@@ -34,7 +38,7 @@ function validatePackagedApp(context, asarApi = asar) {
   let files;
   let packagedMetadata;
   try {
-    files = new Set(asarApi.listPackage(archive));
+    files = new Set(asarApi.listPackage(archive).map(listedAsarPath));
     packagedMetadata = JSON.parse(asarApi.extractFile(archive, 'package.json').toString('utf8'));
   } catch (error) {
     fail(`app.asar is invalid: ${error.message}`);
@@ -63,5 +67,6 @@ async function afterPack(context) {
 }
 
 exports.default = afterPack;
+exports.listedAsarPath = listedAsarPath;
 exports.resourcesDirectory = resourcesDirectory;
 exports.validatePackagedApp = validatePackagedApp;
