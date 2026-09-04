@@ -5,7 +5,37 @@ on:
   pull_request:
 
 jobs:
-  test-and-build:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python -m json.tool evals/evals.json
+      - run: python -m unittest discover -s tests -v
+      - run: python -m py_compile scripts/build_title_reference_sheet.py scripts/composite_title_layer.py scripts/build_desktop_pet_pack.py scripts/validate_desktop_pet_pack.py scripts/prepare_generated_animation_strips.py scripts/check_desktop_pet_environment.py scripts/install_desktop_pet_runtime.py
+
+  npm-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        node_version: ["22.12.0", "24.11.1"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node_version }}
+          cache: npm
+          cache-dependency-path: assets/desktop-pet-runtime/package-lock.json
+      - run: npm ci
+        working-directory: assets/desktop-pet-runtime
+      - run: npm test
+        working-directory: assets/desktop-pet-runtime
+
+  pack:
     strategy:
       fail-fast: false
       matrix:
@@ -19,21 +49,14 @@ jobs:
       CSC_IDENTITY_AUTO_DISCOVERY: "false"
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-      - run: python -m pip install -r requirements-dev.txt
-      - run: python -m json.tool evals/evals.json
-      - run: python -m unittest discover -s tests -v
-      - run: python -m py_compile scripts/build_title_reference_sheet.py scripts/composite_title_layer.py scripts/build_desktop_pet_pack.py scripts/validate_desktop_pet_pack.py scripts/prepare_generated_animation_strips.py scripts/check_desktop_pet_environment.py scripts/install_desktop_pet_runtime.py
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "22.12.0"
           cache: npm
           cache-dependency-path: assets/desktop-pet-runtime/package-lock.json
       - run: npm ci
         working-directory: assets/desktop-pet-runtime
-      - run: npm test
-        working-directory: assets/desktop-pet-runtime
       - run: npm run ${{ matrix.build_command }}
+        working-directory: assets/desktop-pet-runtime
+      - run: npm run test:packaged
         working-directory: assets/desktop-pet-runtime

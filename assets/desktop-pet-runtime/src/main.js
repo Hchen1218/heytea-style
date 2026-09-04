@@ -4,6 +4,7 @@ const { app, BrowserWindow, dialog, ipcMain, Menu, nativeImage, screen, shell, T
 const AdmZip = require('adm-zip');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const { inspectSchemaVersion, validateManifest } = require('./core/manifest');
@@ -14,10 +15,14 @@ const { planWalk } = require('./core/walk-planner');
 const { fallY, planCursorChase, planFall } = require('./core/motion-planner');
 const { floorBottom } = require('./core/floor-policy');
 
-// Keeps local QA and screenshots isolated from a user's real imported pets.
+const SELF_TEST_REQUESTED = process.argv.includes('--self-test');
+
+// --self-test must not share Chromium profile state with a live app.
 // Production launches do not set this variable and continue using Electron's
 // normal per-user application-data directory.
-if (process.env.DESKTOP_PET_USER_DATA_DIR) {
+if (SELF_TEST_REQUESTED) {
+  app.setPath('userData', fs.mkdtempSync(path.join(os.tmpdir(), 'doodle-pet-self-test-')));
+} else if (process.env.DESKTOP_PET_USER_DATA_DIR) {
   app.setPath('userData', path.resolve(process.env.DESKTOP_PET_USER_DATA_DIR));
 }
 
@@ -693,7 +698,15 @@ function registerIpc() {
 }
 
 const launchArgv = [...process.argv];
-if (!app.requestSingleInstanceLock({ argv: launchArgv })) {
+if (SELF_TEST_REQUESTED) {
+  app.whenReady().then(() => {
+    const payload = JSON.stringify({ ok: true, product: 'Doodle Desktop Pet', version: app.getVersion() });
+    process.stdout.write(`SELF_TEST_RESULT:${payload}\n`, () => app.exit(0));
+  }).catch((error) => {
+    console.error(`SELF_TEST_FAILED: ${error.message}`);
+    app.exit(1);
+  });
+} else if (!app.requestSingleInstanceLock({ argv: launchArgv })) {
   app.quit();
 } else {
   commandQueue.dispatch(launchArgv);

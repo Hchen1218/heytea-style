@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import plistlib
 import shutil
 import subprocess
 import sys
@@ -14,7 +15,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from check_desktop_pet_environment import (
-    MIN_NODE_MAJOR,
+    MIN_NODE_VERSION,
     PRODUCT_NAME,
     EnvironmentReport,
     detect_environment,
@@ -24,6 +25,23 @@ from check_desktop_pet_environment import (
 
 class InstallError(RuntimeError):
     pass
+
+
+class CapturedCommandError(RuntimeError):
+    def __init__(self, command: list[str], returncode: int, output: str):
+        super().__init__(f"command exited {returncode}: {' '.join(command)}")
+        self.command = command
+        self.returncode = returncode
+        self.output = output
+
+
+class RuntimeBuildError(InstallError):
+    def __init__(self, diagnostic: dict):
+        super().__init__(json.dumps(diagnostic, ensure_ascii=False))
+        self.diagnostic = diagnostic
+
+
+SELF_TEST_PREFIX = "SELF_TEST_RESULT:"
 
 
 @dataclass(frozen=True)
@@ -39,6 +57,7 @@ class InstallPlan:
     installToolchain: list[list[str]]
     installDependencies: list[str] | None
     buildRuntime: list[str] | None
+    buildFallback: list[list[str]] | None
     installDirectory: str | None
     launchAfterInstall: bool
 
@@ -64,6 +83,7 @@ def toolchain_commands(report: EnvironmentReport) -> list[list[str]]:
 def make_plan(report: EnvironmentReport, *, launch: bool = True) -> InstallPlan:
     npm = "npm.cmd" if report.platform == "windows" else "npm"
     build_script = "pack:win" if report.platform == "windows" else "pack:mac"
+    root = Path(report.runtimeRoot)
     replacement_needed = report.runtimeInstalled and not report.runtimeCompatible
     upgrade = replacement_needed and report.runtimeScope == "user"
     side_by_side = replacement_needed and report.runtimeScope == "system"
@@ -94,8 +114,12 @@ def make_plan(report: EnvironmentReport, *, launch: bool = True) -> InstallPlan:
         stopExisting=replacement_needed,
         backupPath=backup,
         installToolchain=toolchain_commands(report),
-        installDependencies=None if report.dependenciesInstalled or not report.sourceCompatible else [npm, "install"],
+        installDependencies=None if report.dependenciesInstalled or not report.sourceCompatible else [npm, "ci"],
         buildRuntime=None if report.runtimeCompatible or not report.sourceCompatible else [npm, "run", build_script],
+        buildFallback=None if report.runtimeCompatible or not report.sourceCompatible else [
+            ["node", str(root / "node_modules" / "electron" / "install.js")],
+            [npm, "run", build_script, "--", f"--config.electronDist={root / 'node_modules' / 'electron' / 'dist'}"],
+        ],
         installDirectory=report.installDirectory,
         launchAfterInstall=launch,
     )
@@ -105,6 +129,104 @@ def run(command: list[str], *, cwd: Path | None = None, dry_run: bool = False) -
     print("+", " ".join(command))
     if not dry_run:
         subprocess.run(command, cwd=cwd, check=True)
+
+
+def run_captured(command: list[str], *, cwd: Path, dry_run: bool = False) -> str:
+    print("+", " ".join(command))
+    if dry_run:
+        return ""
+    completed = subprocess.run(command, cwd=cwd, capture_output=True, text=True)
+    output = "\n".join(part.strip() for part in (completed.stdout, completed.stderr) if part.strip())
+    if output:
+        print(output)
+    if completed.returncode != 0:
+        raise CapturedCommandError(command, completed.returncode, output)
+    return output
+
+
+def is_archive_build_failure(output: str) -> bool:
+    lowered = output.lower()
+    signatures = (
+        "invalid package",
+        "extractzipstreaming",
+        "unzipper",
+        "err_stream",
+        "premature close",
+        "archive extraction",
+    )
+    return any(signature in lowered for signature in signatures)
+
+
+def parse_self_test_output(stdout: str) -> dict:
+    for line in reversed([part.strip() for part in (stdout or "").splitlines() if part.strip()]):
+        if line.startswith(SELF_TEST_PREFIX):
+            return json.loads(line[len(SELF_TEST_PREFIX):] or "{}")
+    raise InstallError(f"packaged runtime self-test response was not found: {stdout}")
+
+
+def build_diagnostic(
+    report: EnvironmentReport,
+    *,
+    stage: str,
+    attempt: str,
+    fallback_used: bool,
+    error: CapturedCommandError | Exception,
+    artifact_checks: dict | None = None,
+) -> dict:
+    output = error.output if isinstance(error, CapturedCommandError) else str(error)
+    return {
+        "stage": stage,
+        "attempt": attempt,
+        "versions": {
+            "node": report.nodeVersion,
+            "npm": report.npmVersion,
+            "electron": report.electronVersion,
+            "electronBuilder": report.electronBuilderVersion,
+        },
+        "exitCode": error.returncode if isinstance(error, CapturedCommandError) else None,
+        "stderrTail": output[-4000:],
+        "fallbackUsed": fallback_used,
+        "artifactChecks": artifact_checks or {
+            "bundleFound": False,
+            "appAsarPresent": False,
+            "defaultAppAbsent": False,
+            "selfTestPassed": False,
+        },
+    }
+
+
+def build_runtime(
+    report: EnvironmentReport,
+    *,
+    npm: str,
+    node: str,
+    root: Path,
+    dry_run: bool = False,
+) -> bool:
+    build_script = "pack:win" if report.platform == "windows" else "pack:mac"
+    try:
+        run_captured([npm, "run", build_script], cwd=root, dry_run=dry_run)
+        return False
+    except CapturedCommandError as first_error:
+        if not is_archive_build_failure(first_error.output):
+            raise RuntimeBuildError(build_diagnostic(
+                report, stage="build", attempt="standard", fallback_used=False, error=first_error,
+            )) from first_error
+
+        electron_installer = root / "node_modules" / "electron" / "install.js"
+        electron_dist = root / "node_modules" / "electron" / "dist"
+        try:
+            run_captured([node, str(electron_installer)], cwd=root, dry_run=dry_run)
+            run_captured(
+                [npm, "run", build_script, "--", f"--config.electronDist={electron_dist}"],
+                cwd=root,
+                dry_run=dry_run,
+            )
+            return True
+        except CapturedCommandError as fallback_error:
+            raise RuntimeBuildError(build_diagnostic(
+                report, stage="build", attempt="fallback", fallback_used=True, error=fallback_error,
+            )) from fallback_error
 
 
 def find_mac_app(dist: Path) -> Path:
@@ -120,6 +242,64 @@ def find_windows_directory(dist: Path) -> Path:
         if (candidate / f"{PRODUCT_NAME}.exe").is_file():
             return candidate
     raise InstallError("Windows build did not produce a runnable unpacked directory")
+
+
+def validate_built_runtime(report: EnvironmentReport, *, fallback_used: bool = False) -> dict:
+    root = Path(report.runtimeRoot)
+    checks = {
+        "bundleFound": False,
+        "appAsarPresent": False,
+        "defaultAppAbsent": False,
+        "selfTestPassed": False,
+    }
+    try:
+        if report.platform == "macos":
+            application = find_mac_app(root / "dist")
+            resources = application / "Contents" / "Resources"
+            with (application / "Contents" / "Info.plist").open("rb") as handle:
+                executable_name = plistlib.load(handle).get("CFBundleExecutable")
+            if not executable_name:
+                raise InstallError("packaged macOS application has no CFBundleExecutable")
+            executable = application / "Contents" / "MacOS" / str(executable_name)
+        else:
+            application = find_windows_directory(root / "dist")
+            resources = application / "resources"
+            executable = application / f"{PRODUCT_NAME}.exe"
+        checks["bundleFound"] = executable.is_file()
+        if not checks["bundleFound"]:
+            raise InstallError(f"packaged runtime executable is missing: {executable}")
+        app_asar = resources / "app.asar"
+        checks["appAsarPresent"] = app_asar.is_file() and app_asar.stat().st_size > 0
+        checks["defaultAppAbsent"] = not (resources / "default_app.asar").exists()
+        if not checks["appAsarPresent"]:
+            raise InstallError(f"validated app.asar is missing: {app_asar}")
+        if not checks["defaultAppAbsent"]:
+            raise InstallError(f"default_app.asar remained in the packaged runtime: {resources}")
+
+        completed = subprocess.run(
+            [str(executable), "--self-test"],
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+        if completed.returncode != 0:
+            raise InstallError(f"packaged runtime self-test exited {completed.returncode}: {(completed.stderr or completed.stdout).strip()}")
+        payload = parse_self_test_output(completed.stdout)
+        if payload.get("ok") is not True or payload.get("product") != PRODUCT_NAME:
+            raise InstallError(f"packaged runtime returned an invalid self-test response: {payload}")
+        if report.sourceVersion and payload.get("version") != report.sourceVersion:
+            raise InstallError(f"packaged runtime version {payload.get('version')} does not match source {report.sourceVersion}")
+        checks["selfTestPassed"] = True
+        return checks
+    except (OSError, subprocess.SubprocessError, json.JSONDecodeError, plistlib.InvalidFileException, InstallError) as error:
+        raise RuntimeBuildError(build_diagnostic(
+            report,
+            stage="validate",
+            attempt="post-build",
+            fallback_used=fallback_used,
+            error=error,
+            artifact_checks=checks,
+        )) from error
 
 
 def available_backup_path(preferred: Path, *, suffix: str | None = None) -> Path:
@@ -241,7 +421,7 @@ def install(
     if not report.nodeSupported or not report.npmAvailable:
         if not allow_toolchain:
             raise InstallError(
-                f"Node.js {MIN_NODE_MAJOR}+ and npm are required; rerun with --install-toolchain after confirmation"
+                f"Node.js {MIN_NODE_VERSION}+ and npm are required; rerun with --install-toolchain after confirmation"
             )
         if not commands:
             manager = "Homebrew" if report.platform == "macos" else "winget"
@@ -256,11 +436,28 @@ def install(
 
     root = Path(report.runtimeRoot)
     npm = shutil.which("npm.cmd" if report.platform == "windows" else "npm")
+    node = shutil.which("node")
     if not npm:
         raise InstallError("npm is unavailable")
+    if not node:
+        raise InstallError("node is unavailable")
     if not report.dependenciesInstalled:
-        run([npm, "install"], cwd=root, dry_run=dry_run)
-    run([npm, "run", "pack:win" if report.platform == "windows" else "pack:mac"], cwd=root, dry_run=dry_run)
+        try:
+            run_captured([npm, "ci"], cwd=root, dry_run=dry_run)
+        except CapturedCommandError as error:
+            raise RuntimeBuildError(build_diagnostic(
+                report, stage="dependencies", attempt="npm-ci", fallback_used=False, error=error,
+            )) from error
+        if not dry_run:
+            report = detect_environment(platform_name=report.platform, runtime_root=root)
+            if not report.dependenciesInstalled:
+                error = InstallError(f"npm ci completed but runtime dependencies are {report.dependencyStatus}")
+                raise RuntimeBuildError(build_diagnostic(
+                    report, stage="dependencies", attempt="post-install-check", fallback_used=False, error=error,
+                )) from error
+    fallback_used = build_runtime(report, npm=npm, node=node, root=root, dry_run=dry_run)
+    if not dry_run:
+        validate_built_runtime(report, fallback_used=fallback_used)
     if report.runtimeInstalled:
         request_runtime_quit(report.platform, Path(report.runtimePath or ""), dry_run=dry_run)
     application = install_built_runtime(
@@ -301,8 +498,17 @@ def main() -> None:
             launch=not args.no_launch,
             dry_run=args.dry_run,
         )
+    except RuntimeBuildError as exc:
+        raise SystemExit(f"INSTALL FAILED: {json.dumps(exc.diagnostic, ensure_ascii=False)}") from exc
     except (InstallError, OSError, subprocess.SubprocessError) as exc:
-        raise SystemExit(f"INSTALL FAILED: {exc}") from exc
+        diagnostic = build_diagnostic(
+            report,
+            stage="install",
+            attempt="installer",
+            fallback_used=False,
+            error=exc,
+        )
+        raise SystemExit(f"INSTALL FAILED: {json.dumps(diagnostic, ensure_ascii=False)}") from exc
     print(json.dumps({"installed": str(application) if application else None, "platform": current_platform}, ensure_ascii=False))
 
 

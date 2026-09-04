@@ -238,6 +238,9 @@ Before committing or packaging this skill:
 - `scripts/build_title_reference_sheet.py` and `scripts/composite_title_layer.py` are present in the package if the docs mention them;
 - `scripts/build_desktop_pet_pack.py` and `scripts/validate_desktop_pet_pack.py` are present when desktop-pet packaging is documented;
 - the Electron runtime contains source and tests but no `node_modules`, `dist`, imported user packs, or app-data state;
+- Electron, electron-builder, and the ASAR verifier are exact-version dependencies with a committed lockfile, and installation uses `npm ci`;
+- macOS and Windows builds parse a valid `app.asar`, contain the declared main entry, omit the template `default_app.asar`, and pass the packaged `--self-test` before installation;
+- CI runs Electron runtime unit tests on both Node.js 22.12.0 and 24.11.1, and packs plus packaged `--self-test` once per OS;
 - Python pack tests and Electron core tests pass;
 - the title reference sheet used for image generation is model-facing: no English labels and no target title rendered in a standard system font;
 - `git status --short` is reviewed before staging; do not stage `.DS_Store`, stale packages, or unrelated generated outputs.
