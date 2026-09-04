@@ -3,23 +3,28 @@
 
 from __future__ import annotations
 
-import argparse
+import hashlib
 import json
 import os
-import platform
+import platform as py_platform
 import plistlib
 import re
 import shutil
 import subprocess
 import sys
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Mapping
+from urllib.error import URLError
+from urllib.request import urlopen
 
 
 PRODUCT_NAME = "Doodle Desktop Pet"
 MIN_NODE_VERSION = "22.12.0"
 MIN_RUNTIME_BY_SCHEMA = {2: "2.0.0", 3: "3.1.0"}
+SOURCE_HASH_MARKER = ".runtime-source-hash"
+NPM_REGISTRY_PING = "https://registry.npmjs.org/-/ping"
+SOURCE_HASH_FILES = ("package.json", "package-lock.json", "scripts/after-pack.js")
 
 
 @dataclass(frozen=True)
@@ -50,6 +55,11 @@ class EnvironmentReport:
     dependenciesInstalled: bool
     packageManager: str | None
     installDirectory: str | None
+    sourceHash: str | None
+    cachedBuildReady: bool
+    installedSourceHash: str | None
+    installedSourceMatches: bool
+    registryReachable: bool | None
     missing: list[str]
     needsConfirmation: bool
     nextAction: str
@@ -87,6 +97,87 @@ def version_tuple(value: str | None) -> tuple[int, int, int] | None:
     if not match:
         return None
     return tuple(int(part or 0) for part in match.groups())
+
+
+def compute_runtime_source_hash(root: Path) -> str | None:
+    root = root.resolve()
+    files: list[Path] = []
+    src = root / "src"
+    if src.is_dir():
+        files.extend(sorted(path for path in src.rglob("*") if path.is_file() and not path.name.startswith(".")))
+    for relative in SOURCE_HASH_FILES:
+        path = root / relative
+        if path.is_file():
+            files.append(path)
+    if not files:
+        return None
+    digest = hashlib.sha256()
+    for path in files:
+        digest.update(path.relative_to(root).as_posix().encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
+def read_source_hash(path: Path) -> str | None:
+    try:
+        value = path.read_text(encoding="utf-8").strip()
+    except OSError:
+        return None
+    return value or None
+
+
+def write_source_hash(path: Path, value: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(f"{value}\n", encoding="utf-8")
+
+
+def cached_bundle_path(platform_name: str, root: Path) -> Path | None:
+    dist = Path(root) / "dist"
+    if platform_name == "macos":
+        return select_mac_app(dist)
+    if platform_name == "windows":
+        return select_windows_unpacked(dist)
+    return None
+
+
+def select_mac_app(dist: Path) -> Path | None:
+    machine = py_platform.machine().lower().replace("aarch64", "arm64").replace("amd64", "x86_64")
+    for folder in (f"mac-{machine}", "mac"):
+        candidate = dist / folder / f"{PRODUCT_NAME}.app"
+        if candidate.is_dir():
+            return candidate
+    matches = sorted(path for path in dist.glob(f"mac*/{PRODUCT_NAME}.app") if path.is_dir())
+    return matches[-1] if matches else None
+
+
+def select_windows_unpacked(dist: Path) -> Path | None:
+    for name in ("win-unpacked", "win-ia32-unpacked", "win-arm64-unpacked"):
+        candidate = dist / name
+        if (candidate / f"{PRODUCT_NAME}.exe").is_file():
+            return candidate
+    return None
+
+
+def bundle_hash_path(platform_name: str, bundle: Path) -> Path:
+    if platform_name == "macos":
+        return bundle / "Contents" / "Resources" / SOURCE_HASH_MARKER
+    return bundle / SOURCE_HASH_MARKER
+
+
+def installed_hash_path(platform_name: str, runtime_path: Path) -> Path:
+    if platform_name == "macos":
+        return runtime_path / "Contents" / "Resources" / SOURCE_HASH_MARKER
+    return runtime_path.parent / SOURCE_HASH_MARKER
+
+
+def probe_npm_registry(url: str = NPM_REGISTRY_PING, timeout: float = 2.5) -> bool:
+    try:
+        with urlopen(url, timeout=timeout) as response:
+            return 200 <= int(response.status) < 400
+    except (OSError, URLError, ValueError, TimeoutError):
+        return False
 
 
 def package_version(path: Path) -> str | None:
@@ -186,6 +277,7 @@ def detect_environment(
     environ: Mapping[str, str] | None = None,
     which: Callable[[str], str | None] = shutil.which,
     required_schema: int = 3,
+    probe_registry: bool = False,
 ) -> EnvironmentReport:
     current_platform = normalize_platform(platform_name)
     current_home = (home or Path.home()).expanduser()
@@ -244,6 +336,14 @@ def detect_environment(
     if current_platform == "windows" and (which("winget") or which("winget.exe")):
         package_manager = "winget"
 
+    source_hash = compute_runtime_source_hash(root) if source_available else None
+    cached_bundle = cached_bundle_path(current_platform, root)
+    cached_hash = read_source_hash(bundle_hash_path(current_platform, cached_bundle)) if cached_bundle else None
+    cached_build_ready = bool(source_hash and cached_bundle and cached_hash == source_hash)
+    installed_source_hash = read_source_hash(installed_hash_path(current_platform, installed)) if installed else None
+    installed_source_matches = bool(source_hash and installed_source_hash == source_hash)
+    registry_reachable = probe_npm_registry() if probe_registry else None
+
     missing: list[str] = []
     if not supported:
         missing.append("supported-platform")
@@ -255,14 +355,15 @@ def detect_environment(
         missing.append("runtime-source")
     elif not source_compatible:
         missing.append(f"runtime-source>={minimum_version}")
-    if not node_path:
-        missing.append("node")
-    elif not node_supported:
-        missing.append(f"node>={MIN_NODE_VERSION}")
-    if not npm_path:
-        missing.append("npm")
-    if source_available and node_supported and npm_path and not dependencies_installed:
-        missing.append("runtime-dependencies")
+    if not cached_build_ready:
+        if not node_path:
+            missing.append("node")
+        elif not node_supported:
+            missing.append(f"node>={MIN_NODE_VERSION}")
+        if not npm_path:
+            missing.append("npm")
+        if source_available and node_supported and npm_path and not dependencies_installed:
+            missing.append("runtime-dependencies")
 
     if runtime_compatible:
         status = "ready"
@@ -273,7 +374,7 @@ def detect_environment(
     elif installed and not source_compatible:
         status = "upgrade-source-missing" if not source_available else "upgrade-source-incompatible"
         next_action = "provide-runtime-package"
-    elif installed and (not node_supported or not npm_path):
+    elif installed and (not node_supported or not npm_path) and not cached_build_ready:
         status = "needs-toolchain"
         next_action = "ask-to-install-toolchain-for-upgrade"
     elif installed:
@@ -282,7 +383,7 @@ def detect_environment(
     elif not source_compatible:
         status = "missing-source" if not source_available else "incompatible-source"
         next_action = "provide-runtime-package"
-    elif not node_supported or not npm_path:
+    elif (not node_supported or not npm_path) and not cached_build_ready:
         status = "needs-toolchain"
         next_action = "ask-to-install-toolchain"
     else:
@@ -317,6 +418,11 @@ def detect_environment(
         dependenciesInstalled=dependencies_installed,
         packageManager=package_manager,
         installDirectory=str(destination) if destination else None,
+        sourceHash=source_hash,
+        cachedBuildReady=cached_build_ready,
+        installedSourceHash=installed_source_hash,
+        installedSourceMatches=installed_source_matches,
+        registryReachable=registry_reachable,
         missing=missing,
         needsConfirmation=supported and not runtime_compatible and source_compatible,
         nextAction=next_action,
@@ -340,6 +446,10 @@ def human_summary(report: EnvironmentReport) -> str:
             f"node: {report.nodeVersion or 'missing'}",
             f"npm: {'yes' if report.npmAvailable else 'no'}",
             f"dependencies: {'yes' if report.dependenciesInstalled else 'no'}",
+            f"source hash: {report.sourceHash or 'unknown'}",
+            f"cached build ready: {'yes' if report.cachedBuildReady else 'no'}",
+            f"installed source matches: {'yes' if report.installedSourceMatches else 'no'}",
+            f"npm registry: {'reachable' if report.registryReachable else 'not probed' if report.registryReachable is None else 'unreachable'}",
             f"next action: {report.nextAction}",
         ]
     )
@@ -348,19 +458,11 @@ def human_summary(report: EnvironmentReport) -> str:
     return "\n".join(lines)
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--json", action="store_true", help="Print a machine-readable report")
-    parser.add_argument("--platform", choices=("macos", "windows"), help="Override platform for diagnostics/tests")
-    parser.add_argument("--runtime-root", type=Path, help="Override the bundled runtime source directory")
-    parser.add_argument("--required-schema", type=int, choices=(2, 3), default=3, help="Pack schema that the installed runner must support")
-    args = parser.parse_args()
+def main(argv: list[str] | None = None) -> int:
+    from desktop_pet import main as cli_main
 
-    report = detect_environment(platform_name=args.platform, runtime_root=args.runtime_root, required_schema=args.required_schema)
-    print(json.dumps(asdict(report), ensure_ascii=False, indent=2) if args.json else human_summary(report))
-    if not report.supported:
-        raise SystemExit(2)
+    return cli_main(["doctor", *(sys.argv[1:] if argv is None else argv)])
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

@@ -36,7 +36,8 @@ class TriggerController {
   scheduleIdle(from) { return this.scheduleRange(from, this.cadence()?.idleIntervalMs || [5000, 9000]); }
   setActivityLevel(level) { if (!this.model.profiles[level]) throw new Error(`Unsupported activity level: ${level}`); this.activityLevel = level; this.nextAmbientAt = this.scheduleAmbient(this.now()); this.nextIdleAt = this.scheduleIdle(this.now()); }
   setReducedMotion(enabled) { this.reducedMotion = Boolean(enabled); this.nextAmbientAt = this.scheduleAmbient(this.now()); this.nextIdleAt = this.scheduleIdle(this.now()); }
-  setPaused(paused) { this.paused = Boolean(paused); if (this.paused) { this.current = null; this.queue = []; this.sleeping = false; } }
+  setPaused(paused) { this.paused = Boolean(paused); if (this.paused) this.cancelCurrent(); }
+  cancelCurrent() { this.current = null; this.queue = []; this.sleeping = false; }
 
   command(behavior, source, extra = {}) { return { type: 'start', behavior, source, ...extra }; }
 

@@ -28,6 +28,7 @@ const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
 let payload, manifest, model, images = {}, groundingByClip = {}, player, controller, gesture;
 let tickTimer, frameTimer, wakeTimer, displayedClip, frameIndex = 0, direction = 1;
 let ignoreMouse = true, dragging = false, pointerPressing = false, dragMoved = false, dragStart, pointerOffset, cursorPoint;
+let warnedHitTest = false;
 const pendingSignals = new Set();
 
 function loadImage(url) { return new Promise((resolve, reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = () => reject(new Error(`Could not load ${url}`)); image.src = url; }); }
@@ -140,7 +141,19 @@ async function applyPet(nextPayload) {
 }
 
 function pointerCoordinates(event) { const rect = canvas.getBoundingClientRect(); return { x: Math.max(0, Math.min(canvas.width - 1, Math.floor((event.clientX - rect.left) / rect.width * canvas.width))), y: Math.max(0, Math.min(canvas.height - 1, Math.floor((event.clientY - rect.top) / rect.height * canvas.height))) }; }
-function isVisiblePixel(event) { const { x, y } = pointerCoordinates(event), b = manifest.hitbox.bounds; if (x < b.x || y < b.y || x >= b.x + b.width || y >= b.y + b.height) return false; try { return context.getImageData(x, y, 1, 1).data[3] >= manifest.hitbox.alphaThreshold; } catch { return true; } }
+function isVisiblePixel(event) {
+  const { x, y } = pointerCoordinates(event), b = manifest.hitbox.bounds;
+  if (x < b.x || y < b.y || x >= b.x + b.width || y >= b.y + b.height) return false;
+  try {
+    return context.getImageData(x, y, 1, 1).data[3] >= manifest.hitbox.alphaThreshold;
+  } catch (error) {
+    if (!warnedHitTest) {
+      warnedHitTest = true;
+      console.warn('pet hit-test failed; treating pixel as visible', error);
+    }
+    return true;
+  }
+}
 function updateClickThrough(ignore) { if (ignoreMouse === ignore) return; ignoreMouse = ignore; runtimeAPI.setIgnoreMouse(ignore); }
 canvas.addEventListener('pointermove', (event) => {
   if (model.schemaVersion === 3 && pointerPressing) {
@@ -197,6 +210,6 @@ runtimeAPI.onFallFinished(() => signalPlayer('floor-impact'));
 runtimeAPI.onCursorNear((point) => { cursorPoint = point; runCommand(controller.interact('pointer')); });
 runtimeAPI.onCursorChaseArrived(({ direction: nextDirection }) => { direction = nextDirection; signalPlayer('motion-finished'); });
 runtimeAPI.onCursorChaseReturned(() => { signalPlayer('motion-finished'); runtimeAPI.persistPosition(); });
-motionQuery.addEventListener('change', (event) => { if (controller) { controller.setReducedMotion(event.matches); if (event.matches && player.currentPhase()?.motion && player.currentPhase().motion !== 'fall') { runtimeAPI.stopWalk(); player.cancel(); controller.current = null; showBase(); } } });
+motionQuery.addEventListener('change', (event) => { if (controller) { controller.setReducedMotion(event.matches); if (event.matches && player.currentPhase()?.motion && player.currentPhase().motion !== 'fall') { runtimeAPI.stopWalk(); player.cancel(); controller.cancelCurrent(); showBase(); } } });
 runtimeAPI.onPetChanged((next) => applyPet(next).catch(() => applyPet({ fallback: true, paused: false, scale: 0.6, activityLevel: 'balanced' })));
 runtimeAPI.getActivePet().then(applyPet).catch(() => applyPet({ fallback: true, paused: false, scale: 0.6, activityLevel: 'balanced' }));

@@ -15,7 +15,7 @@ jobs:
       - run: python -m pip install -r requirements-dev.txt
       - run: python -m json.tool evals/evals.json
       - run: python -m unittest discover -s tests -v
-      - run: python -m py_compile scripts/build_title_reference_sheet.py scripts/composite_title_layer.py scripts/build_desktop_pet_pack.py scripts/validate_desktop_pet_pack.py scripts/prepare_generated_animation_strips.py scripts/check_desktop_pet_environment.py scripts/install_desktop_pet_runtime.py
+      - run: python -m py_compile scripts/build_title_reference_sheet.py scripts/composite_title_layer.py scripts/build_desktop_pet_pack.py scripts/validate_desktop_pet_pack.py scripts/prepare_generated_animation_strips.py scripts/check_desktop_pet_environment.py scripts/install_desktop_pet_runtime.py scripts/desktop_pet.py
 
   npm-test:
     strategy:

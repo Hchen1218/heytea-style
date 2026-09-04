@@ -77,10 +77,10 @@ This branch never requires desktop-runner preflight. If the user selected both f
 
 Read `references/desktop-pet-workflow.md`, `references/desktop-pet-environment.md`, `references/mixed-media-style-guide.md`, and `references/desktop-pet-pack.md`.
 
-- For an approved `flavor-monster`, run `scripts/check_desktop_pet_environment.py --json --required-schema 3` only now, before motion generation.
+- For an approved `flavor-monster`, run `python3 scripts/desktop_pet.py doctor --json --required-schema 3` only now, before motion generation. The older `scripts/check_desktop_pet_environment.py` entry is a shim for the same command. Do not pass `--probe-registry` unless diagnosing npm connectivity.
 - For an explicit `source-faithful` request, first complete its three-candidate identity workflow and obtain explicit canonical-identity approval; then run the same environment gate before motion generation. Source-faithful remains schema v2 and flavor-monster uses schema v3.
 - If preflight reports missing or outdated components, explain the exact plan and request consent immediately before installation or upgrade. Never silently install or replace software, bypass operating-system warnings, or enable launch-at-login.
-- Continue only after preflight reports `ready`. Then create the mode-specific motion set, request motion approval, and only after approval build and validate the importable pack and delivery folder.
+- Continue only after preflight reports `ready`. Then create the mode-specific motion set, request motion approval, and only after approval run `python3 scripts/desktop_pet.py pack <pet-dir>` to build, validate, and write the delivery folder. The older `build_desktop_pet_pack.py` / `validate_desktop_pet_pack.py` scripts remain callable.
 
 For schema-v1 migration, preserve the original pack, create a new v2 draft, add the four missing states, and require fresh motion approval. Never overwrite or silently activate the v1 pack.
 

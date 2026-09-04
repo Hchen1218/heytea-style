@@ -7,8 +7,10 @@ Read this reference only after the user has explicitly approved a canonical iden
 Before generating any motion assets, run the read-only preflight:
 
 ```bash
-python scripts/check_desktop_pet_environment.py --json --required-schema 3
+python3 scripts/desktop_pet.py doctor --json --required-schema 3
 ```
+
+The older `scripts/check_desktop_pet_environment.py` entry is a shim for `desktop_pet.py doctor`. Registry probing is opt-in via `--probe-registry`.
 
 Interpret the result:
 
@@ -41,26 +43,37 @@ Never treat “make me a desktop pet” as permission to install software. Never
 First inspect the exact plan:
 
 ```bash
-python scripts/install_desktop_pet_runtime.py --json-plan
+python3 scripts/desktop_pet.py install --json-plan
+python3 scripts/desktop_pet.py install --json-plan --upgrade
 ```
+
+`--json-plan` must use the same flags you intend to pass with `--yes` (`--upgrade`, `--mirror`, `--install-toolchain`, `--no-launch`). Otherwise the printed plan can disagree with what `install()` will do.
 
 After the user explicitly approves:
 
 ```bash
-python scripts/install_desktop_pet_runtime.py --yes
+python3 scripts/desktop_pet.py install --yes
 ```
 
 When Node.js/npm are also missing and the preflight reports Homebrew or winget:
 
 ```bash
-python scripts/install_desktop_pet_runtime.py --yes --install-toolchain
+python3 scripts/desktop_pet.py install --yes --install-toolchain
 ```
 
 For an installed legacy runner that preflight marks `upgradeable`, explicit consent authorizes:
 
 ```bash
-python scripts/install_desktop_pet_runtime.py --yes --upgrade
+python3 scripts/desktop_pet.py install --yes --upgrade
 ```
+
+If `npm ci` or Electron downloads fail because the default registry is unreachable, retry with `--mirror` (npmmirror):
+
+```bash
+python3 scripts/desktop_pet.py install --yes --mirror
+```
+
+The JSON plan includes `reuseCachedBuild`. When a previous local `dist/` bundle matches the current runtime source hash, installation copies that bundle and skips `npm ci` and electron-builder. `scripts/install_desktop_pet_runtime.py` is a shim for `desktop_pet.py install`.
 
 The JSON report identifies the installed runner as `runtimeScope: "user"` or `"system"`. The install plan exposes the matching `installMode`: `in-place-upgrade` for a per-user legacy runner and `user-side-by-side` for a system-wide legacy runner.
 
@@ -80,14 +93,16 @@ On macOS it can use Homebrew to install Node.js. On Windows it can use winget to
 The approved installer may perform only the missing steps:
 
 1. install Node.js/npm through the detected trusted package manager when explicitly allowed;
-2. run `npm ci` inside the bundled runner source when dependencies are absent or drifted;
-3. build only the current operating-system target;
-4. copy the unsigned local MVP into the per-user application directory;
+2. reuse a hash-matching local `dist/` bundle when one exists; otherwise run `npm ci` inside the bundled runner source when dependencies are absent or drifted;
+3. build only the current operating-system target, unless a matching cached bundle is reused;
+4. copy the unsigned local MVP into the per-user application directory, clear the macOS quarantine xattr on that local copy, and apply an ad-hoc signature so Finder does not mark it as damaged;
 5. launch the runner once for verification.
+
+A matching cached bundle is identified by a source hash over `src/**`, `package.json`, `package-lock.json`, and `scripts/after-pack.js`. The hash is stamped into the built app after a successful `--self-test`. Clearing quarantine applies only to the locally built copy the installer just wrote; it does not disable Gatekeeper, SIP, or SmartScreen.
 
 Before an old runner is stopped or any application is copied, the build must pass both layers of verification: the packaging hook parses `app.asar` and confirms `package.json` plus the declared main entry, then the built executable runs `--self-test` without creating a window, tray, or user-data state. `default_app.asar` is Electron's template fallback and is deliberately absent from a finished build; its absence is not a packaging failure.
 
-If the standard build fails with an archive-stream, `unzipper`, or `Invalid package` signature, the installer may retry exactly once. The retry runs Electron's bundled `install-electron` helper, then points electron-builder at the checksum-verified unpacked `node_modules/electron/dist` directory. It never deletes or mutates the user's global Electron cache. A second failure stops installation and returns structured stage, version, log-tail, fallback, and artifact-check diagnostics.
+If the standard build fails with an archive-stream, `unzipper`, or `Invalid package` signature, the installer may retry exactly once. The retry runs Electron's bundled `install-electron` helper, then points electron-builder at the checksum-verified unpacked `node_modules/electron/dist` directory. It never deletes or mutates the user's global Electron cache. A second failure stops installation and returns structured stage, version, log-tail, fallback, artifact-check, Chinese `summary`, and `nextSteps` diagnostics. Network failures include an explicit `--mirror` retry suggestion.
 
 It does not:
 

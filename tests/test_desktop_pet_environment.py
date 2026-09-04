@@ -13,11 +13,20 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from check_desktop_pet_environment import detect_environment
+from check_desktop_pet_environment import (
+    compute_runtime_source_hash,
+    detect_environment,
+    installed_hash_path,
+    select_mac_app,
+    write_source_hash,
+    bundle_hash_path,
+)
 from install_desktop_pet_runtime import (
     CapturedCommandError,
     InstallError,
+    NPM_MIRROR_ENV,
     RuntimeBuildError,
+    build_diagnostic,
     build_runtime,
     install,
     install_built_runtime,
@@ -30,6 +39,13 @@ RUNTIME_DEV_DEPENDENCIES = RUNTIME_PACKAGE["devDependencies"]
 ELECTRON_VERSION = RUNTIME_DEV_DEPENDENCIES["electron"]
 ELECTRON_BUILDER_VERSION = RUNTIME_DEV_DEPENDENCIES["electron-builder"]
 ASAR_VERSION = RUNTIME_DEV_DEPENDENCIES["@electron/asar"]
+
+
+def report_ns(**kwargs):
+    kwargs.setdefault("cachedBuildReady", False)
+    kwargs.setdefault("installedSourceMatches", False)
+    kwargs.setdefault("sourceHash", None)
+    return SimpleNamespace(**kwargs)
 
 
 def make_runtime(root: Path, *, dependencies: bool = False, windows: bool = False, version: str = "3.1.0") -> Path:
@@ -206,8 +222,8 @@ class DesktopPetEnvironmentTest(unittest.TestCase):
             installDirectory="C:/Users/A/AppData/Local/Programs/Doodle Desktop Pet",
             runtimeRoot="C:/runtime",
         )
-        user = make_plan(SimpleNamespace(**common, runtimeScope="user", runtimePath="C:/Users/A/AppData/Local/Programs/Doodle Desktop Pet/Doodle Desktop Pet.exe"))
-        system = make_plan(SimpleNamespace(**common, runtimeScope="system", runtimePath="C:/Program Files/Doodle Desktop Pet/Doodle Desktop Pet.exe"))
+        user = make_plan(report_ns(**common, runtimeScope="user", runtimePath="C:/Users/A/AppData/Local/Programs/Doodle Desktop Pet/Doodle Desktop Pet.exe"))
+        system = make_plan(report_ns(**common, runtimeScope="system", runtimePath="C:/Program Files/Doodle Desktop Pet/Doodle Desktop Pet.exe"))
         self.assertEqual(user.installMode, "in-place-upgrade")
         self.assertTrue(user.upgradeExisting)
         self.assertIsNotNone(user.backupPath)
@@ -349,7 +365,7 @@ class DesktopPetEnvironmentTest(unittest.TestCase):
         self.assertEqual(raised.exception.diagnostic["attempt"], "standard")
 
     def test_validation_failure_happens_before_quit_or_install(self) -> None:
-        report = SimpleNamespace(
+        report = report_ns(
             platform="macos", runtimeCompatible=False, runtimeInstalled=True, runtimeVersion="2.0.0",
             minimumRuntimeVersion="3.1.0", runtimePath="/Applications/Doodle Desktop Pet.app",
             runtimeScope="user", supported=True, sourceAvailable=True, sourceCompatible=True,
@@ -372,7 +388,7 @@ class DesktopPetEnvironmentTest(unittest.TestCase):
         copy_runtime.assert_not_called()
 
     def test_dependency_install_failure_returns_structured_diagnostic(self) -> None:
-        report = SimpleNamespace(
+        report = report_ns(
             platform="macos", runtimeCompatible=False, runtimeInstalled=False, runtimeVersion=None,
             minimumRuntimeVersion="3.1.0", runtimePath=None, runtimeScope=None, supported=True,
             sourceAvailable=True, sourceCompatible=True, sourceVersion="3.1.1", runtimeRoot="/runtime",
@@ -418,7 +434,7 @@ class DesktopPetEnvironmentTest(unittest.TestCase):
         self.assertEqual(raised.exception.diagnostic["attempt"], "standard")
 
     def test_dry_run_prints_quit_and_copy_without_validating(self) -> None:
-        report = SimpleNamespace(
+        report = report_ns(
             platform="macos", runtimeCompatible=False, runtimeInstalled=True, runtimeVersion="2.0.0",
             minimumRuntimeVersion="3.1.0", runtimePath="/Applications/Doodle Desktop Pet.app",
             runtimeScope="user", supported=True, sourceAvailable=True, sourceCompatible=True,
@@ -460,6 +476,139 @@ class DesktopPetEnvironmentTest(unittest.TestCase):
             self.assertFalse(report.supported)
             self.assertEqual(report.status, "unsupported")
             self.assertEqual(report.nextAction, "stop")
+
+    @patch("check_desktop_pet_environment.command_version", return_value="v22.12.0")
+    def test_matching_cached_build_skips_npm_ci_and_pack(self, _version) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            runtime = make_runtime(base / "runtime", dependencies=False)
+            source_hash = compute_runtime_source_hash(runtime)
+            built = runtime / "dist" / "mac-arm64" / "Doodle Desktop Pet.app"
+            make_mac_app(built, "3.1.2")
+            write_source_hash(bundle_hash_path("macos", built), source_hash or "")
+            report = detect_environment(
+                platform_name="macos",
+                runtime_root=runtime,
+                home=base / "home",
+                which={"node": "/bin/node", "npm": "/bin/npm"}.get,
+            )
+            self.assertTrue(report.cachedBuildReady)
+            self.assertEqual(report.sourceHash, source_hash)
+            plan = make_plan(report)
+            self.assertTrue(plan.reuseCachedBuild)
+            self.assertIsNone(plan.installDependencies)
+            self.assertIsNone(plan.buildRuntime)
+            with (
+                patch("install_desktop_pet_runtime.build_runtime") as build,
+                patch("install_desktop_pet_runtime.run_captured") as npm_ci,
+                patch("install_desktop_pet_runtime.validate_built_runtime"),
+                patch("install_desktop_pet_runtime.stamp_built_source_hash"),
+                patch("install_desktop_pet_runtime.install_built_runtime", return_value=base / "Applications" / "Doodle Desktop Pet.app"),
+            ):
+                install(report, allow_toolchain=False, allow_upgrade=False, launch=False, dry_run=False)
+            build.assert_not_called()
+            npm_ci.assert_not_called()
+
+    def test_network_failure_diagnostic_recommends_mirror(self) -> None:
+        report = SimpleNamespace(nodeVersion="v24.11.1", npmVersion="11.6.1", electronVersion=None, electronBuilderVersion=None)
+        error = CapturedCommandError(["npm", "ci"], 1, "request to https://registry.npmjs.org failed: ETIMEDOUT")
+        diagnostic = build_diagnostic(report, stage="dependencies", attempt="npm-ci", fallback_used=False, error=error)
+        self.assertTrue(diagnostic["networkFailure"])
+        self.assertIn("npm ci", diagnostic["summary"])
+        self.assertTrue(any("--mirror" in step for step in diagnostic["nextSteps"]))
+
+    def test_mirror_passes_npm_registry_into_subprocess_env(self) -> None:
+        report = report_ns(
+            platform="macos", runtimeCompatible=False, runtimeInstalled=False, runtimeVersion=None,
+            minimumRuntimeVersion="3.1.0", runtimePath=None, runtimeScope=None, supported=True,
+            sourceAvailable=True, sourceCompatible=True, sourceVersion="3.1.1", runtimeRoot="/runtime",
+            nodeSupported=True, npmAvailable=True, dependenciesInstalled=False, dependencyStatus="missing",
+            packageManager="brew", electronVersion=None, electronBuilderVersion=None,
+            nodeVersion="v24.11.1", npmVersion="11.6.1", installDirectory="/Applications",
+        )
+        failure = CapturedCommandError(["npm", "ci"], 7, "registry unavailable")
+        with (
+            patch("install_desktop_pet_runtime.shutil.which", side_effect=lambda name: f"/bin/{name}"),
+            patch("install_desktop_pet_runtime.run_captured", side_effect=failure) as captured,
+        ):
+            with self.assertRaises(RuntimeBuildError):
+                install(report, allow_toolchain=False, allow_upgrade=False, launch=False, dry_run=False, use_mirror=True)
+        self.assertEqual(captured.call_args.kwargs["env"]["npm_config_registry"], NPM_MIRROR_ENV["npm_config_registry"])
+
+    def test_cached_bundle_prefers_native_arch(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            dist = Path(temp)
+            generic = dist / "mac" / "Doodle Desktop Pet.app"
+            arm = dist / "mac-arm64" / "Doodle Desktop Pet.app"
+            make_mac_app(generic, "3.1.0")
+            make_mac_app(arm, "3.1.0")
+            with patch("check_desktop_pet_environment.py_platform.machine", return_value="arm64"):
+                self.assertEqual(select_mac_app(dist), arm)
+            with patch("check_desktop_pet_environment.py_platform.machine", return_value="x86_64"):
+                self.assertEqual(select_mac_app(dist), generic)
+
+    @patch("check_desktop_pet_environment.command_version", return_value="v22.12.0")
+    def test_compatible_runtime_with_changed_source_agrees_between_plan_and_install(self, _version) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            home = base / "home"
+            app = home / "Applications" / "Doodle Desktop Pet.app"
+            make_mac_app(app, "3.1.0")
+            runtime = make_runtime(base / "runtime", dependencies=True)
+            source_hash = compute_runtime_source_hash(runtime)
+            write_source_hash(installed_hash_path("macos", app), "stale-hash")
+            built = runtime / "dist" / "mac-arm64" / "Doodle Desktop Pet.app"
+            make_mac_app(built, "3.1.0")
+            write_source_hash(bundle_hash_path("macos", built), source_hash or "")
+            report = detect_environment(
+                platform_name="macos",
+                runtime_root=runtime,
+                home=home,
+                which={"node": "/bin/node", "npm": "/bin/npm"}.get,
+            )
+            self.assertTrue(report.runtimeCompatible)
+            self.assertFalse(report.installedSourceMatches)
+            self.assertTrue(report.cachedBuildReady)
+
+            preview = make_plan(report, allow_upgrade=False)
+            self.assertEqual(preview.installMode, "launch-existing")
+            self.assertFalse(preview.reuseCachedBuild)
+            self.assertIsNone(preview.buildRuntime)
+
+            upgrade_plan = make_plan(report, allow_upgrade=True)
+            self.assertEqual(upgrade_plan.installMode, "in-place-upgrade")
+            self.assertTrue(upgrade_plan.reuseCachedBuild)
+            self.assertIsNone(upgrade_plan.buildRuntime)
+
+            with (
+                patch("install_desktop_pet_runtime.build_runtime") as build,
+                patch("install_desktop_pet_runtime.run_captured") as npm_ci,
+                patch("install_desktop_pet_runtime.validate_built_runtime"),
+                patch("install_desktop_pet_runtime.stamp_built_source_hash"),
+                patch("install_desktop_pet_runtime.install_built_runtime") as copy_runtime,
+                patch("install_desktop_pet_runtime.launch_runtime") as launch,
+            ):
+                install(report, allow_toolchain=False, allow_upgrade=False, launch=False, dry_run=False)
+            build.assert_not_called()
+            npm_ci.assert_not_called()
+            copy_runtime.assert_not_called()
+            launch.assert_not_called()
+
+            with (
+                patch("install_desktop_pet_runtime.build_runtime") as build,
+                patch("install_desktop_pet_runtime.run_captured") as npm_ci,
+                patch("install_desktop_pet_runtime.validate_built_runtime"),
+                patch("install_desktop_pet_runtime.stamp_built_source_hash"),
+                patch(
+                    "install_desktop_pet_runtime.install_built_runtime",
+                    return_value=app,
+                ) as copy_runtime,
+                patch("install_desktop_pet_runtime.request_runtime_quit"),
+            ):
+                install(report, allow_toolchain=False, allow_upgrade=True, launch=False, dry_run=False)
+            build.assert_not_called()
+            npm_ci.assert_not_called()
+            copy_runtime.assert_called_once()
 
 
 if __name__ == "__main__":

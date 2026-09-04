@@ -74,25 +74,21 @@ A loop may not complete on `animation-finished`; it needs an explicit external e
 Before motion approval, create artifacts only:
 
 ```bash
-python scripts/build_desktop_pet_pack.py path/to/pet-id \
-  --review-only --review-dir path/to/review
+python3 scripts/desktop_pet.py review path/to/pet-id
 ```
 
-For v2, the required-only contact sheet is 3×4. For v3, the overview contains one cell per behavior and `behavior-timelines.png` shows phase boundaries and completion events. Both formats also produce `motion-preview.gif` and `frame-audit.png`, which places every frame on a contrasting dark background. After explicit approval, build and independently validate:
+For v2, the required-only contact sheet is 3×4. For v3, the overview contains one cell per behavior and `behavior-timelines.png` shows phase boundaries and completion events. Both formats also produce `motion-preview.gif` and `frame-audit.png`, which places every frame on a contrasting dark background. After explicit approval, build, independently validate, and write the delivery folder in one step:
 
 ```bash
-python scripts/build_desktop_pet_pack.py path/to/pet-id --out path/to/pet-id.zip --review-dir path/to/review
-python scripts/validate_desktop_pet_pack.py path/to/pet-id.zip
+python3 scripts/desktop_pet.py pack path/to/pet-id
 ```
 
-For a non-technical-user delivery, build the platform folder in the same validated step:
+Defaults write the ZIP, review artifacts, and start/quit entrypoints under `generated-pets/`. Pass `--out`, `--review-dir`, and `--delivery-dir` to override. The older `build_desktop_pet_pack.py` / `validate_desktop_pet_pack.py` commands remain valid. Validation errors name the file and frame and include a one-line fix hint; `--json` is available on `validate_desktop_pet_pack.py`.
+
+For a non-technical-user delivery, `pack` already writes the platform folder. To target another OS:
 
 ```bash
-python scripts/build_desktop_pet_pack.py path/to/pet-id \
-  --out path/to/pet-id.zip \
-  --review-dir path/to/review \
-  --delivery-dir path/to/pet-delivery \
-  --delivery-platform macos   # or windows; use all only for cross-platform distribution
+python3 scripts/desktop_pet.py pack path/to/pet-id --delivery-platform windows
 ```
 
 The delivery folder contains the ZIP, `preview.png`, `使用说明.txt`, and two lightweight entrypoints: `启动桌宠` passes `--open-pet` to the installed shared runner; `关闭桌宠` passes `--quit`. macOS uses executable `.command` files and Windows uses `.cmd` files. Do not place the Electron application, dependencies, imported runtime data, or a second copy of the runner in this folder.
